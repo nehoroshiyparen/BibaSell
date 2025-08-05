@@ -1,5 +1,5 @@
 import { injectable } from "inversify";
-import { RewardServiceAbstract } from "../abstraction/reward.service.abstraction";
+import { RewardServiceAbstract } from "src/types/abstractions/services/reward.service.abstraction";
 import { Reward } from "src/database/models/Reward.model";
 import { TypeofRewardSchema } from "src/types/schemas/reward/Reward.schema";
 import { RewardArray } from "src/types/schemas/reward/RewardArray.schema";

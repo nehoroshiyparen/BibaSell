@@ -5,7 +5,7 @@ import { PersonArray } from "src/types/schemas/person/PersonArraySchema";
 import { PersonFilters } from "src/types/interfaces/filters/PersonFilters.interface";
 import { ApiError } from "src/utils/ApiError/ApiError";
 import { RethrowApiError } from "src/utils/ApiError/RethrowApiError";
-import { PersonServiceAbstract } from "../abstraction/person.service.abstraction";
+import { PersonServiceAbstract } from "../types/abstractions/services/person.service.abstraction";
 import { TYPES } from "src/di/types";
 
 @injectable()
@@ -44,10 +44,6 @@ export class PersonServiceImpl implements PersonServiceAbstract {
 
     async getFilteredPersons(filters: PersonFilters): Promise<Person[] | null> {
         try {
-            if (!filters.name && !filters.surname && !filters.patronymic && !filters.rank) {
-                throw ApiError.BadRequest(`There must be at least one filtered param`)
-            }
-
             const candidates = await Person.findAll({
                 where: {
                     ...filters

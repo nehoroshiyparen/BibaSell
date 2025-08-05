@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
 import { TYPES } from "src/di/types";
-import { RewardServiceAbstract } from "src/services/abstraction/reward.service.abstraction";
+import { RewardServiceAbstract } from "src/types/abstractions/services/reward.service.abstraction";
 import { TypeofRewardSchema } from "src/types/schemas/reward/Reward.schema";
 import { RewardArraySchema } from "src/types/schemas/reward/RewardArray.schema";
 import { SendError, SendResponse } from "src/utils/http";

@@ -7,7 +7,7 @@ import { PersonRouter } from "src/routes/person.routes";
 import { IndexRouter } from "src/routes";
 import { DatabaseAbstract } from "src/types/abstractions";
 import { DatabaseImpl } from "src/database/database.impl";
-import { RewardServiceAbstract } from "src/services/abstraction/reward.service.abstraction";
+import { RewardServiceAbstract } from "src/types/abstractions/services/reward.service.abstraction";
 import { RewardServiceImpl } from "src/services/impl/reward.service.impl";
 import { RewardControllerImpl } from "src/controllers/reward.controller";
 import { RewardRouter } from "src/routes/reward.routes";
