@@ -38,10 +38,15 @@ export class AppImpl implements AppAbstract {
         await this.#database.setup()
 
         this.#app.use('/api', this.#router)
-        this.#app.use(...this.#middlewares)
+        this.setupMiddlewares(this.#middlewares)
 
         this.#app.listen(this.port, () => {
             console.log(`App '${this.name}' started on port ${this.port}`)
         })
+    }
+
+    private setupMiddlewares(middlewares: RequestHandler[]) {
+        if (middlewares.length === 0) return
+        this.#app.use(...middlewares)
     }
 }

@@ -10,11 +10,11 @@ export class DatabaseImpl implements DatabaseAbstract {
   constructor() {
     this.sequelize = new Sequelize({
       dialect: 'postgres',
-      host: process.env.DB_HOST,
-      database: process.env.DB_NAME,
-      username: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      logging: false
+      host: 'db', // или process.env.DB_HOST, если переменная точно есть
+      port: 5432, // или Number(process.env.DB_PORT)
+      username: 'nehoroshiyparen', // ⚠️ Жёстко прописанное значение
+      password: '1212', // ⚠️ И пароль тоже
+      database: 'BIBACELL',
     });
   }
 

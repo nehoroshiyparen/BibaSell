@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --poll --interval 500 --transpile-only --require tsconfig-paths/register src/index.ts",
+    "dev": "ts-node-dev --respawn --transpile-only --poll --interval 500 --require tsconfig-paths/register src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js"
   },
@@ -22,6 +22,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "debug": "^4.4.1",
     "dotenv": "^17.2.0",
     "inversify": "^7.7.0",
     "pg": "^8.16.3",
