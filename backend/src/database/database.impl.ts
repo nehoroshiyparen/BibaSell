@@ -1,32 +1,39 @@
-import { injectable } from 'inversify'
-import { Sequelize } from 'sequelize'
-import { DatabaseAbstract } from 'src/types/abstractions'
+import { Sequelize } from 'sequelize';
+import { injectable } from 'inversify';
+import { DatabaseAbstract } from '../types/abstractions';
+import { ISequelizeModel } from 'src/types/abstractions/sequelize.model.abstraction';
 
 @injectable()
 export class DatabaseImpl implements DatabaseAbstract {
-    name: string
-    #database: Sequelize
+  private sequelize: Sequelize;
 
-    constructor (
-        name: string,
-        database: Sequelize
-    ) {
-        this.name = name
-        this.#database = database
+  constructor() {
+    this.sequelize = new Sequelize({
+      dialect: 'postgres',
+      host: process.env.DB_HOST,
+      database: process.env.DB_NAME,
+      username: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      logging: false
+    });
+  }
+
+  public async setup() {
+    try {
+      await this.sequelize.authenticate();
+      await this.sequelize.sync();
+      console.log('Database connected');
+    } catch (error) {
+      console.error('Database connection error:', error);
+      throw error;
     }
+  }
 
-    public async setup() {
-        try {
-            await this.#database.authenticate()
-            await this.#database.sync({ alter: true })
+  public registerModels(model: ISequelizeModel[]): void {
+    model.forEach(model => model.initialize(this.sequelize))
+  }
 
-            console.log(`🟢 Database '${this.name}' is started`)
-        } catch (e) {
-            console.log(`🔴 Failed to connect database: ${e}`)
-        }
-    }
-
-    public getDatabase() {
-        return this.#database
-    }
+  public getDatabase() {
+    return this.sequelize;
+  }
 }

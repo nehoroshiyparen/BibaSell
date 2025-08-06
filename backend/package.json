@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "node --require tsconfig-paths/register node_modules/ts-node-dev/lib/bin.js --respawn --transpile-only src/index.ts",
+    "dev": "ts-node-dev --respawn --poll --interval 500 --transpile-only --require tsconfig-paths/register src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js"
   },
@@ -14,11 +14,12 @@
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/node": "^24.0.14",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "eslint-plugin-import": "^2.32.0",
     "express": "^5.1.0",
     "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.9.2"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "dotenv": "^17.2.0",
@@ -26,6 +27,7 @@
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.7",
+    "ts-node-dev": "^2.0.0",
     "zod": "^4.0.14"
   }
 }

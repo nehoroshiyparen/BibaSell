@@ -8,7 +8,7 @@ export class PersonRouter {
     private router: Router
 
     constructor(
-        @inject(TYPES.PersonControllerImpl) private personController: PersonControllerImpl
+        @inject(TYPES.PersonController) private personController: PersonControllerImpl
     ) {
         this.router = Router()
         this.setup()

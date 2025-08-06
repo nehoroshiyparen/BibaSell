@@ -1,9 +1,13 @@
 import express, { Express, RequestHandler, Router } from 'express'
-import { container } from 'src/di/container'
-import { IndexRouter } from 'src/routes'
-import { AppAbstract } from './types/abstractions'
-import { injectable } from 'inversify'
+import { container } from './di/container'
+import { IndexRouter } from 'src/routes/index'
+import { AppAbstract, DatabaseAbstract } from './types/abstractions'
+import { inject, injectable } from 'inversify'
 import { DatabaseImpl } from './database/database.impl'
+import { TYPES } from './di/types'
+import { ENV } from './config'
+import { Person } from './database/models/Person.model'
+import { Reward } from './database/models/Reward.model'
 
 @injectable()
 export class AppImpl implements AppAbstract {
@@ -17,19 +21,20 @@ export class AppImpl implements AppAbstract {
     #middlewares: RequestHandler[] = []
 
     constructor (
-        name: string,
-        port: number,
+        @inject(TYPES.IndexRouter) private readonly indexRouter: IndexRouter,
+        @inject(TYPES.Sequelize) private readonly database: DatabaseImpl
     ) {
-        this.#router = container.get(IndexRouter).getRouter()
-        this.#database = container.get(DatabaseImpl)
+        this.#router = indexRouter.getRouter()
+        this.#database = database
 
-        this.name = name
-        this.port = port
+        this.name = ENV.APP_NAME
+        this.port = ENV.APP_PORT
 
         this.#middlewares = []
     }
 
     public async setup() {
+        this.#database.registerModels([Person, Reward])
         await this.#database.setup()
 
         this.#app.use('/api', this.#router)

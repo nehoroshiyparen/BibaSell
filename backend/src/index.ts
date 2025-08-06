@@ -1,7 +1,8 @@
-import { AppStructure } from "./types/structure";
+import { AppImpl } from "./app.impl";
 import { ENV } from "./config";
-import { db } from "./database";
+import { container } from "./di/container";
+import { TYPES } from "./di/types";
 
-const app = new AppStructure(ENV.APP_NAME, ENV.APP_PORT, [db])
+const app = container.get<AppImpl>(TYPES.App)
 
 app.setup()

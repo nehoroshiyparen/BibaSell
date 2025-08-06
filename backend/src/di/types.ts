@@ -1,4 +1,5 @@
 export const TYPES = {
+    App: Symbol.for('App'),
     Sequelize: Symbol.for('Sequelize'),
 
     PersonService: Symbol.for('PersonService'),

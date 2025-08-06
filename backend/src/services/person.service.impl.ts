@@ -7,6 +7,7 @@ import { ApiError } from "src/utils/ApiError/ApiError";
 import { RethrowApiError } from "src/utils/ApiError/RethrowApiError";
 import { PersonServiceAbstract } from "../types/abstractions/services/person.service.abstraction";
 import { TYPES } from "src/di/types";
+import { Reward } from "src/database/models/Reward.model";
 
 @injectable()
 export class PersonServiceImpl implements PersonServiceAbstract {
@@ -16,7 +17,15 @@ export class PersonServiceImpl implements PersonServiceAbstract {
 
     async getPersonById(id: number) {
         try {
-            const person = await Person.findByPk(id)
+            const person = await Person.findByPk(id, {
+                include: [
+                    {
+                        model: Reward,
+                        as: 'rewards',
+                        through: { attributes: [] }
+                    }
+                ]
+            })
 
             if (!person) {
                 throw ApiError.NotFound('Person not found')

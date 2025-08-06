@@ -1,19 +1,21 @@
 import { Container } from "inversify";
-import { PersonServiceImpl } from "src/services/impl/person.service.impl";
+import { PersonServiceImpl } from "src/services/person.service.impl";
 import { TYPES } from "./types";
-import { PersonServiceAbstract } from "src/services";
+import { PersonServiceAbstract } from "src/types/abstractions/services/person.service.abstraction";
 import { PersonControllerImpl } from "src/controllers/person.controller";
 import { PersonRouter } from "src/routes/person.routes";
 import { IndexRouter } from "src/routes";
-import { DatabaseAbstract } from "src/types/abstractions";
+import { AppAbstract, DatabaseAbstract } from "src/types/abstractions";
 import { DatabaseImpl } from "src/database/database.impl";
 import { RewardServiceAbstract } from "src/types/abstractions/services/reward.service.abstraction";
-import { RewardServiceImpl } from "src/services/impl/reward.service.impl";
+import { RewardServiceImpl } from "src/services/reward.service.impl";
 import { RewardControllerImpl } from "src/controllers/reward.controller";
 import { RewardRouter } from "src/routes/reward.routes";
+import { AppImpl } from "src/app.impl";
 
 const container = new Container()
 
+container.bind<AppAbstract>(TYPES.App).to(AppImpl).inSingletonScope()
 container.bind<DatabaseAbstract>(TYPES.Sequelize).to(DatabaseImpl).inSingletonScope()
 
 // Сервисы
