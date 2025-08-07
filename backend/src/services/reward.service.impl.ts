@@ -1,4 +1,4 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { RewardServiceAbstract } from "src/types/abstractions/services/reward.service.abstraction";
 import { Reward } from "src/database/models/Reward.model";
 import { TypeofRewardSchema } from "src/types/schemas/reward/Reward.schema";
@@ -6,16 +6,13 @@ import { RewardArray } from "src/types/schemas/reward/RewardArray.schema";
 import { RethrowApiError } from "src/utils/ApiError/RethrowApiError";
 import { ApiError } from "src/utils/ApiError/ApiError";
 import { Sequelize } from "sequelize";
+import { TYPES } from "src/di/types";
 
 @injectable()
 export class RewardServiceImpl implements RewardServiceAbstract {
-    private sequelize: Sequelize
-
-    constructor (
-        sequelize: Sequelize
-    ) {
-        this.sequelize = sequelize
-    }
+    constructor(
+        @inject(TYPES.Sequelize) private sequelize: Sequelize
+    ) {}
 
     async getRewardById(id: number): Promise<Reward> {
         try {

@@ -1,5 +1,4 @@
 import express, { Express, RequestHandler, Router } from 'express'
-import { container } from './di/container'
 import { IndexRouter } from 'src/routes/index'
 import { AppAbstract, DatabaseAbstract } from './types/abstractions'
 import { inject, injectable } from 'inversify'
@@ -38,7 +37,7 @@ export class AppImpl implements AppAbstract {
         this.#database.registerModels([Person, Reward, PersonRewards])
         await this.#database.setup()
 
-        this.#app.use('/api', this.#router)
+        this.#app.use(this.#router)
         this.setupMiddlewares(this.#middlewares)
 
         this.#app.listen(this.port, () => {

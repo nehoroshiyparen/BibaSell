@@ -10,17 +10,20 @@ import { RouterAbstract } from "src/types/abstractions/router.abstraction";
 export class IndexRouter implements RouterAbstract {
     private router: Router
 
-    constructor(
-        @inject(TYPES.PersonRouter) private personRouter: PersonRouter
-    ) {
+    constructor () {
         this.router = Router()
+        this.setup()
     }
 
     async setup() {
-        ROUTES.forEach(({path, router}) => {
-            const instance: RouterAbstract = container.get(router)
-            this.router.use(path, instance.getRouter())
-        })
+        await Promise.all(ROUTES.map(async ({path, router}) => {
+            try {
+                const instance = await container.getAsync<RouterAbstract>(router);
+                this.router.use('/api' + path, instance.getRouter());
+            } catch (error) {
+                console.error(`❌ Failed ${path}:`, error);
+            }
+        }));
     }
 
     getRouter() { return this.router }

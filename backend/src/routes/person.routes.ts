@@ -15,11 +15,11 @@ export class PersonRouter {
     }
 
     async setup() {
-        this.router.get('/:id', this.personController.getPersonById)
-        this.router.get('/pagination', this.personController.getPersons)
-        this.router.get('/filtered', this.personController.getFilteredPersons)
-        this.router.patch('/pack', this.personController.uploadPersonPack)
-        this.router.delete('/pack', this.personController.deletePersons)
+        this.router.get('/:id', this.personController.getPersonById.bind(this.personController))
+        this.router.get('/pagination', this.personController.getPersons.bind(this.personController))
+        this.router.get('/filtered', this.personController.getFilteredPersons.bind(this.personController))
+        this.router.patch('/pack', this.personController.uploadPersonPack.bind(this.personController))
+        this.router.delete('/pack', this.personController.deletePersons.bind(this.personController))
     }
 
     getRouter(): Router { return this.router }

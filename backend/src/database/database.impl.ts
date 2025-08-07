@@ -18,8 +18,6 @@ export class DatabaseImpl implements DatabaseAbstract {
       await this.sequelize.authenticate();
       await this.sequelize.sync();
 
-      console.log(ENV)
-
       console.log('Database connected');
     } catch (error) {
       console.error('Database connection error:', error);

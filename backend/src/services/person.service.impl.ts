@@ -16,6 +16,8 @@ export class PersonServiceImpl implements PersonServiceAbstract {
     ) {}
 
     async getPersonById(id: number) {
+        console.log(id)
+
         try {
             const person = await Person.findByPk(id, {
                 include: [
