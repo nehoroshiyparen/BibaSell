@@ -8,6 +8,7 @@ import { TYPES } from './di/types'
 import { ENV } from './config'
 import { Person } from './database/models/Person.model'
 import { Reward } from './database/models/Reward.model'
+import { PersonRewards } from './database/models/PersonRewards.model'
 
 @injectable()
 export class AppImpl implements AppAbstract {
@@ -34,7 +35,7 @@ export class AppImpl implements AppAbstract {
     }
 
     public async setup() {
-        this.#database.registerModels([Person, Reward])
+        this.#database.registerModels([Person, Reward, PersonRewards])
         await this.#database.setup()
 
         this.#app.use('/api', this.#router)

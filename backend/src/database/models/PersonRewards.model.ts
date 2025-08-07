@@ -23,7 +23,7 @@ export class PersonRewards extends Model {
           onUpdate: 'CASCADE',
         }
       }, {
-        sequelize: sequelize,
+        sequelize,
         modelName: 'PersonRewards',
         tableName: 'person_rewards',
         timestamps: false,
@@ -34,19 +34,23 @@ export class PersonRewards extends Model {
           },
         ]
       })
+      
+      this.setupAssociations()
+    }
+
+    private static setupAssociations() {
+      Person.belongsToMany(Reward, {
+        through: PersonRewards,
+        foreignKey: 'person_id',
+        otherKey: 'reward_id',
+        as: 'rewards'
+      })
+
+      Reward.belongsToMany(Person, {
+        through: PersonRewards,
+        foreignKey: 'reward_id',
+        otherKey: 'person_id',
+        as: 'persons'
+      })
     }
 }
-
-Person.belongsToMany(Reward, {
-  through: PersonRewards,
-  foreignKey: 'person_id',
-  otherKey: 'reward_id',
-  as: 'rewards'
-})
-
-Reward.belongsToMany(Person, {
-  through: PersonRewards,
-  foreignKey: 'reward_id',
-  otherKey: 'person_id',
-  as: 'persons'
-})
