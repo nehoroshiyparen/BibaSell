@@ -12,6 +12,9 @@ import { RewardServiceImpl } from "src/services/reward.service.impl";
 import { RewardControllerImpl } from "src/controllers/reward.controller";
 import { RewardRouter } from "src/routes/reward.routes";
 import { AppImpl } from "src/app.impl";
+import { ArticleServiceAbstract } from "src/types/abstractions/services/article.service.abstraction";
+import { ArticleServiceImpl } from "src/services/article.service.impl";
+import { ArticleControllerImpl } from "src/controllers/article.controller";
 
 const container = new Container()
 
@@ -21,10 +24,12 @@ container.bind<DatabaseAbstract>(TYPES.Sequelize).to(DatabaseImpl).inSingletonSc
 // Сервисы
 container.bind<PersonServiceAbstract>(TYPES.PersonService).to(PersonServiceImpl).inSingletonScope()
 container.bind<RewardServiceAbstract>(TYPES.RewardService).to(RewardServiceImpl).inSingletonScope()
+container.bind<ArticleServiceAbstract>(TYPES.ArticleService).to(ArticleServiceImpl).inSingletonScope()
 
 // Контроллеры
 container.bind<PersonControllerImpl>(TYPES.PersonController).to(PersonControllerImpl).inSingletonScope()
 container.bind<RewardControllerImpl>(TYPES.RewardController).to(RewardControllerImpl).inSingletonScope()
+container.bind<ArticleControllerImpl>(TYPES.ArticleController).to(ArticleControllerImpl).inSingletonScope()
 
 // Роутеры
 container.bind<PersonRouter>(TYPES.PersonRouter).to(PersonRouter).inSingletonScope()

@@ -7,6 +7,10 @@ import { PersonServiceAbstract } from "src/types/abstractions/services/person.se
 import { injectable, inject } from "inversify";
 import { TYPES } from "src/di/types";
 import { ApiError } from "src/utils/ApiError/ApiError";
+import { ValidateId } from "src/utils/validations/ids/id.validate";
+import { ValidatePaginationParams } from "src/utils/validations/paginationParams.validate";
+import { ValidateFilters } from "src/utils/validations/filtes.validate";
+import { ValidateIdArray } from "src/utils/validations/ids/idArray.validate";
 
 @injectable()
 export class PersonControllerImpl {
@@ -26,7 +30,7 @@ export class PersonControllerImpl {
         try {
             const id = Number(req.params.id)
 
-            if (isNaN(id) || id < 1) throw ApiError.BadRequest('Invalid person id')
+            ValidateId(id)
 
             const person = await this.personService.getPersonById(id)
 
@@ -48,7 +52,7 @@ export class PersonControllerImpl {
             const offset = Number(req.query.offset) || 0
             const limit = Math.min(Number(req.query.limit) || 20, 100)
 
-            if (offset < 0 || limit < 0) throw ApiError.BadRequest('Offset and limit must be positive numbers')
+            ValidatePaginationParams(offset, limit)
 
             const persons = await this.personService.getPersons(offset, limit)
 
@@ -74,7 +78,7 @@ export class PersonControllerImpl {
                 rank: String(req.query.rank),
             }
 
-            if (Object.values(filters).every(val => !val))  throw ApiError.BadRequest(`There must be at least one filtered param`)
+            ValidateFilters(filters)
 
             const persons = await this.personService.getFilteredPersons(filters)
 
@@ -116,8 +120,7 @@ export class PersonControllerImpl {
         try {
             const ids = String(req.query.ids).split(',').map(Number)
 
-            if (!ids.length) throw ApiError.BadRequest('No id provided for deletion')
-            if (ids.some(id => isNaN(id) || id < 1)) throw ApiError.BadRequest('All id must be positive numbers')
+            ValidateIdArray(ids)
 
             const { status } = await this.personService.deletePersons(ids)
 

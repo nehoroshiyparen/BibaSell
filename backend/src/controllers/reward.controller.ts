@@ -5,6 +5,10 @@ import { RewardServiceAbstract } from "src/types/abstractions/services/reward.se
 import { TypeofRewardSchema } from "src/types/schemas/reward/Reward.schema";
 import { RewardArraySchema } from "src/types/schemas/reward/RewardArray.schema";
 import { SendError, SendResponse } from "src/utils/http";
+import { ValidateFilters } from "src/utils/validations/filtes.validate";
+import { ValidateId } from "src/utils/validations/ids/id.validate";
+import { ValidateIdArray } from "src/utils/validations/ids/idArray.validate";
+import { ValidatePaginationParams } from "src/utils/validations/paginationParams.validate";
 
 @injectable()
 export class RewardControllerImpl {
@@ -15,6 +19,8 @@ export class RewardControllerImpl {
     async getRewardById(req: Request, res: Response) {
         try {
             const id = Number(req.params.id)
+
+            ValidateId(id)
 
             const reward = await this.rewardService.getRewardById(id)
 
@@ -28,6 +34,8 @@ export class RewardControllerImpl {
         try {
             const offset = Number(req.query.offset)
             const limit = Number(req.query.limit)
+
+            ValidatePaginationParams(offset, limit)
 
             const rewards = await this.rewardService.getRewards(offset, limit)
 
@@ -46,6 +54,8 @@ export class RewardControllerImpl {
                 addition: String(req.query.addition),
                 description: String(req.query.description)
             }
+
+            ValidateFilters(filters)
 
             const rewards = await this.rewardService.getFilteredRewards(filters)
 
@@ -71,6 +81,8 @@ export class RewardControllerImpl {
     async deleteRewards(req: Request, res: Response) {
         try {
             const ids = String(req.query).split(',').map(Number)
+
+            ValidateIdArray(ids)
 
             const { status } = await this.rewardService.deleteRewards(ids)
 
