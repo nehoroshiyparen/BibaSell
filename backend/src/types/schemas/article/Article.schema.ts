@@ -2,12 +2,11 @@ import z from "zod";
 
 export const ArticleSchema = z.object({
     title: z.string(),
-    slug: z.string(),
-    cover_image_url: z.string(),
-    author_username: z.string(),
+    author_username: z.string().optional(),
     content_markdown: z.string(),
-    content_html: z.string(),
-    is_published: z.string()
+    event_start_date: z.date().optional(),
+    event_end_date: z.date().optional(),
+    is_published: z.boolean().optional()
 })
 
 export type TypeofArticleSchema = z.infer<typeof ArticleSchema>

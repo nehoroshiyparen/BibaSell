@@ -1,13 +1,13 @@
 import { Sequelize } from "sequelize";
 import { inject, injectable } from "inversify";
 import { Person } from "src/database/models/Person.model";
-import { PersonArray } from "src/types/schemas/person/PersonArraySchema";
-import { PersonFilters } from "src/types/interfaces/filters/PersonFilters.interface";
+import { TypeofPersonArraySchema } from "src/types/schemas/person/PersonArraySchema";
 import { ApiError } from "src/utils/ApiError/ApiError";
 import { RethrowApiError } from "src/utils/ApiError/RethrowApiError";
 import { PersonServiceAbstract } from "../types/abstractions/services/person.service.abstraction";
 import { TYPES } from "src/di/types";
 import { Reward } from "src/database/models/Reward.model";
+import { TypeofPersonFiltersSchema } from "src/types/schemas/person/PersonFilters.schema";
 
 @injectable()
 export class PersonServiceImpl implements PersonServiceAbstract {
@@ -53,7 +53,7 @@ export class PersonServiceImpl implements PersonServiceAbstract {
         }
     }
 
-    async getFilteredPersons(filters: PersonFilters): Promise<Person[] | null> {
+    async getFilteredPersons(filters: TypeofPersonFiltersSchema): Promise<Person[] | null> {
         try {
             const candidates = await Person.findAll({
                 where: {
@@ -67,54 +67,87 @@ export class PersonServiceImpl implements PersonServiceAbstract {
         }
     }
     
-    async uploadPersonPack(persons: PersonArray): Promise<{ status: number }> {
-        const transaction = await this.sequelize.transaction()
-
-        const errorLimit = Math.floor(persons.length/2)
-        let errorCounter = 0
-
-        persons.forEach(async (person) => {
-            try {
-                await Person.create(person, { transaction })
-                if (errorCounter >= errorLimit) {
-                    await transaction.rollback()
-                    throw ApiError.BadRequest(`Too much failed request, data won't be saved. Changes rolled back`)
+    async uploadPersonPack(persons: TypeofPersonArraySchema): Promise<{ status: number }> {
+        const transaction = await this.sequelize.transaction();
+        const errorLimit = Math.floor(persons.length / 2);
+        let errorCounter = 0;
+    
+        try {
+            for (const person of persons) {
+                try {
+                    if (errorCounter >= errorLimit) {
+                        throw ApiError.BadRequest(`Too many failed requests, changes will be rolled back`);
+                    }
+    
+                    await Person.create({
+                        where: { persons },
+                        transaction
+                    });
+                } catch (e) {
+                    errorCounter++;
+                    console.log(`Error while creating person: ${person} \n Error: ${e}`);
+                    
+                    if (errorCounter >= errorLimit) {
+                        break;
+                    }
                 }
-            }   catch (e) {
-                errorCounter++
-                console.log(`Error while creating person: ${person} \n Error: ${e}`)
             }
-        })
-
-        await transaction.commit()
-        return { status: errorCounter === 0 ? 200 : 206 }
+    
+            if (errorCounter > 0 && errorCounter < errorLimit) {
+                await transaction.commit();
+                return { status: 206 };
+            } else if (errorCounter >= errorLimit) {
+                await transaction.rollback();
+                return { status: 400 };
+            }
+    
+            await transaction.commit();
+            return { status: 201 };
+        } catch (e) {
+            await transaction.rollback();
+            throw RethrowApiError(`Service error: Method - deletePersons`, e);
+        }
     }
 
     async deletePersons(ids: number[]): Promise<{ status: number }> {
-        const transaction = await this.sequelize.transaction()
-
-        const errorLimit = Math.floor(ids.length/2)
-        let errorCounter = 0
-
-        ids.forEach(async (id) => {
-            try {
-                if (errorCounter >= errorLimit) {
-                    await transaction.rollback()
-                    throw ApiError.BadRequest(`Too much failed request, data won't be saved. Changes rolled back`)
+        const transaction = await this.sequelize.transaction();
+        const errorLimit = Math.floor(ids.length / 2);
+        let errorCounter = 0;
+    
+        try {
+            for (const id of ids) {
+                try {
+                    if (errorCounter >= errorLimit) {
+                        throw ApiError.BadRequest(`Too many failed requests, changes will be rolled back`);
+                    }
+    
+                    await Person.destroy({
+                        where: { id },
+                        transaction
+                    });
+                } catch (e) {
+                    errorCounter++;
+                    console.log(`Error while deleting person with id: ${id} \n Error: ${e}`);
+                    
+                    if (errorCounter >= errorLimit) {
+                        break;
+                    }
                 }
-                await Person.destroy({
-                    where: { 
-                        id 
-                    },
-                    transaction
-                })
-            } catch (e) {
-                errorCounter++
-                console.log(`Error while deleting person with id: ${id} \n Error: ${e}`)
             }
-        })
-        
-        await transaction.commit()
-        return { status: errorCounter === 0 ? 200 : 206 }
+    
+            if (errorCounter > 0 && errorCounter < errorLimit) {
+                await transaction.commit();
+                return { status: 206 };
+            } else if (errorCounter >= errorLimit) {
+                await transaction.rollback();
+                return { status: 400 };
+            }
+    
+            await transaction.commit();
+            return { status: 200 };
+        } catch (e) {
+            await transaction.rollback();
+            throw RethrowApiError(`Service error: Method - deletePersons`, e);
+        }
     }
 }

@@ -3,6 +3,6 @@ import { ArticleSchema } from "./Article.schema";
 import { HeadingArraySchema } from "../heading/HeadingArray.schema";
 
 export const ArticlePatchSchema = ArticleSchema.extend({
-    headings: HeadingArraySchema
+    headings: HeadingArraySchema.optional()
 })
-export type TypeofArticlePatchSchema = z.infer<typeof ArticlePatchSchema>
+export type TypeofAdvancedArticleSchema = z.infer<typeof ArticlePatchSchema>

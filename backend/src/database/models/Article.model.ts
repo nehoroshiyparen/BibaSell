@@ -1,5 +1,6 @@
-import { DataTypes, Model, Sequelize } from "sequelize";
+import { DataTypes, Model, NonAttribute, Sequelize } from "sequelize";
 import { sequelize as sequelizeConfig } from "../config";
+import { Heading } from "./Heading.model";
 
 export class Article extends Model {
     public id!: number
@@ -18,6 +19,8 @@ export class Article extends Model {
     public event_end_date!: Date
 
     public is_published!: boolean
+
+    declare readonly headings?: NonAttribute<Heading[]>;
 
     static initialize(sequelize: Sequelize) {
         this.init({
@@ -41,6 +44,16 @@ export class Article extends Model {
             sequelize,
             modelName: 'Article',
             tableName: 'article',
+        })
+
+        this.setupAssociations()
+    }
+
+    static setupAssociations() {
+        this.belongsTo(Heading, {
+            foreignKey: 'article_id',
+            onDelete: 'CASCADE',
+            as: 'headings'
         })
     }
 }

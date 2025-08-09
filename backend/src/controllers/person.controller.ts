@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
-import { PersonArraySchema, PersonArray  } from '../types/schemas/person/PersonArraySchema'
+import { TypeofPersonArraySchema, PersonArraySchema } from '../types/schemas/person/PersonArraySchema'
 import { SendError, SendResponse } from "src/utils/http";
 import { status } from "src/consts/status";
-import { PersonFilters } from "src/types/interfaces/filters/PersonFilters.interface";
 import { PersonServiceAbstract } from "src/types/abstractions/services/person.service.abstraction";
 import { injectable, inject } from "inversify";
 import { TYPES } from "src/di/types";
 import { ApiError } from "src/utils/ApiError/ApiError";
 import { ValidateId } from "src/utils/validations/ids/id.validate";
 import { ValidatePaginationParams } from "src/utils/validations/paginationParams.validate";
-import { ValidateFilters } from "src/utils/validations/filtes.validate";
+import { ValidateObjectFieldsNotNull } from "src/utils/validations/objectFieldsNotNull.validate";
 import { ValidateIdArray } from "src/utils/validations/ids/idArray.validate";
+import { PersonFiltersSchema } from "src/types/schemas/person/PersonFilters.schema";
 
 @injectable()
 export class PersonControllerImpl {
@@ -64,23 +64,19 @@ export class PersonControllerImpl {
 
     /**
      * Возвращает массив объектов Person по указанным фильтрам
-     * @param req В query запроса указываются параметры для фильтрации. Параметры могут быть любым свойством Person
+     * @param req В body запроса указываются параметры для фильтрации. Параметры могут быть любым свойством Person
      * @param res 
      * @throws {BadRequest} Если ни один параметр фильтрации не указан
      * @throws {Internal} Если возникает непредсказанная ошибка
      */
     async getFilteredPersons(req: Request, res: Response) {
         try {
-            const filters: PersonFilters = {
-                name: String(req.query.name),
-                surname: String(req.query.surname),
-                patronymic: String(req.query.patronymic),
-                rank: String(req.query.rank),
-            }
+            const filters = req.body
 
-            ValidateFilters(filters)
+            ValidateObjectFieldsNotNull(filters)
+            const validatedFilters = PersonFiltersSchema.parse(filters)
 
-            const persons = await this.personService.getFilteredPersons(filters)
+            const persons = await this.personService.getFilteredPersons(validatedFilters)
 
             SendResponse(res, status.OK, persons ? `Persons fetched` : `No candidates found`, persons)
         } catch (e) {
@@ -98,11 +94,11 @@ export class PersonControllerImpl {
     async uploadPersonPack(req: Request, res: Response) {
         try {
             const dataPack = req.body
-            const validatedData: PersonArray = PersonArraySchema.parse(dataPack)
+            const validatedData = PersonArraySchema.parse(dataPack)
 
             const { status } =  await this.personService.uploadPersonPack(validatedData)
 
-            SendResponse(res, status, status === 200 ? `Person data pack uploaded` : `Person data pack uploaded partially`, null)
+            SendResponse(res, status, status === 201 ? `Persons created` : status === 206 ? `Persons created partilly` : `Persons weren't created. To much invalid data`, null)
         } catch (e) {
             SendError(res, e)
         }
@@ -124,7 +120,7 @@ export class PersonControllerImpl {
 
             const { status } = await this.personService.deletePersons(ids)
 
-            SendResponse(res, status, status === 200 ? `Persons deleted` : `Persons deleted partilly`, null)
+            SendResponse(res, status, status === 200 ? `Persons deleted` : status === 206 ? `Persons deleted partilly` : `Persons weren't deleted. To much invalid data`, null)
         } catch (e) {
             SendError(res, e)
         }
