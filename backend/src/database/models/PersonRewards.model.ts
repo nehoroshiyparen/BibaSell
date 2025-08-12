@@ -1,4 +1,4 @@
-import { DataTypes, Model, Sequelize } from "sequelize";
+import { DataTypes, Model, Database } from "sequelize";
 import { Person } from "./Person.model";
 import { Reward } from "./Reward.model";
 
@@ -6,7 +6,7 @@ export class PersonRewards extends Model {
     public person_id!: number
     public reward_id!: number
 
-    static initialize(sequelize: Sequelize) {
+    static initialize(sequelize: Database) {
       this.init({
         person_id: {
           type: DataTypes.INTEGER,

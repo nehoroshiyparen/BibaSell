@@ -1,4 +1,4 @@
-import { DataTypes, Model, NonAttribute, Sequelize } from "sequelize";
+import { DataTypes, Model, NonAttribute, Database } from "sequelize";
 import { sequelize as sequelizeConfig } from "../config";
 import { Heading } from "./Heading.model";
 
@@ -13,7 +13,6 @@ export class Article extends Model {
     public author_username!: string
 
     public content_markdown!: string
-    public content_html!: string
 
     public event_start_date!: Date
     public event_end_date!: Date
@@ -22,7 +21,7 @@ export class Article extends Model {
 
     declare readonly headings?: NonAttribute<Heading[]>;
 
-    static initialize(sequelize: Sequelize) {
+    static initialize(sequelize: Database) {
         this.init({
             id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
 
@@ -34,7 +33,6 @@ export class Article extends Model {
             author_username: { type: DataTypes.STRING, allowNull: false, defaultValue: 'Не указан' },
 
             content_markdown: { type: DataTypes.TEXT, allowNull: false },
-            content_html: { type: DataTypes.TEXT, allowNull: false },
 
             event_start_date: { type: DataTypes.DATE, allowNull: true, defaultValue: 'Не указано' },
             event_end_date: { type: DataTypes.DATE, allowNull: true, defaultValue: 'Не указано' },

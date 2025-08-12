@@ -15,11 +15,14 @@ import { AppImpl } from "src/app.impl";
 import { ArticleServiceAbstract } from "src/types/abstractions/services/article.service.abstraction";
 import { ArticleServiceImpl } from "src/services/article.service.impl";
 import { ArticleControllerImpl } from "src/controllers/article.controller";
+import { RedisAbstract } from "src/types/abstractions/redis.abstraction";
+import { RedisImpl } from "src/redis/redis.impl";
 
 const container = new Container()
 
 container.bind<AppAbstract>(TYPES.App).to(AppImpl).inSingletonScope()
-container.bind<DatabaseAbstract>(TYPES.Sequelize).to(DatabaseImpl).inSingletonScope()
+container.bind<DatabaseAbstract>(TYPES.Database).to(DatabaseImpl).inSingletonScope()
+container.bind<RedisAbstract>(TYPES.Redis).to(RedisImpl).inSingletonScope()
 
 // Сервисы
 container.bind<PersonServiceAbstract>(TYPES.PersonService).to(PersonServiceImpl).inSingletonScope()

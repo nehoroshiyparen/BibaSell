@@ -1,4 +1,4 @@
-import { DataTypes, Model, Sequelize } from "sequelize";
+import { DataTypes, Model, Database } from "sequelize";
 
 export class Reward extends Model {
     public id!: number
@@ -8,7 +8,7 @@ export class Reward extends Model {
     public addition!: string
     public description!: string
 
-    static initialize(sequelize: Sequelize) {
+    static initialize(sequelize: Database) {
         this.init({
             id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
             label: { type: DataTypes.STRING, allowNull: false, unique: true },

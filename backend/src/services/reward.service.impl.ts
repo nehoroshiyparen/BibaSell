@@ -7,12 +7,17 @@ import { RethrowApiError } from "src/utils/ApiError/RethrowApiError";
 import { ApiError } from "src/utils/ApiError/ApiError";
 import { Sequelize } from "sequelize";
 import { TYPES } from "src/di/types";
+import { DatabaseImpl } from "src/database/database.impl";
 
 @injectable()
 export class RewardServiceImpl implements RewardServiceAbstract {
+    private sequelize: Sequelize
+
     constructor(
-        @inject(TYPES.Sequelize) private sequelize: Sequelize
-    ) {}
+        @inject(TYPES.Database) private database: DatabaseImpl
+    ) {
+        this.sequelize = this.database.getDatabase()
+    }
 
     async getRewardById(id: number): Promise<Reward> {
         try {

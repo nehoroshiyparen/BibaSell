@@ -1,8 +1,15 @@
 import { inject, injectable } from "inversify";
+import { Redis } from "ioredis";
 import { Sequelize } from "sequelize";
+import { redisIdPrefixes } from "src/consts";
+import { DatabaseImpl } from "src/database/database.impl";
 import { Article } from "src/database/models/Article.model";
 import { Heading } from "src/database/models/Heading.model";
 import { TYPES } from "src/di/types";
+import { headersParser } from "src/features/markdown/parsing/header.parser";
+import { MdxParser } from "src/features/markdown/parsing/mdx.parser";
+import { getSlug } from "src/features/slugging/getSlug";
+import { RedisImpl } from "src/redis/redis.impl";
 import { ArticleServiceAbstract } from "src/types/abstractions/services/article.service.abstraction";
 import { ArticleContent } from "src/types/interfaces/articles/ArticleContent";
 import { ArticlePreview } from "src/types/interfaces/articles/ArticlePreview";
@@ -14,9 +21,14 @@ import { RethrowApiError } from "src/utils/ApiError/RethrowApiError";
 
 @injectable()
 export class ArticleServiceImpl implements ArticleServiceAbstract {
+    private sequelize: Sequelize
+
     constructor(
-        @inject(TYPES.Sequelize) private sequelize: Sequelize
-    ) {}
+        @inject(TYPES.Database) private database: DatabaseImpl,
+        @inject(TYPES.Redis) private redis: RedisImpl,
+    ) {
+        this.sequelize = this.database.getDatabase()
+    }
 
     async getArticleById(id: number): Promise<ArticlePreview> {
         try {
@@ -80,11 +92,13 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
         }
     }
 
+    async getArticleByContent() {
+        
+    }
+
     async getArticleContentById(id: number): Promise<ArticleContent> {
-        const content = await Article.findByPk(id, {
-            attributes: [
-                'content_html'
-            ],
+        const article = await Article.findByPk(id, {
+            attributes: [],
             include: [
                 {
                     model: Heading,
@@ -94,14 +108,50 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
             ]
         })
 
-        if (!content) throw ApiError.NotFound(`Content for article with id: ${id}, not found`)
+        if (!article) throw ApiError.NotFound(`Article with id: ${id}, not found`)
 
-        return content
+        const key = this.redis.joinKeys([redisIdPrefixes.content_html, `${id}`])
+        const content_html = await this.redis.getValue(key)
+
+        if (!content_html) throw ApiError.NotFound(`Content for article with id ${id} not found`)
+
+        return { content_html, headings: article.headings }
     }
 
     async createArticle(options: TypeofAdvancedArticleSchema): Promise<Article> {
         try {
+            const { content_markdown, headings, ...articleOpt } = options
 
+            const slug = getSlug(options.title)
+
+            const processedHeadings  = headersParser(options.content_markdown)
+            headings?.forEach((heading) => processedHeadings.push(heading.title))
+
+            const content_html = await MdxParser(options.content_markdown)
+
+            const article = await Article.create({
+                ...articleOpt,
+                slug,
+                content_markdown
+            })
+
+            await Promise.all(
+                processedHeadings.map(async (heading) => {
+                    try {
+                        await Heading.create({
+                            title: heading,
+                            article_id: article.id,
+                        })
+                    } catch (e) {
+                        throw ApiError.BadRequest(`Error while creating heading: ${heading}`)
+                    }
+                })
+            )
+
+            const key = this.redis.joinKeys([redisIdPrefixes.content_html, `${article.id}`])
+            this.redis.setValue(key, content_html)
+
+            return article
         } catch (e) {
             RethrowApiError(`Service error: Method - createArticle`, e)
         }

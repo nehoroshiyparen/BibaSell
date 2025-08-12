@@ -1,7 +1,7 @@
-import { Sequelize } from "sequelize";
+import { Database } from "sequelize";
 import { ENV } from "src/config";
 
-export const sequelize = new Sequelize({
+export const sequelize = new Database({
   dialect: 'postgres',
   host: ENV.DB_HOST,
   port: ENV.DB_PORT,

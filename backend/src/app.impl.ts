@@ -8,6 +8,7 @@ import { ENV } from './config'
 import { Person } from './database/models/Person.model'
 import { Reward } from './database/models/Reward.model'
 import { PersonRewards } from './database/models/PersonRewards.model'
+import { RedisImpl } from './redis/redis.impl'
 
 @injectable()
 export class AppImpl implements AppAbstract {
@@ -17,12 +18,14 @@ export class AppImpl implements AppAbstract {
     #app: Express = express()
     #router: Router
     #database: DatabaseImpl
+    #redis: RedisImpl
 
     #middlewares: RequestHandler[] = []
 
     constructor (
         @inject(TYPES.IndexRouter) private readonly indexRouter: IndexRouter,
-        @inject(TYPES.Sequelize) private readonly database: DatabaseImpl
+        @inject(TYPES.Database) private readonly database: DatabaseImpl,
+        @inject(TYPES.Redis) private readonly redis: RedisImpl,
     ) {
         this.#router = indexRouter.getRouter()
         this.#database = database
@@ -37,8 +40,12 @@ export class AppImpl implements AppAbstract {
         this.#database.registerModels([Person, Reward, PersonRewards])
         await this.#database.setup()
 
+        this.redis.setup()
+
         this.#app.use(this.#router)
         this.setupMiddlewares(this.#middlewares)
+
+        this.#redis.startRedisPing()
 
         this.#app.listen(this.port, () => {
             console.log(`App '${this.name}' started on port ${this.port}`)

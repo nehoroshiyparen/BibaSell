@@ -3,7 +3,6 @@ import { injectable } from 'inversify';
 import { DatabaseAbstract } from '../types/abstractions';
 import { ISequelizeModel } from 'src/types/abstractions/sequelize.model.abstraction';
 import { sequelize as sequelizeConfig } from './config';
-import { ENV } from 'src/config';
 
 @injectable()
 export class DatabaseImpl implements DatabaseAbstract {

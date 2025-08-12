@@ -1,4 +1,4 @@
-import { DataTypes, Model, Sequelize } from "sequelize";
+import { DataTypes, Model, Database } from "sequelize";
 import { Article } from "./Article.model";
 
 export class Heading extends Model {
@@ -6,7 +6,7 @@ export class Heading extends Model {
     public title!: string
     public article_id!: number
 
-    static initaialize(sequelize: Sequelize) {
+    static initaialize(sequelize: Database) {
         this.init({
             id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
             title: {type: DataTypes.STRING, allowNull: false },

@@ -8,12 +8,17 @@ import { PersonServiceAbstract } from "../types/abstractions/services/person.ser
 import { TYPES } from "src/di/types";
 import { Reward } from "src/database/models/Reward.model";
 import { TypeofPersonFiltersSchema } from "src/types/schemas/person/PersonFilters.schema";
+import { DatabaseImpl } from "src/database/database.impl";
 
 @injectable()
 export class PersonServiceImpl implements PersonServiceAbstract {
+    private sequelize: Sequelize
+
     constructor(
-        @inject(TYPES.Sequelize) private sequelize: Sequelize
-    ) {}
+        @inject(TYPES.Database) private database: DatabaseImpl
+    ) {
+        this.sequelize = this.database.getDatabase()
+    }
 
     async getPersonById(id: number) {
         console.log(id)
