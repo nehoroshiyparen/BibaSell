@@ -19,6 +19,20 @@ services:
       - db
     restart: unless-stopped
 
+  client:
+    container_name: bibacell_frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev  # или Dockerfile.prod, если prod
+    ports:
+      - "9973:9973"  # порт для фронтенда
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - app
+    restart: unless-stopped
+
   db:
     container_name: db
     image: postgres:14
