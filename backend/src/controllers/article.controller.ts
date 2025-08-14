@@ -9,6 +9,7 @@ import { SendError, SendResponse } from "src/utils/http";
 import { ValidateObjectFieldsNotNull } from "src/utils/validations/objectFieldsNotNull.validate";
 import { ValidateId } from "src/utils/validations/ids/id.validate";
 import { ValidateIdArray } from "src/utils/validations/ids/idArray.validate";
+import { ApiError } from "src/utils/ApiError/ApiError";
 
 @injectable()
 export class ArticleControllerImpl {
@@ -46,6 +47,34 @@ export class ArticleControllerImpl {
             const article = await this.articleService.getFilteredArticle(validatedFilters)
 
             SendResponse(res, article ? status.OK : status.NOT_FOUND , article ? `Article fetched` : `No candidates found`, article)
+        } catch (e) {
+            SendError(res, e)
+        }
+    }
+
+    async getArticleByContent(req: Request, res: Response) {
+        try {
+            const content = String(req.params.content)
+
+            if (!content) throw ApiError.BadRequest(`Content is null`)
+                
+            const article = await this.articleService.getArticleByContent(content)
+    
+            SendResponse(res, status.OK, `Article fetched`, article)
+        } catch (e) {
+            SendError(res, e)
+        }
+    }
+
+    async getArticleContentById(req: Request, res: Response) {
+        try {
+            const id = Number(req.params.id)
+
+            ValidateId(id)
+
+            const article = await this.articleService.getArticleContentById(id)
+
+            SendResponse(res, status.OK, `Article fetched`, article)
         } catch (e) {
             SendError(res, e)
         }

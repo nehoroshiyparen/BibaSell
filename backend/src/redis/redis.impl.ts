@@ -11,9 +11,7 @@ export class RedisImpl implements RedisAbstract {
 
     constructor () {
         this.redis = redisConfig
-    }
 
-    setup(): void {
         this.redis.on('connect', () => {
             console.log(`Redis is working on port: ${ENV.REDIS_PORT}`)
         })
@@ -21,6 +19,14 @@ export class RedisImpl implements RedisAbstract {
         this.redis.on('error', (e) => {
             console.log(`Redis error: ${e}`)
         })
+
+        this.redis.on("ready", () => {
+            console.log("Redis is ready to accept commands")
+        })
+    }
+
+    async setup(): Promise<void> {
+        console.log('Redis connected')
     }
 
     async startRedisPing(): Promise<NodeJS.Timeout> {

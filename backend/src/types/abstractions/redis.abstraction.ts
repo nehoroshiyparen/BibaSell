@@ -1,7 +1,7 @@
 import { Redis } from "ioredis"
 
 export interface RedisAbstract {
-    setup(): void
+    setup(): Promise<void>
     startRedisPing(): Promise<NodeJS.Timeout>
 
     joinKeys(keys: string[]): string 

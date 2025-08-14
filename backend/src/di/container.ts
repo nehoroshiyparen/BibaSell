@@ -17,6 +17,7 @@ import { ArticleServiceImpl } from "src/services/article.service.impl";
 import { ArticleControllerImpl } from "src/controllers/article.controller";
 import { RedisAbstract } from "src/types/abstractions/redis.abstraction";
 import { RedisImpl } from "src/redis/redis.impl";
+import { ArticleRouter } from "src/routes/article.routes";
 
 const container = new Container()
 
@@ -37,6 +38,7 @@ container.bind<ArticleControllerImpl>(TYPES.ArticleController).to(ArticleControl
 // Роутеры
 container.bind<PersonRouter>(TYPES.PersonRouter).to(PersonRouter).inSingletonScope()
 container.bind<RewardRouter>(TYPES.RewardRouter).to(RewardRouter).inSingletonScope()
+container.bind<ArticleRouter>(TYPES.ArticleRouter).to(ArticleRouter).inSingletonScope()
 container.bind<IndexRouter>(TYPES.IndexRouter).to(IndexRouter).inSingletonScope()
 
 export { container }

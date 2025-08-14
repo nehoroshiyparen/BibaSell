@@ -1,8 +1,8 @@
-import { compile } from "@mdx-js/mdx";
 import { renderToString } from "react-dom/server";
 import React from "react";
 
 export async function MdxParser(mdxContent: string) {
+    const { compile } = await import('@mdx-js/mdx')
     // Компилируем MDX в ES-модуль с функцией React-компонента
     const compiled = await compile(mdxContent, {
       outputFormat: "program",          // полноценный ES-модуль

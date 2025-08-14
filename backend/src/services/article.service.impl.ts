@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Redis } from "ioredis";
-import { Sequelize } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import { redisIdPrefixes } from "src/consts";
 import { DatabaseImpl } from "src/database/database.impl";
 import { Article } from "src/database/models/Article.model";
@@ -18,6 +18,9 @@ import { TypeofArticleFiltersSchema } from "src/types/schemas/article/ArticleFil
 import { TypeofAdvancedArticleSchema } from "src/types/schemas/article/ArticlePatch.schema";
 import { ApiError } from "src/utils/ApiError/ApiError";
 import { RethrowApiError } from "src/utils/ApiError/RethrowApiError";
+import { cleanup } from "src/utils/helper/object.cleanup";
+import { sanitizeMarkdownToText } from "src/utils/sanitize/markdown";
+import { ValidateObjectFieldsNotNull } from "src/utils/validations/objectFieldsNotNull.validate";
 
 @injectable()
 export class ArticleServiceImpl implements ArticleServiceAbstract {
@@ -92,33 +95,57 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
         }
     }
 
-    async getArticleByContent() {
-        
+    async getArticleByContent(content: string) {
+        try {
+            const cleanedContent = sanitizeMarkdownToText(content)
+
+            const article = await Article.findOne({
+                where: { content_markdown: { [Op.like]: `%${cleanedContent}%` } },
+                attributes: ['id', 'title', 'slug', 'author_username', 'event_start_date', 'event_end_date']
+            })
+
+            if (!article) throw ApiError.NotFound("Article not found")
+
+            const key = this.redis.joinKeys([redisIdPrefixes.content_html, `${article.id}`])
+            const cachedHtml = await this.redis.getValue(key)
+
+            return {
+                article,
+                content_html: cachedHtml,
+            }
+        } catch (e) {
+            RethrowApiError(`Service error: Method - getArticleByContent`, e)
+        }
     }
 
     async getArticleContentById(id: number): Promise<ArticleContent> {
-        const article = await Article.findByPk(id, {
-            attributes: [],
-            include: [
-                {
-                    model: Heading,
-                    as: 'headings',
-                    attributes: ['id', 'title'],
-                }
-            ]
-        })
-
-        if (!article) throw ApiError.NotFound(`Article with id: ${id}, not found`)
-
-        const key = this.redis.joinKeys([redisIdPrefixes.content_html, `${id}`])
-        const content_html = await this.redis.getValue(key)
-
-        if (!content_html) throw ApiError.NotFound(`Content for article with id ${id} not found`)
-
-        return { content_html, headings: article.headings }
+        try {
+            const article = await Article.findByPk(id, {
+                attributes: [],
+                include: [
+                    {
+                        model: Heading,
+                        as: 'headings',
+                        attributes: ['id', 'title'],
+                    }
+                ]
+            })
+    
+            if (!article) throw ApiError.NotFound(`Article with id: ${id}, not found`)
+    
+            const key = this.redis.joinKeys([redisIdPrefixes.content_html, `${id}`])
+            const content_html = await this.redis.getValue(key)
+    
+            if (!content_html) throw ApiError.NotFound(`Content for article with id ${id} not found`)
+    
+            return { content_html, headings: article.headings }
+        } catch (e) {
+            RethrowApiError(`Service error: Method - getArticleContentById`, e)
+        }
     }
 
     async createArticle(options: TypeofAdvancedArticleSchema): Promise<Article> {
+        const transaction = await this.sequelize.transaction()
         try {
             const { content_markdown, headings, ...articleOpt } = options
 
@@ -133,7 +160,7 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
                 ...articleOpt,
                 slug,
                 content_markdown
-            })
+            }, { transaction })
 
             await Promise.all(
                 processedHeadings.map(async (heading) => {
@@ -141,7 +168,7 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
                         await Heading.create({
                             title: heading,
                             article_id: article.id,
-                        })
+                        }, { transaction })
                     } catch (e) {
                         throw ApiError.BadRequest(`Error while creating heading: ${heading}`)
                     }
@@ -151,16 +178,80 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
             const key = this.redis.joinKeys([redisIdPrefixes.content_html, `${article.id}`])
             this.redis.setValue(key, content_html)
 
+            await transaction.commit()
+
             return article
         } catch (e) {
+            await transaction.rollback()
             RethrowApiError(`Service error: Method - createArticle`, e)
         }
     }
 
     async updateArcticle(id: number, options: TypeofAdvancedArticleSchema): Promise<Article> {
+        const transaction = await this.sequelize.transaction()
         try {
+            const { content_markdown, headings, ...articleOpt } = options
 
+            const article = await Article.findByPk(id)
+            if (!article) throw ApiError.NotFound(`Article with id: ${id} not found`)
+
+            const slug = getSlug(options.title)
+
+            const updateData = cleanup({
+                ...articleOpt,
+                slug,
+                content_markdown,
+            })
+
+            if (Object.keys(updateData).length > 0) {
+                await Article.update(updateData, { 
+                    where: 
+                        {
+                            id 
+                        },
+                    transaction
+                    }
+                )
+            }
+            
+            // Удаление старых заголовков и создание новых
+            if (headings || content_markdown) {
+                await Heading.destroy({
+                    where: {
+                        article_id: id
+                    }, transaction
+                })
+    
+                const processedHeadings  = headersParser(options.content_markdown)
+                headings?.forEach((heading) => processedHeadings.push(heading.title))
+
+                await Promise.all(
+                    processedHeadings.map(async (heading) => {
+                        try {
+                            await Heading.create({
+                                title: heading,
+                                article_id: id,
+                            }, { transaction })
+                        } catch (e) {
+                            throw ApiError.BadRequest(`Error while creating heading: ${heading}`)
+                        }
+                    })
+                )
+            }
+
+            // Парсинг маркдауна
+            if (content_markdown) {
+                const content_html = await MdxParser(content_markdown)
+                const key = this.redis.joinKeys([redisIdPrefixes.content_html, `${id}`])
+                this.redis.setValue(key, content_html)
+            }
+
+            await transaction.commit()
+            await article.reload({ transaction })
+
+            return article
         } catch (e) {
+            await transaction.rollback()
             RethrowApiError(`Service error: Method - updateArcticle`, e)
         }
     }

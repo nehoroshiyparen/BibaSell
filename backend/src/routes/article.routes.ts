@@ -1,16 +1,26 @@
 import { Router } from "express";
+import { inject, injectable } from "inversify";
+import { ArticleControllerImpl } from "src/controllers/article.controller";
+import { TYPES } from "src/di/types";
 import { RouterAbstract } from "src/types/abstractions";
 
-export class ArticleRoute implements RouterAbstract {
+@injectable()
+export class ArticleRouter implements RouterAbstract {
     private router: Router
 
-    constructor () {
+    constructor (
+        @inject(TYPES.ArticleController) private articleController: ArticleControllerImpl
+    ) {
         this.router = Router()
         this.setup()
     }
     
     async setup(): Promise<void> {
-        
+        this.router.get('/:id', this.articleController.getArticleById.bind(this.articleController))
+        this.router.post('/filtered', this.articleController.getFilteredArticle.bind(this.articleController))
+        this.router.post('/', this.articleController.craeteArticle.bind(this.articleController))
+        this.router.put('/update', this.articleController.updateArticle.bind(this.articleController))
+        this.router.delete('/pack', this.articleController.deleteArticles.bind(this.articleController))
     }
 
     getRouter(): Router {

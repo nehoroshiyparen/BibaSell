@@ -1,4 +1,4 @@
-import { DataTypes, Model, NonAttribute, Database } from "sequelize";
+import { DataTypes, Model, NonAttribute, Sequelize } from "sequelize";
 import { sequelize as sequelizeConfig } from "../config";
 import { Heading } from "./Heading.model";
 
@@ -21,7 +21,7 @@ export class Article extends Model {
 
     declare readonly headings?: NonAttribute<Heading[]>;
 
-    static initialize(sequelize: Database) {
+    static initialize(sequelize: Sequelize) {
         this.init({
             id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
 

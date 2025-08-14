@@ -29,6 +29,7 @@ export class AppImpl implements AppAbstract {
     ) {
         this.#router = indexRouter.getRouter()
         this.#database = database
+        this.#redis = redis
 
         this.name = ENV.APP_NAME
         this.port = ENV.APP_PORT
