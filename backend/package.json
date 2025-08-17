@@ -27,7 +27,7 @@
     "@mdx-js/node-loader": "^3.1.0",
     "debug": "^4.4.1",
     "dotenv": "^17.2.0",
-    "inversify": "^7.7.0",
+    "inversify": "^7.8.1",
     "ioredis": "^5.7.0",
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",

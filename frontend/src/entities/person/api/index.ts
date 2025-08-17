@@ -1,4 +1,4 @@
-export const personApiUrl = '/persons'
+export const PersonApiUrl = '/persons'
 
 export { deletePersonsApi } from './delete/deletePersons'
 

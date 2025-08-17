@@ -4,21 +4,6 @@ import type { PersonFilters } from "../model/types/PersonFilters";
 import { pushPersons, setPersons } from "../model";
 import { store } from "src/app/store";
 
-export const getFilteredPersons = async (filters: PersonFilters) => {
-    const state = store.getState()
-    const persons = state.person
-
-    const filteredPersons = await getFilteredPersonsApi(filters)
-
-    if (!persons || persons.length === 0) {
-        store.dispatch(setPersons(filteredPersons))
-    } else {
-        store.dispatch(pushPersons(filteredPersons))
-    }
-
-    return persons
-}
-
 export const getPersonById = async (id: number) => {
     const fetchedPerson = await getPersonByIdApi(id)
 
@@ -36,6 +21,14 @@ export const getPersons = async (offset: number, limit: number) => {
     } else {
         store.dispatch(pushPersons(fetchedPersons))
     }
+}
+
+export const getFilteredPersons = async (filters: PersonFilters) => {
+    const filteredPersons = await getFilteredPersonsApi(filters)
+
+    store.dispatch(setPersons(filteredPersons))
+
+    return filteredPersons
 }
 
 export const uploadPersonPack = async (pack: PersonAdvanced[]) => {

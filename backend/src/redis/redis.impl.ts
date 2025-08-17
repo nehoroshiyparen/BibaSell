@@ -34,8 +34,6 @@ export class RedisImpl implements RedisAbstract {
             const isAlive = this.redis.ping()
             if (!isAlive) {
                 console.log(`Redis ping failed !!!`)
-            } else {
-                console.log(`Redis is alive`)
             }
         }, 120000)
     }
