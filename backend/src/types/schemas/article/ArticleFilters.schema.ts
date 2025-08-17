@@ -6,5 +6,5 @@ export const ArticleFiltersSchema = z.object({
     event_start_date: z.date().optional(),
     event_end_date: z.date().optional(),
     content: z.string().optional(),
-})
+}).strict()
 export type TypeofArticleFiltersSchema = z.infer<typeof ArticleFiltersSchema>

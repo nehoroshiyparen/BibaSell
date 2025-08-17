@@ -1,10 +1,10 @@
 import z from "zod";
 
 export const RewardFiltersSchema = z.object({
-    label: z.string().optional,
-    realeseDate: z.string().optional,
-    count: z.number().optional,
+    label: z.string().optional(),
+    realeseDate: z.string().optional(),
+    count: z.number().optional(),
     addition: z.string().optional(),
     description: z.string().optional(),
-})
+}).strict()
 export type TypeofRewardFiltersSchema = z.infer<typeof RewardFiltersSchema>

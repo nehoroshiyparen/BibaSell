@@ -15,7 +15,7 @@ export class DatabaseImpl implements DatabaseAbstract {
   public async setup() {
     try {
       await this.sequelize.authenticate();
-      await this.sequelize.sync();
+      await this.sequelize.sync({ alter: true });
 
       console.log('Database connected');
     } catch (error) {
@@ -26,6 +26,7 @@ export class DatabaseImpl implements DatabaseAbstract {
 
   public registerModels(model: ISequelizeModel[]): void {
     model.forEach(model => model.initialize(this.sequelize))
+    console.log('reg')
   }
 
   public getDatabase() {

@@ -1,12 +1,12 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 
 export class Person extends Model {
-    public id!: number
-    public name!: string
-    public addition!: string
-    public description!: string
-    public rank!: string
-    public comments!: string
+    declare id: number
+    declare name: string
+    declare addition?: string
+    declare description?: string
+    declare rank?: string
+    declare comments?: string
 
     static initialize(sequelize: Sequelize) {
         this.init({

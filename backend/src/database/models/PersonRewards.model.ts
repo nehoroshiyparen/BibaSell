@@ -3,8 +3,8 @@ import { Person } from "./Person.model";
 import { Reward } from "./Reward.model";
 
 export class PersonRewards extends Model {
-    public person_id!: number
-    public reward_id!: number
+    declare person_id: number
+    declare reward_id: number
 
     static initialize(sequelize: Sequelize) {
       this.init({

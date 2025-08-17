@@ -4,5 +4,5 @@ import { HeadingArraySchema } from "../heading/HeadingArray.schema";
 
 export const ArticlePatchSchema = ArticleSchema.extend({
     headings: HeadingArraySchema.optional()
-})
+}).strict()
 export type TypeofAdvancedArticleSchema = z.infer<typeof ArticlePatchSchema>

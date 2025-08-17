@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { TypeofPersonArraySchema, PersonArraySchema } from '../types/schemas/person/PersonArraySchema'
+import { TypeofPersonArraySchema, PersonArraySchema, PersonArrayJsonSchema } from '../types/schemas/person/PersonArraySchema'
 import { SendError, SendResponse } from "src/utils/http";
 import { status } from "src/consts/status";
 import { PersonServiceAbstract } from "src/types/abstractions/services/person.service.abstraction";
@@ -56,7 +56,7 @@ export class PersonControllerImpl {
 
             const persons = await this.personService.getPersons(offset, limit)
 
-            SendResponse(res, status.OK, persons ? `Persons fetched` : `No more data`, persons)
+            SendResponse(res, status.OK, persons?.length !== 0 ? `Persons fetched` : `No more data`, persons)
         } catch (e) {
             SendError(res, e)
         }
@@ -73,12 +73,14 @@ export class PersonControllerImpl {
         try {
             const filters = req.body
 
+            console.log(filters, req.body)
+
             ValidateObjectFieldsNotNull(filters)
             const validatedFilters = PersonFiltersSchema.parse(filters)
 
             const persons = await this.personService.getFilteredPersons(validatedFilters)
 
-            SendResponse(res, status.OK, persons ? `Persons fetched` : `No candidates found`, persons)
+            SendResponse(res, status.OK, persons?.length !== 0 ? `Persons fetched` : `No candidates found`, persons)
         } catch (e) {
             SendError(res, e)
         }
@@ -94,9 +96,9 @@ export class PersonControllerImpl {
     async uploadPersonPack(req: Request, res: Response) {
         try {
             const dataPack = req.body
-            const validatedData = PersonArraySchema.parse(dataPack)
+            const validatedData = PersonArrayJsonSchema.parse(dataPack)
 
-            const { status } =  await this.personService.uploadPersonPack(validatedData)
+            const { status } =  await this.personService.uploadPersonPack(validatedData.data)
 
             SendResponse(res, status, status === 201 ? `Persons created` : status === 206 ? `Persons created partilly` : `Persons weren't created. To much invalid data`, null)
         } catch (e) {

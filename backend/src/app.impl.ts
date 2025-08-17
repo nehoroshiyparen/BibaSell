@@ -9,6 +9,7 @@ import { Person } from './database/models/Person.model'
 import { Reward } from './database/models/Reward.model'
 import { PersonRewards } from './database/models/PersonRewards.model'
 import { RedisImpl } from './redis/redis.impl'
+import { Heading } from './database/models/Heading.model'
 
 @injectable()
 export class AppImpl implements AppAbstract {
@@ -43,6 +44,8 @@ export class AppImpl implements AppAbstract {
 
         this.redis.setup()
 
+        this.#app.use(express.json())
+        
         this.#app.use(this.#router)
         this.setupMiddlewares(this.#middlewares)
 

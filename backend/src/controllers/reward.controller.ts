@@ -3,7 +3,7 @@ import { inject, injectable } from "inversify";
 import { TYPES } from "src/di/types";
 import { RewardServiceAbstract } from "src/types/abstractions/services/reward.service.abstraction";
 import { RewardSchema, TypeofRewardSchema } from "src/types/schemas/reward/Reward.schema";
-import { RewardArraySchema } from "src/types/schemas/reward/RewardArray.schema";
+import { RewardArrayJsonSchema, RewardArraySchema } from "src/types/schemas/reward/RewardArray.schema";
 import { SendError, SendResponse } from "src/utils/http";
 import { ValidateObjectFieldsNotNull } from "src/utils/validations/objectFieldsNotNull.validate";
 import { ValidateId } from "src/utils/validations/ids/id.validate";
@@ -56,6 +56,8 @@ export class RewardControllerImpl {
         try {
             const filters = req.body
 
+            console.log(filters)
+
             ValidateObjectFieldsNotNull(filters)
             const validatedFilters = RewardFiltersSchema.parse(filters)
 
@@ -71,9 +73,9 @@ export class RewardControllerImpl {
         try {
             const data = req.body
             
-            const validatedData = RewardArraySchema.parse(data)
+            const validatedData = RewardArrayJsonSchema.parse(data)
 
-            const { status } = await this.rewardService.uploadRewardPack(validatedData)
+            const { status } = await this.rewardService.uploadRewardPack(validatedData.data)
 
             SendResponse(res, status, status === 201 ? `Rewards created` : status === 206 ? `Rewards created partilly` : `Rewards weren't created. To much invalid data`, null)
         } catch (e) {
@@ -83,7 +85,7 @@ export class RewardControllerImpl {
 
     async deleteRewards(req: Request, res: Response) {
         try {
-            const ids = String(req.query).split(',').map(Number)
+            const ids = String(req.query.ids).split(',').map(Number)
 
             ValidateIdArray(ids)
 

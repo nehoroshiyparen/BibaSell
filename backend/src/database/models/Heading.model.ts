@@ -2,11 +2,11 @@ import { DataTypes, Model, Sequelize } from "sequelize";
 import { Article } from "./Article.model";
 
 export class Heading extends Model {
-    public id!: number
-    public title!: string
-    public article_id!: number
+    declare id: number
+    declare title: string
+    declare article_id: number
 
-    static initaialize(sequelize: Sequelize) {
+    static initialize(sequelize: Sequelize) {
         this.init({
             id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
             title: {type: DataTypes.STRING, allowNull: false },

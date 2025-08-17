@@ -7,6 +7,6 @@ export const ArticleSchema = z.object({
     event_start_date: z.date().optional(),
     event_end_date: z.date().optional(),
     is_published: z.boolean().optional()
-})
+}).strict()
 
 export type TypeofArticleSchema = z.infer<typeof ArticleSchema>

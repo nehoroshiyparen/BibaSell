@@ -1,12 +1,12 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 
 export class Reward extends Model {
-    public id!: number
-    public label!: string
-    public realeseDate!: string
-    public count!: number
-    public addition!: string
-    public description!: string
+    declare id: number;
+    declare label: string;
+    declare realeseDate: string;
+    declare count: number;
+    declare addition?: string;
+    declare description?: string;
 
     static initialize(sequelize: Sequelize) {
         this.init({
@@ -17,9 +17,9 @@ export class Reward extends Model {
             addition: { type: DataTypes.TEXT, allowNull: true },
             description: { type: DataTypes.TEXT, allowNull: true },
         }, {
-            sequelize: sequelize,
+            sequelize,
             modelName: 'Reward',
-            tableName: 'rewards'
-        })
+            tableName: 'rewards',
+        });
     }
 }

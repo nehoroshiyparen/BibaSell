@@ -6,5 +6,5 @@ export const RewardSchema = z.object({
     count: z.number(),
     addition: z.string().optional(),
     description: z.string().optional(),
-})
+}).strict()
 export type TypeofRewardSchema = z.infer<typeof RewardSchema>

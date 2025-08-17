@@ -48,14 +48,6 @@ export class RewardServiceImpl implements RewardServiceAbstract {
     }
 
     async getFilteredRewards(filters: TypeofRewardSchema): Promise<Reward[] | null> {
-        if (!(
-            filters.addition && 
-            filters.count && 
-            filters.description && 
-            filters.label && 
-            filters.realeseDate
-        )) throw ApiError.BadRequest(`There must be at least one filtered param`)
-
         const candidates = await Reward.findAll({
             where: {
                 ...filters
@@ -66,85 +58,63 @@ export class RewardServiceImpl implements RewardServiceAbstract {
     }
 
     async uploadRewardPack(rewards: RewardArray): Promise<{ status: number }> {
-        const transaction = await this.sequelize.transaction();
-        const errorLimit = Math.floor(rewards.length / 2);
+        const errorLimit = Math.max(Math.floor(rewards.length / 2), 1);
         let errorCounter = 0;
     
         try {
             for (const reward of rewards) {
                 try {
-                    if (errorCounter >= errorLimit) {
-                        throw ApiError.BadRequest(`Too many failed requests, changes will be rolled back`);
-                    }
-    
-                    await Reward.create({
-                        where: { reward },
-                        transaction
+                    await this.sequelize.transaction(async (t) => {
+                        await Reward.create(reward, { transaction: t });
                     });
                 } catch (e) {
+                    console.log(`Error creating reward: ${reward.label}`, e);
                     errorCounter++;
-                    console.log(`Error while creating reward: ${reward} \n Error: ${e}`);
-                    
-                    if (errorCounter >= errorLimit) {
-                        break;
-                    }
+                    if (errorCounter >= errorLimit) break;
                 }
             }
     
             if (errorCounter > 0 && errorCounter < errorLimit) {
-                await transaction.commit();
                 return { status: 206 };
             } else if (errorCounter >= errorLimit) {
-                await transaction.rollback();
                 return { status: 400 };
             }
     
-            await transaction.commit();
             return { status: 201 };
         } catch (e) {
-            await transaction.rollback();
             throw RethrowApiError(`Service error: Method - uploadRewardPack`, e);
         }
     }
 
     async deleteRewards(ids: number[]): Promise<{ status: number }> {
-        const transaction = await this.sequelize.transaction();
         const errorLimit = Math.floor(ids.length / 2);
         let errorCounter = 0;
     
         try {
             for (const id of ids) {
                 try {
-                    if (errorCounter >= errorLimit) {
-                        throw ApiError.BadRequest(`Too many failed requests, changes will be rolled back`);
-                    }
-    
-                    await Reward.destroy({
-                        where: { id },
-                        transaction
+                    if (errorCounter >= errorLimit) break;
+
+                    await this.sequelize.transaction(async (t) => {
+                        await Reward.destroy({
+                            where: { id },
+                            transaction: t
+                        });
                     });
                 } catch (e) {
                     errorCounter++;
-                    console.log(`Error while deleting person with id: ${id} \n Error: ${e}`);
-                    
-                    if (errorCounter >= errorLimit) {
-                        break;
-                    }
+                    console.log(`Error while deleting reward with id: ${id} \n Error: ${e}`);
                 }
             }
     
             if (errorCounter > 0 && errorCounter < errorLimit) {
-                await transaction.commit();
                 return { status: 206 };
             } else if (errorCounter >= errorLimit) {
-                await transaction.rollback();
                 return { status: 400 };
             }
     
-            await transaction.commit();
             return { status: 200 };
         } catch (e) {
-            await transaction.rollback();
             throw RethrowApiError(`Service error: Method - deletePersons`, e);
         }
     }
