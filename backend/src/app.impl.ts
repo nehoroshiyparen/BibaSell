@@ -10,6 +10,7 @@ import { Reward } from './database/models/Reward.model'
 import { PersonRewards } from './database/models/PersonRewards.model'
 import { RedisImpl } from './redis/redis.impl'
 import { Heading } from './database/models/Heading.model'
+import { Article } from './database/models/Article.model'
 
 @injectable()
 export class AppImpl implements AppAbstract {
@@ -39,7 +40,7 @@ export class AppImpl implements AppAbstract {
     }
 
     public async setup() {
-        this.#database.registerModels([Person, Reward, PersonRewards])
+        this.#database.registerModels([Person, Reward, PersonRewards, Article, Heading])
         await this.#database.setup()
 
         this.redis.setup()

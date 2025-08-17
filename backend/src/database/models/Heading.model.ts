@@ -23,14 +23,13 @@ export class Heading extends Model {
                 }
             ]
         })
-
-        this.setupAssociations()
     }
 
     static setupAssociations() {
         this.belongsTo(Article, {
             foreignKey: 'article_id',
             onDelete: 'CASCADE',
+            as: 'article'
         })
     }
 }

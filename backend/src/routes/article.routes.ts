@@ -16,11 +16,16 @@ export class ArticleRouter implements RouterAbstract {
     }
     
     async setup(): Promise<void> {
+        this.router.post('/filtered', this.articleController.getFilteredArticles.bind(this.articleController))
         this.router.get('/:id', this.articleController.getArticleById.bind(this.articleController))
-        this.router.post('/filtered', this.articleController.getFilteredArticle.bind(this.articleController))
+        this.router.get('/content/:id', this.articleController.getArticleContent.bind(this.articleController))
+        this.router.get('/search/:content', this.articleController.searchArticleByContent.bind(this.articleController))
+
         this.router.post('/', this.articleController.craeteArticle.bind(this.articleController))
+
         this.router.put('/update', this.articleController.updateArticle.bind(this.articleController))
-        this.router.delete('/pack', this.articleController.deleteArticles.bind(this.articleController))
+
+        this.router.delete('/pack', this.articleController.bulkDeleteArticles.bind(this.articleController))
     }
 
     getRouter(): Router {

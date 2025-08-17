@@ -37,28 +37,28 @@ export class ArticleControllerImpl {
      * @param req 
      * @param res 
      */
-    async getFilteredArticle(req: Request, res: Response) {
+    async getFilteredArticles(req: Request, res: Response) {
         try {
             const filters = req.body
 
             ValidateObjectFieldsNotNull(filters)
             const validatedFilters = ArticleFiltersSchema.parse(filters)
 
-            const article = await this.articleService.getFilteredArticle(validatedFilters)
+            const articles = await this.articleService.getFilteredArticles(validatedFilters)
 
-            SendResponse(res, article ? status.OK : status.NOT_FOUND , article ? `Article fetched` : `No candidates found`, article)
+            SendResponse(res, articles ? status.OK : status.NOT_FOUND , articles.length !== 0 ? `Article fetched` : `No candidates found`, articles)
         } catch (e) {
             SendError(res, e)
         }
     }
 
-    async getArticleByContent(req: Request, res: Response) {
+    async searchArticleByContent(req: Request, res: Response) {
         try {
             const content = String(req.params.content)
 
             if (!content) throw ApiError.BadRequest(`Content is null`)
                 
-            const article = await this.articleService.getArticleByContent(content)
+            const article = await this.articleService.searchArticleByContent(content)
     
             SendResponse(res, status.OK, `Article fetched`, article)
         } catch (e) {
@@ -66,13 +66,13 @@ export class ArticleControllerImpl {
         }
     }
 
-    async getArticleContentById(req: Request, res: Response) {
+    async getArticleContent(req: Request, res: Response) {
         try {
             const id = Number(req.params.id)
 
             ValidateId(id)
 
-            const article = await this.articleService.getArticleContentById(id)
+            const article = await this.articleService.getArticleContent(id)
 
             SendResponse(res, status.OK, `Article fetched`, article)
         } catch (e) {
@@ -110,13 +110,13 @@ export class ArticleControllerImpl {
         }
     }
 
-    async deleteArticles(req: Request, res: Response) {
+    async bulkDeleteArticles(req: Request, res: Response) {
         try {
             const ids = String(req.query).split(',').map(Number)
 
             ValidateIdArray(ids)
 
-            const { status } = await this.articleService.deleteArticles(ids)
+            const { status } = await this.articleService.bulkDeleteArticles(ids)
 
             SendResponse(res, status, status === 200 ? `Articles deleted` : status === 206 ? `Articles deleted partilly` : `Articles weren't deleted. To much invalid data`, null)
         } catch (e) {

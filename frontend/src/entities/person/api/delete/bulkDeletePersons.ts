@@ -2,7 +2,7 @@ import type { ApiRequest } from "src/shared/api/types/ApiRequest"
 import { PersonApiUrl } from ".."
 import { requestWithRedux } from "src/shared/api/requests/requestWithRedux"
 
-export const deletePersonsApi = async (ids: number[]) => {
+export const bulkDeletePersonsApi = async (ids: number[]) => {
     const ids_string = ids.map(id => String(id)).join(',')
 
     const req: ApiRequest<undefined, undefined> = {

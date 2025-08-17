@@ -6,6 +6,6 @@ export interface RewardServiceAbstract {
     getRewardById(id: number): Promise<Reward>;
     getRewards(offset: number, limit: number): Promise<Reward[] | null>;
     getFilteredRewards(filters: TypeofRewardFiltersSchema): Promise<Reward[] | null>
-    uploadRewardPack(data: RewardArray): Promise<{ status: number }>;
-    deleteRewards(ids: number[]): Promise<{ status: number }>;
+    bulkCreateRewards(data: RewardArray): Promise<{ status: number }>;
+    bulkDeleteRewards(ids: number[]): Promise<{ status: number }>;
 }

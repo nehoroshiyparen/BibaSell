@@ -34,11 +34,9 @@ export class PersonRewards extends Model {
           },
         ]
       })
-      
-      this.setupAssociations()
     }
 
-    private static setupAssociations() {
+    static setupAssociations() {
       Person.belongsToMany(Reward, {
         through: PersonRewards,
         foreignKey: 'person_id',

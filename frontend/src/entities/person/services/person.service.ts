@@ -1,4 +1,4 @@
-import { deletePersonsApi, getFilteredPersonsApi, getPersonByIdApi, getPersonsApi, uploadPersonPackApi } from "../api";
+import { bulkDeletePersonsApi, getFilteredPersonsApi, getPersonByIdApi, getPersonsApi, bulkCreatePersonsApi } from "../api";
 import type { PersonAdvanced } from "../model/types/PersonAdvanced";
 import type { PersonFilters } from "../model/types/PersonFilters";
 import { pushPersons, setPersons } from "../model";
@@ -31,10 +31,10 @@ export const getFilteredPersons = async (filters: PersonFilters) => {
     return filteredPersons
 }
 
-export const uploadPersonPack = async (pack: PersonAdvanced[]) => {
-    await uploadPersonPackApi(pack)
+export const bulkCreatePersons = async (pack: PersonAdvanced[]) => {
+    await bulkCreatePersonsApi(pack)
 }
 
-export const deletePersons = async (ids: number[]) => {
-    await deletePersonsApi(ids)
+export const bulkDeletePersons = async (ids: number[]) => {
+    await bulkDeletePersonsApi(ids)
 }

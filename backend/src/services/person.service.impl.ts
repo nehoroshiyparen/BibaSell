@@ -72,7 +72,7 @@ export class PersonServiceImpl implements PersonServiceAbstract {
         }
     }
     
-    async uploadPersonPack(persons: TypeofPersonArraySchema): Promise<{ status: number }> {
+    async bulkCreatePersons(persons: TypeofPersonArraySchema): Promise<{ status: number }> {
         const errorLimit = Math.max(Math.floor(persons.length / 2), 1);
         let errorCounter = 0;
         
@@ -99,11 +99,11 @@ export class PersonServiceImpl implements PersonServiceAbstract {
     
             return { status: 201 };
         } catch (e) {
-            throw RethrowApiError(`Service error: Method - deletePersons`, e);
+            throw RethrowApiError(`Service error: Method - bulkDeletePersons`, e);
         }
     }
 
-    async deletePersons(ids: number[]): Promise<{ status: number }> {
+    async bulkDeletePersons(ids: number[]): Promise<{ status: number }> {
         const errorLimit = Math.floor(ids.length / 2);
         let errorCounter = 0;
     
@@ -132,7 +132,7 @@ export class PersonServiceImpl implements PersonServiceAbstract {
     
             return { status: 201 };
         } catch (e) {
-            throw RethrowApiError(`Service error: Method - deletePersons`, e);
+            throw RethrowApiError(`Service error: Method - bulkDeletePersons`, e);
         }
     }
 }

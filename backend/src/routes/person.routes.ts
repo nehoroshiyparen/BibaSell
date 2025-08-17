@@ -19,9 +19,9 @@ export class PersonRouter {
         this.router.post('/filtered', this.personController.getFilteredPersons.bind(this.personController))
         this.router.get('/:id', this.personController.getPersonById.bind(this.personController))
 
-        this.router.patch('/pack', this.personController.uploadPersonPack.bind(this.personController))
+        this.router.patch('/pack', this.personController.bulkCreatePersons.bind(this.personController))
 
-        this.router.delete('/pack', this.personController.deletePersons.bind(this.personController))
+        this.router.delete('/pack', this.personController.bulkDeletePersons.bind(this.personController))
     }
 
     getRouter(): Router { return this.router }

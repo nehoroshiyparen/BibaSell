@@ -6,6 +6,6 @@ export interface PersonServiceAbstract {
     getPersonById(id: number): Promise<Person>;
     getPersons(offset: number, limit: number): Promise<Person[] | null>;
     getFilteredPersons(filters: TypeofPersonFiltersSchema): Promise<Person[] | null>
-    uploadPersonPack(data: TypeofPersonArraySchema): Promise<{ status: number }>;
-    deletePersons(ids: number[]): Promise<{ status: number }>;
+    bulkCreatePersons(data: TypeofPersonArraySchema): Promise<{ status: number }>;
+    bulkDeletePersons(ids: number[]): Promise<{ status: number }>;
 }

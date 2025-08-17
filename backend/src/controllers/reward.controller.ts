@@ -69,13 +69,13 @@ export class RewardControllerImpl {
         }
     }
 
-    async uploadRewardPack(req: Request, res: Response) {
+    async bulkCreateRewards(req: Request, res: Response) {
         try {
             const data = req.body
             
             const validatedData = RewardArrayJsonSchema.parse(data)
 
-            const { status } = await this.rewardService.uploadRewardPack(validatedData.data)
+            const { status } = await this.rewardService.bulkCreateRewards(validatedData.data)
 
             SendResponse(res, status, status === 201 ? `Rewards created` : status === 206 ? `Rewards created partilly` : `Rewards weren't created. To much invalid data`, null)
         } catch (e) {
@@ -83,13 +83,13 @@ export class RewardControllerImpl {
         }
     }
 
-    async deleteRewards(req: Request, res: Response) {
+    async bulkDeleteRewards(req: Request, res: Response) {
         try {
             const ids = String(req.query.ids).split(',').map(Number)
 
             ValidateIdArray(ids)
 
-            const { status } = await this.rewardService.deleteRewards(ids)
+            const { status } = await this.rewardService.bulkDeleteRewards(ids)
 
             SendResponse(res, status, status === 200 ? `Rewards deleted` : status === 206 ? `Rewards deleted partilly` : `Rewards weren't deleted. To much invalid data`, null)
         } catch (e) {

@@ -26,7 +26,11 @@ export class DatabaseImpl implements DatabaseAbstract {
 
   public registerModels(model: ISequelizeModel[]): void {
     model.forEach(model => model.initialize(this.sequelize))
-    console.log('reg')
+    model.forEach(model => {
+        if (typeof model.setupAssociations === 'function') {
+          model.setupAssociations()
+        }
+    })
   }
 
   public getDatabase() {

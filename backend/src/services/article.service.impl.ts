@@ -13,6 +13,7 @@ import { RedisImpl } from "src/redis/redis.impl";
 import { ArticleServiceAbstract } from "src/types/abstractions/services/article.service.abstraction";
 import { ArticleContent } from "src/types/interfaces/articles/ArticleContent";
 import { ArticlePreview } from "src/types/interfaces/articles/ArticlePreview";
+import { HeadingBase } from "src/types/interfaces/headings/HeadingBase";
 import { TypeofArticleSchema } from "src/types/schemas/article/Article.schema";
 import { TypeofArticleFiltersSchema } from "src/types/schemas/article/ArticleFilters.schema";
 import { TypeofAdvancedArticleSchema } from "src/types/schemas/article/ArticlePatch.schema";
@@ -65,7 +66,7 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
         }
     }
 
-    async getFilteredArticle(filters: TypeofArticleFiltersSchema): Promise<ArticlePreview[]> {
+    async getFilteredArticles(filters: TypeofArticleFiltersSchema): Promise<ArticlePreview[]> {
         try {
             const articles = await Article.findAll({
                 where: {
@@ -91,12 +92,14 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
 
             return articles
         } catch (e) {
-            RethrowApiError(`Service error: Method - getFilteredArticle`, e)
+            RethrowApiError(`Service error: Method - getFilteredArticles`, e)
         }
     }
 
-    async getArticleByContent(content: string) {
+    async searchArticleByContent(content: string) {
         try {
+            console.log(content)
+
             const cleanedContent = sanitizeMarkdownToText(content)
 
             const article = await Article.findOne({
@@ -109,16 +112,18 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
             const key = this.redis.joinKeys([redisIdPrefixes.content_html, `${article.id}`])
             const cachedHtml = await this.redis.getValue(key)
 
+            if (!cachedHtml) throw ApiError.NotFound(`Content for this article was not found`)
+
             return {
                 article,
                 content_html: cachedHtml,
             }
         } catch (e) {
-            RethrowApiError(`Service error: Method - getArticleByContent`, e)
+            RethrowApiError(`Service error: Method - searchArticleByContent`, e)
         }
     }
 
-    async getArticleContentById(id: number): Promise<ArticleContent> {
+    async getArticleContent(id: number): Promise<ArticleContent> {
         try {
             const article = await Article.findByPk(id, {
                 attributes: [],
@@ -138,9 +143,9 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
     
             if (!content_html) throw ApiError.NotFound(`Content for article with id ${id} not found`)
     
-            return { content_html, headings: article.headings }
+            return { content_html, headings: article.headings ?? [] }
         } catch (e) {
-            RethrowApiError(`Service error: Method - getArticleContentById`, e)
+            RethrowApiError(`Service error: Method - getArticleContent`, e)
         }
     }
 
@@ -256,45 +261,36 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
         }
     }
 
-    async deleteArticles(ids: number[]): Promise<{ status: number }> {
-        const transaction = await this.sequelize.transaction();
+    async bulkDeleteArticles(ids: number[]): Promise<{ status: number }> {
         const errorLimit = Math.floor(ids.length / 2);
         let errorCounter = 0;
     
         try {
-            for (const id of ids) {
+           for (const id of ids) {
                 try {
-                    if (errorCounter >= errorLimit) {
-                        throw ApiError.BadRequest(`Too many failed requests, changes will be rolled back`);
-                    }
-    
-                    await Article.destroy({
-                        where: { id },
-                        transaction
-                    });
+                    if (errorCounter >= errorLimit) break
+
+                    await this.sequelize.transaction(async (t) => {
+                        await Article.destroy({
+                            where: { id },
+                            transaction: t
+                        })
+                    })
                 } catch (e) {
-                    errorCounter++;
-                    console.log(`Error while deleting article with id: ${id} \n Error: ${e}`);
-                    
-                    if (errorCounter >= errorLimit) {
-                        break;
-                    }
+                    errorCounter++
+                    console.log(`Error while deleting article with id: ${id} \n Error: ${e}`)
                 }
-            }
+           }
     
             if (errorCounter > 0 && errorCounter < errorLimit) {
-                await transaction.commit();
                 return { status: 206 };
             } else if (errorCounter >= errorLimit) {
-                await transaction.rollback();
                 return { status: 400 };
             }
     
-            await transaction.commit();
             return { status: 200 };
         } catch (e) {
-            await transaction.rollback();
-            throw RethrowApiError(`Service error: Method - deleteArticles`, e);
+            throw RethrowApiError(`Service error: Method - bulkDeleteArticles`, e);
         }
     }
 }

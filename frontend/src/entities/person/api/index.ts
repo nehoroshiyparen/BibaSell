@@ -1,9 +1,9 @@
 export const PersonApiUrl = '/persons'
 
-export { deletePersonsApi } from './delete/deletePersons'
+export { bulkDeletePersonsApi } from './delete/bulkDeletePersons'
 
 export { getFilteredPersonsApi } from './get/getFilteredPersons'
 export { getPersonByIdApi } from './get/getPersonById'
 export { getPersonsApi } from './get/getPersons'
 
-export { uploadPersonPackApi } from './patch/uploadPersonPack'
+export { bulkCreatePersonsApi } from './patch/bulkCreatePersons'

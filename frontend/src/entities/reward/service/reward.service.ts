@@ -1,5 +1,5 @@
 import { store } from "src/app/store"
-import { deleteRewardsApi, getFilteredRewardsApi, getRewardByIdApi, getRewardsApi, uploadRewardPackApi } from "../api"
+import { bulkDeleteRewardsApi, getFilteredRewardsApi, getRewardByIdApi, getRewardsApi, bulkCreateRewardsApi } from "../api"
 import type { RewardAdvanced } from "../model/types/RewardAdvanced"
 import type { RewardFilters } from "../model/types/RewardFilters"
 import { pushRewards, setRewards } from "../model"
@@ -32,10 +32,10 @@ export const getFilteredRewards = async (filters: RewardFilters) => {
     return filteredRewards
 }
 
-export const uploadRewardPack = async (pack: RewardAdvanced[]) => {
-    await uploadRewardPackApi(pack)
+export const bulkCreateRewards = async (pack: RewardAdvanced[]) => {
+    await bulkCreateRewardsApi(pack)
 }
 
 export const deleteRewads = async (ids: number[]) => {
-    await deleteRewardsApi(ids)
+    await bulkDeleteRewardsApi(ids)
 }

@@ -93,12 +93,12 @@ export class PersonControllerImpl {
      * @throws {BadRequest} Если хотя бы половина данных не смогла сохраниться в базе данных (Никакие изменения в таком случае не внесутся в бд)
      * @throws {Internal} Если возникает непредсказанная ошибка
      */
-    async uploadPersonPack(req: Request, res: Response) {
+    async bulkCreatePersons(req: Request, res: Response) {
         try {
             const dataPack = req.body
             const validatedData = PersonArrayJsonSchema.parse(dataPack)
 
-            const { status } =  await this.personService.uploadPersonPack(validatedData.data)
+            const { status } =  await this.personService.bulkCreatePersons(validatedData.data)
 
             SendResponse(res, status, status === 201 ? `Persons created` : status === 206 ? `Persons created partilly` : `Persons weren't created. To much invalid data`, null)
         } catch (e) {
@@ -114,13 +114,13 @@ export class PersonControllerImpl {
      * @throws {BadRequest} Если хотя бы половина данных не смогла сохраниться в базе данных (Никакие изменения в таком случае не внесутся в бд)
      * @throws {Internal} Если возникает непредсказанная ошибка
      */
-    async deletePersons(req: Request, res: Response) {
+    async bulkDeletePersons(req: Request, res: Response) {
         try {
             const ids = String(req.query.ids).split(',').map(Number)
 
             ValidateIdArray(ids)
 
-            const { status } = await this.personService.deletePersons(ids)
+            const { status } = await this.personService.bulkDeletePersons(ids)
 
             SendResponse(res, status, status === 200 ? `Persons deleted` : status === 206 ? `Persons deleted partilly` : `Persons weren't deleted. To much invalid data`, null)
         } catch (e) {

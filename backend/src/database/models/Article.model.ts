@@ -43,12 +43,10 @@ export class Article extends Model {
             modelName: 'Article',
             tableName: 'article',
         });
-
-        this.setupAssociations();
     }
 
     static setupAssociations() {
-        this.belongsTo(Heading, {
+        this.hasMany(Heading, {
             foreignKey: 'article_id',
             onDelete: 'CASCADE',
             as: 'headings'

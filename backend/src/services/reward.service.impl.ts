@@ -57,7 +57,7 @@ export class RewardServiceImpl implements RewardServiceAbstract {
         return candidates
     }
 
-    async uploadRewardPack(rewards: RewardArray): Promise<{ status: number }> {
+    async bulkCreateRewards(rewards: RewardArray): Promise<{ status: number }> {
         const errorLimit = Math.max(Math.floor(rewards.length / 2), 1);
         let errorCounter = 0;
     
@@ -82,11 +82,11 @@ export class RewardServiceImpl implements RewardServiceAbstract {
     
             return { status: 201 };
         } catch (e) {
-            throw RethrowApiError(`Service error: Method - uploadRewardPack`, e);
+            throw RethrowApiError(`Service error: Method - bulkCreateRewards`, e);
         }
     }
 
-    async deleteRewards(ids: number[]): Promise<{ status: number }> {
+    async bulkDeleteRewards(ids: number[]): Promise<{ status: number }> {
         const errorLimit = Math.floor(ids.length / 2);
         let errorCounter = 0;
     
@@ -115,7 +115,7 @@ export class RewardServiceImpl implements RewardServiceAbstract {
     
             return { status: 200 };
         } catch (e) {
-            throw RethrowApiError(`Service error: Method - deletePersons`, e);
+            throw RethrowApiError(`Service error: Method - bulkDeletePersons`, e);
         }
     }
 }

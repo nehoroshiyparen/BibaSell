@@ -1,3 +1,4 @@
-import { createLoader } from '@mdx-js/node-loader'
-
-export const loader = createLoader()
+export const MdxLoader = async () => {
+    const { createLoader } = await import('@mdx-js/node-loader')
+    return createLoader()
+}
