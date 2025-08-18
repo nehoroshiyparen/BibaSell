@@ -1,16 +1,15 @@
 import { Request, Response } from "express";
-import { TypeofPersonArraySchema, PersonArraySchema, PersonArrayJsonSchema } from '../types/schemas/person/PersonArraySchema'
-import { SendError, SendResponse } from "src/utils/http";
-import { status } from "src/consts/status";
-import { PersonServiceAbstract } from "src/types/abstractions/services/person.service.abstraction";
+import { PersonArrayJsonSchema } from '../types/schemas/person/PersonArraySchema.js'
+import { SendError, SendResponse } from "#src/utils/http/index.js";
+import { status } from "#src/consts/status.js";
+import { PersonServiceAbstract } from "#src/types/abstractions/services/person.service.abstraction.js";
 import { injectable, inject } from "inversify";
-import { TYPES } from "src/di/types";
-import { ApiError } from "src/utils/ApiError/ApiError";
-import { ValidateId } from "src/utils/validations/ids/id.validate";
-import { ValidatePaginationParams } from "src/utils/validations/paginationParams.validate";
-import { ValidateObjectFieldsNotNull } from "src/utils/validations/objectFieldsNotNull.validate";
-import { ValidateIdArray } from "src/utils/validations/ids/idArray.validate";
-import { PersonFiltersSchema } from "src/types/schemas/person/PersonFilters.schema";
+import { TYPES } from "#src/di/types.js";
+import { ValidateId } from "#src/utils/validations/ids/id.validate.js";
+import { ValidatePaginationParams } from "#src/utils/validations/paginationParams.validate.js";
+import { ValidateObjectFieldsNotNull } from "#src/utils/validations/objectFieldsNotNull.validate.js";
+import { ValidateIdArray } from "#src/utils/validations/ids/idArray.validate.js";
+import { PersonFiltersSchema } from "#src/types/schemas/person/PersonFilters.schema.js";
 
 @injectable()
 export class PersonControllerImpl {

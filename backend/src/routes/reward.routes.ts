@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { inject, injectable } from "inversify";
-import { RewardControllerImpl } from "src/controllers/reward.controller";
-import { TYPES } from "src/di/types";
+import { RewardControllerImpl } from "#src/controllers/reward.controller.js";
+import { TYPES } from "#src/di/types.js";
 
 @injectable()
 export class RewardRouter {

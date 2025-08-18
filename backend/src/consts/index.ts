@@ -1,3 +1,3 @@
-export { status } from './status'
-export { errorCodes } from './errorCodes'
-export { redisIdPrefixes } from './redisIdPrefixes'
+export { status } from './status.js'
+export { errorCodes } from './errorCodes.js'
+export { redisIdPrefixes } from './redisIdPrefixes.js'

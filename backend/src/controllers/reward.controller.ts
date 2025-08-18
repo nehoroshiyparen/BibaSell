@@ -1,15 +1,14 @@
 import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
-import { TYPES } from "src/di/types";
-import { RewardServiceAbstract } from "src/types/abstractions/services/reward.service.abstraction";
-import { RewardSchema, TypeofRewardSchema } from "src/types/schemas/reward/Reward.schema";
-import { RewardArrayJsonSchema, RewardArraySchema } from "src/types/schemas/reward/RewardArray.schema";
-import { SendError, SendResponse } from "src/utils/http";
-import { ValidateObjectFieldsNotNull } from "src/utils/validations/objectFieldsNotNull.validate";
-import { ValidateId } from "src/utils/validations/ids/id.validate";
-import { ValidateIdArray } from "src/utils/validations/ids/idArray.validate";
-import { ValidatePaginationParams } from "src/utils/validations/paginationParams.validate";
-import { RewardFiltersSchema } from "src/types/schemas/reward/RewardFilters.schema";
+import { TYPES } from "#src/di/types.js";
+import { RewardServiceAbstract } from "#src/types/abstractions/services/reward.service.abstraction.js";
+import { RewardArrayJsonSchema } from "#src/types/schemas/reward/RewardArray.schema.js";
+import { SendError, SendResponse } from "#src/utils/http/index.js";
+import { ValidateObjectFieldsNotNull } from "#src/utils/validations/objectFieldsNotNull.validate.js";
+import { ValidateId } from "#src/utils/validations/ids/id.validate.js";
+import { ValidateIdArray } from "#src/utils/validations/ids/idArray.validate.js";
+import { ValidatePaginationParams } from "#src/utils/validations/paginationParams.validate.js";
+import { RewardFiltersSchema } from "#src/types/schemas/reward/RewardFilters.schema.js";
 
 @injectable()
 export class RewardControllerImpl {

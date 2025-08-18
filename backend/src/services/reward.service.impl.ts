@@ -1,13 +1,13 @@
 import { inject, injectable } from "inversify";
-import { RewardServiceAbstract } from "src/types/abstractions/services/reward.service.abstraction";
-import { Reward } from "src/database/models/Reward.model";
-import { TypeofRewardSchema } from "src/types/schemas/reward/Reward.schema";
-import { RewardArray } from "src/types/schemas/reward/RewardArray.schema";
-import { RethrowApiError } from "src/utils/ApiError/RethrowApiError";
-import { ApiError } from "src/utils/ApiError/ApiError";
+import { RewardServiceAbstract } from "#src/types/abstractions/services/reward.service.abstraction.js";
+import { Reward } from "#src/database/models/Reward.model.js";
+import { TypeofRewardSchema } from "#src/types/schemas/reward/Reward.schema.js";
+import { RewardArray } from "#src/types/schemas/reward/RewardArray.schema.js";
+import { RethrowApiError } from "#src/utils/ApiError/RethrowApiError.js";
+import { ApiError } from "#src/utils/ApiError/ApiError.js";
 import { Sequelize } from "sequelize";
-import { TYPES } from "src/di/types";
-import { DatabaseImpl } from "src/database/database.impl";
+import { TYPES } from "#src/di/types.js";
+import { DatabaseImpl } from "#src/database/database.impl.js";
 
 @injectable()
 export class RewardServiceImpl implements RewardServiceAbstract {

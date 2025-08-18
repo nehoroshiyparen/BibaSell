@@ -1,4 +1,4 @@
-import { Error } from "./Error.interface";
+import { Error } from "./Error.interface.js";
 
 export interface ApiResponse<T> {
     message: string,

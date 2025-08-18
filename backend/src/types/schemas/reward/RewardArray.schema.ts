@@ -1,5 +1,5 @@
 import z from "zod";
-import { RewardSchema } from "./Reward.schema";
+import { RewardSchema } from "./Reward.schema.js";
 
 export const RewardArrayJsonSchema = z.object({
     data: z.array(RewardSchema)

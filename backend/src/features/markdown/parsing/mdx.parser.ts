@@ -1,33 +1,29 @@
-import { renderToString } from "react-dom/server";
-import React from "react";
+import { evaluate } from '@mdx-js/mdx';
+import * as runtime from 'react/jsx-runtime';
+import React from 'react';
+import { renderToString } from 'react-dom/server';
+import { pathToFileURL } from 'node:url';
 
 export async function MdxParser(mdxContent: string) {
-    const { compile } = await import('@mdx-js/mdx')
-    // Компилируем MDX в ES-модуль с функцией React-компонента
-    const compiled = await compile(mdxContent, {
-      outputFormat: "program",          // полноценный ES-модуль
-      development: false,               // для продакшна — false
-      jsxRuntime: "automatic",          // использовать jsx-runtime (React 17+)
-    });
+  // Если у тебя есть путь (файл), лучше передать {path, value}, иначе можно передать {value}
+  // baseUrl помогает корректно разрешать import / import.meta.url внутри MDX.
+  const baseUrl = pathToFileURL(process.cwd() + '/').toString(); // или import.meta.url если вызов из модуля
 
-    // Конвертируем код в data-url для динамического импорта
-    const moduleUrl = `data:text/javascript;base64,${Buffer.from(String(compiled)).toString("base64")}`;
+  // evaluate компилирует + выполняет MDX, принимает runtime как набор значений (jsx helpers)
+  const mdxModule = await evaluate(
+    { value: mdxContent },           // можно передать { path, value } если есть реальный файл
+    { ...runtime, baseUrl }         // runtime + опции (development, remarkPlugins и т.д.)
+  );
 
-    // Динамически импортируем модуль с React-компонентом MDX
-    const { default: MdxComponent } = await import(moduleUrl);
+  const MDXContent = mdxModule.default;
+  if (!MDXContent) throw new Error('MDX compile/evaluate returned no default export');
 
-    if (!MdxComponent) {
-      throw new Error("MDX content missing default export");
-    }
+  // Теперь рендерим как обычный React-компонент
+  const html = renderToString(
+    React.createElement(MDXContent as any, {
+      components: {} // передай свои компоненты, если нужно
+    })
+  );
 
-    // Рендерим React-компонент в строку
-    const html = renderToString(
-      React.createElement(MdxComponent, {
-        components: {
-          // здесь можно передавать кастомные MDX-компоненты, если нужны
-        },
-      })
-    );
-
-    return html;
+  return html;
 }

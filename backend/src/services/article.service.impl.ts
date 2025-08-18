@@ -1,27 +1,23 @@
 import { inject, injectable } from "inversify";
-import { Redis } from "ioredis";
 import { Op, Sequelize } from "sequelize";
-import { redisIdPrefixes } from "src/consts";
-import { DatabaseImpl } from "src/database/database.impl";
-import { Article } from "src/database/models/Article.model";
-import { Heading } from "src/database/models/Heading.model";
-import { TYPES } from "src/di/types";
-import { headersParser } from "src/features/markdown/parsing/header.parser";
-import { MdxParser } from "src/features/markdown/parsing/mdx.parser";
-import { getSlug } from "src/features/slugging/getSlug";
-import { RedisImpl } from "src/redis/redis.impl";
-import { ArticleServiceAbstract } from "src/types/abstractions/services/article.service.abstraction";
-import { ArticleContent } from "src/types/interfaces/articles/ArticleContent";
-import { ArticlePreview } from "src/types/interfaces/articles/ArticlePreview";
-import { HeadingBase } from "src/types/interfaces/headings/HeadingBase";
-import { TypeofArticleSchema } from "src/types/schemas/article/Article.schema";
-import { TypeofArticleFiltersSchema } from "src/types/schemas/article/ArticleFilters.schema";
-import { TypeofAdvancedArticleSchema } from "src/types/schemas/article/ArticlePatch.schema";
-import { ApiError } from "src/utils/ApiError/ApiError";
-import { RethrowApiError } from "src/utils/ApiError/RethrowApiError";
-import { cleanup } from "src/utils/helper/object.cleanup";
-import { sanitizeMarkdownToText } from "src/utils/sanitize/markdown";
-import { ValidateObjectFieldsNotNull } from "src/utils/validations/objectFieldsNotNull.validate";
+import { redisIdPrefixes } from "#src/consts/index.js";
+import { DatabaseImpl } from "#src/database/database.impl.js";
+import { Article } from "#src/database/models/Article.model.js";
+import { Heading } from "#src/database/models/Heading.model.js";
+import { TYPES } from "#src/di/types.js";
+import { headersParser } from "#src/features/markdown/parsing/header.parser.js";
+import { MdxParser } from "#src/features/markdown/parsing/mdx.parser.js";
+import { getSlug } from "#src/features/slugging/getSlug.js";
+import { RedisImpl } from "#src/redis/redis.impl.js";
+import { ArticleServiceAbstract } from "#src/types/abstractions/services/article.service.abstraction.js";
+import { ArticleContent } from "#src/types/interfaces/articles/ArticleContent.js";
+import { ArticlePreview } from "#src/types/interfaces/articles/ArticlePreview.js";
+import { TypeofArticleFiltersSchema } from "#src/types/schemas/article/ArticleFilters.schema.js";
+import { TypeofAdvancedArticleSchema } from "#src/types/schemas/article/ArticlePatch.schema.js";
+import { ApiError } from "#src/utils/ApiError/ApiError.js";
+import { RethrowApiError } from "#src/utils/ApiError/RethrowApiError.js";
+import { cleanup } from "#src/utils/helper/object.cleanup.js";
+import { sanitizeMarkdownToText } from "#src/utils/sanitize/markdown.js";
 
 @injectable()
 export class ArticleServiceImpl implements ArticleServiceAbstract {
@@ -158,6 +154,7 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
 
             const processedHeadings  = headersParser(options.content_markdown)
             headings?.forEach((heading) => processedHeadings.push(heading.title))
+            processedHeadings.push(articleOpt.title)
 
             const content_html = await MdxParser(options.content_markdown)
 
@@ -170,12 +167,14 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
             await Promise.all(
                 processedHeadings.map(async (heading) => {
                     try {
+                        console.log(heading)
+
                         await Heading.create({
                             title: heading,
                             article_id: article.id,
                         }, { transaction })
                     } catch (e) {
-                        throw ApiError.BadRequest(`Error while creating heading: ${heading}`)
+                        throw ApiError.BadRequest(`Error while creating heading: ${heading}`, undefined, e)
                     }
                 })
             )

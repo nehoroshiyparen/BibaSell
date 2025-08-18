@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { ApiResponse } from "src/types/interfaces/http/Response.interface";
+import { ApiResponse } from "#src/types/interfaces/http/Response.interface.js";
 
 export function SendResponse<T>(
     res: Response, 

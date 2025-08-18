@@ -1,6 +1,6 @@
-import { Person } from "src/database/models/Person.model";
-import { TypeofPersonArraySchema } from "src/types/schemas/person/PersonArraySchema";
-import { TypeofPersonFiltersSchema } from "src/types/schemas/person/PersonFilters.schema";
+import { Person } from "#src/database/models/Person.model.js";
+import { TypeofPersonArraySchema } from "#src/types/schemas/person/PersonArraySchema.js";
+import { TypeofPersonFiltersSchema } from "#src/types/schemas/person/PersonFilters.schema.js";
 
 export interface PersonServiceAbstract {
     getPersonById(id: number): Promise<Person>;

@@ -1,6 +1,6 @@
-import { Reward } from "src/database/models/Reward.model";
-import { RewardArray } from "src/types/schemas/reward/RewardArray.schema";
-import { TypeofRewardFiltersSchema } from "src/types/schemas/reward/RewardFilters.schema";
+import { Reward } from "#src/database/models/Reward.model.js";
+import { RewardArray } from "#src/types/schemas/reward/RewardArray.schema.js";
+import { TypeofRewardFiltersSchema } from "#src/types/schemas/reward/RewardFilters.schema.js";
 
 export interface RewardServiceAbstract {
     getRewardById(id: number): Promise<Reward>;

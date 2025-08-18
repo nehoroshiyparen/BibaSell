@@ -1,23 +1,23 @@
 import { Container } from "inversify";
-import { PersonServiceImpl } from "src/services/person.service.impl";
-import { TYPES } from "./types";
-import { PersonServiceAbstract } from "src/types/abstractions/services/person.service.abstraction";
-import { PersonControllerImpl } from "src/controllers/person.controller";
-import { PersonRouter } from "src/routes/person.routes";
-import { IndexRouter } from "src/routes";
-import { AppAbstract, DatabaseAbstract } from "src/types/abstractions";
-import { DatabaseImpl } from "src/database/database.impl";
-import { RewardServiceAbstract } from "src/types/abstractions/services/reward.service.abstraction";
-import { RewardServiceImpl } from "src/services/reward.service.impl";
-import { RewardControllerImpl } from "src/controllers/reward.controller";
-import { RewardRouter } from "src/routes/reward.routes";
-import { AppImpl } from "src/app.impl";
-import { ArticleServiceAbstract } from "src/types/abstractions/services/article.service.abstraction";
-import { ArticleServiceImpl } from "src/services/article.service.impl";
-import { ArticleControllerImpl } from "src/controllers/article.controller";
-import { RedisAbstract } from "src/types/abstractions/redis.abstraction";
-import { RedisImpl } from "src/redis/redis.impl";
-import { ArticleRouter } from "src/routes/article.routes";
+import { PersonServiceImpl } from "#src/services/person.service.impl.js";
+import { TYPES } from "./types.js";
+import { PersonServiceAbstract } from "#src/types/abstractions/services/person.service.abstraction.js";
+import { PersonControllerImpl } from "#src/controllers/person.controller.js";
+import { PersonRouter } from "#src/routes/person.routes.js";
+import { IndexRouter } from "#src/routes/index.js";
+import { AppAbstract, DatabaseAbstract } from "#src/types/abstractions/index.js";
+import { DatabaseImpl } from "#src/database/database.impl.js";
+import { RewardServiceAbstract } from "#src/types/abstractions/services/reward.service.abstraction.js";
+import { RewardServiceImpl } from "#src/services/reward.service.impl.js";
+import { RewardControllerImpl } from "#src/controllers/reward.controller.js";
+import { RewardRouter } from "#src/routes/reward.routes.js";
+import { AppImpl } from "#src/app.impl.js";
+import { ArticleServiceAbstract } from "#src/types/abstractions/services/article.service.abstraction.js";
+import { ArticleServiceImpl } from "#src/services/article.service.impl.js";
+import { ArticleControllerImpl } from "#src/controllers/article.controller.js";
+import { RedisAbstract } from "#src/types/abstractions/redis.abstraction.js";
+import { RedisImpl } from "#src/redis/redis.impl.js";
+import { ArticleRouter } from "#src/routes/article.routes.js";
 
 const container = new Container()
 

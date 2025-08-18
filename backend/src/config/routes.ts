@@ -1,4 +1,4 @@
-import { TYPES } from "src/di/types";
+import { TYPES } from "#src/di/types.js";
 
 export const ROUTES = [
     { path: '/persons', router: TYPES.PersonRouter },

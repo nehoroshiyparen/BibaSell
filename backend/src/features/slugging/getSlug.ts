@@ -1,4 +1,4 @@
-import { translitMap } from "./translitMap";
+import { translitMap } from "./translitMap.js";
 
 export function getSlug(s: string) {
     return s

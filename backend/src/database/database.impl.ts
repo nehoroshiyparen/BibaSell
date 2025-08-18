@@ -1,8 +1,8 @@
 import { Sequelize } from 'sequelize';
 import { injectable } from 'inversify';
-import { DatabaseAbstract } from '../types/abstractions';
-import { ISequelizeModel } from 'src/types/abstractions/sequelize.model.abstraction';
-import { sequelize as sequelizeConfig } from './config';
+import { DatabaseAbstract } from '../types/abstractions/index.js';
+import { ISequelizeModel } from '#src/types/abstractions/sequelize.model.abstraction.js';
+import { sequelize as sequelizeConfig } from './config.js';
 
 @injectable()
 export class DatabaseImpl implements DatabaseAbstract {

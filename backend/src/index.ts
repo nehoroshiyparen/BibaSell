@@ -1,6 +1,6 @@
-import { AppImpl } from "./app.impl";
-import { container } from "./di/container";
-import { TYPES } from "./di/types";
+import { AppImpl } from "./app.impl.js";
+import { container } from "./di/container.js";
+import { TYPES } from "./di/types.js";
 
 const app = container.get<AppImpl>(TYPES.App)
 

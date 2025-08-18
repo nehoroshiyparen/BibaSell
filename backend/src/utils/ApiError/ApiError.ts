@@ -1,5 +1,5 @@
-import { errorCodes } from "src/consts/errorCodes"
-import { status } from "src/consts/status"
+import { errorCodes } from "#src/consts/errorCodes.js"
+import { status } from "#src/consts/status.js"
 
 export class ApiError extends Error {
     status: number

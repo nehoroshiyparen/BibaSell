@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
-import { status } from "src/consts";
-import { TYPES } from "src/di/types";
-import { ArticleServiceAbstract } from "src/types/abstractions/services/article.service.abstraction";
-import { ArticleFiltersSchema } from "src/types/schemas/article/ArticleFilters.schema";
-import { ArticlePatchSchema } from "src/types/schemas/article/ArticlePatch.schema";
-import { SendError, SendResponse } from "src/utils/http";
-import { ValidateObjectFieldsNotNull } from "src/utils/validations/objectFieldsNotNull.validate";
-import { ValidateId } from "src/utils/validations/ids/id.validate";
-import { ValidateIdArray } from "src/utils/validations/ids/idArray.validate";
-import { ApiError } from "src/utils/ApiError/ApiError";
+import { status } from "#src/consts/index.js";
+import { TYPES } from "#src/di/types.js";
+import { ArticleServiceAbstract } from "#src/types/abstractions/services/article.service.abstraction.js";
+import { ArticleFiltersSchema } from "#src/types/schemas/article/ArticleFilters.schema.js";
+import { ArticlePatchSchema } from "#src/types/schemas/article/ArticlePatch.schema.js";
+import { SendError, SendResponse } from "#src/utils/http/index.js";
+import { ValidateObjectFieldsNotNull } from "#src/utils/validations/objectFieldsNotNull.validate.js";
+import { ValidateId } from "#src/utils/validations/ids/id.validate.js";
+import { ValidateIdArray } from "#src/utils/validations/ids/idArray.validate.js";
+import { ApiError } from "#src/utils/ApiError/ApiError.js";
 
 @injectable()
 export class ArticleControllerImpl {

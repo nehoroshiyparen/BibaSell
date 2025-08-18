@@ -1,9 +1,9 @@
 import { injectable } from "inversify";
 import { Redis } from "ioredis";
-import { RedisAbstract } from "src/types/abstractions/redis.abstraction";
-import { redisConfig } from "./config";
-import { ENV } from "src/config";
-import { ApiError } from "src/utils/ApiError/ApiError";
+import { RedisAbstract } from "#src/types/abstractions/redis.abstraction.js";
+import { redisConfig } from "./config.js";
+import { ENV } from "#src/config/index.js";
+import { ApiError } from "#src/utils/ApiError/ApiError.js";
 
 @injectable()
 export class RedisImpl implements RedisAbstract {

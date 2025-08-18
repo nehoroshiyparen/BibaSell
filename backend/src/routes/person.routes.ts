@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { inject, injectable } from "inversify";
-import { PersonControllerImpl } from "src/controllers/person.controller";
-import { TYPES } from "src/di/types";
+import { PersonControllerImpl } from "#src/controllers/person.controller.js";
+import { TYPES } from "#src/di/types.js";
 
 @injectable()
 export class PersonRouter {

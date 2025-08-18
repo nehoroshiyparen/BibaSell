@@ -1,4 +1,4 @@
-import { ApiError } from "../ApiError/ApiError";
+import { ApiError } from "../ApiError/ApiError.js";
 
 export function ValidateObjectFieldsNotNull(filters: object) {
     console.log(filters)

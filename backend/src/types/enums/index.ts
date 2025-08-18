@@ -1,1 +1,1 @@
-export { HttpMethods } from './httpMethods.enum'
+export { HttpMethods } from './httpMethods.enum.js'

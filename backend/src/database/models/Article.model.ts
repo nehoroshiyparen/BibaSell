@@ -1,6 +1,5 @@
 import { DataTypes, Model, NonAttribute, Sequelize } from "sequelize";
-import { sequelize as sequelizeConfig } from "../config";
-import { Heading } from "./Heading.model";
+import { Heading } from "./Heading.model.js";
 
 export class Article extends Model {
     declare id: number;

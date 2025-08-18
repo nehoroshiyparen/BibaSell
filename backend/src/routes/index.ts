@@ -1,10 +1,8 @@
 import { Router } from "express";
-import { inject, injectable } from "inversify";
-import { TYPES } from "src/di/types";
-import { PersonRouter } from "./person.routes";
-import { ROUTES } from "src/config";
-import { container } from "src/di/container";
-import { RouterAbstract } from "src/types/abstractions/router.abstraction";
+import { injectable } from "inversify";
+import { ROUTES } from "#src/config/index.js";
+import { container } from "#src/di/container.js";
+import { RouterAbstract } from "#src/types/abstractions/router.abstraction.js";
 
 @injectable()
 export class IndexRouter implements RouterAbstract {

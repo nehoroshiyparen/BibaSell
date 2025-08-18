@@ -1,9 +1,8 @@
-import { Article } from "src/database/models/Article.model"
-import { ArticleContent } from "src/types/interfaces/articles/ArticleContent"
-import { ArticlePreview } from "src/types/interfaces/articles/ArticlePreview"
-import { HeadingBase } from "src/types/interfaces/headings/HeadingBase"
-import { TypeofArticleFiltersSchema } from "src/types/schemas/article/ArticleFilters.schema"
-import { TypeofAdvancedArticleSchema } from "src/types/schemas/article/ArticlePatch.schema"
+import { Article } from "#src/database/models/Article.model.js"
+import { ArticleContent } from "#src/types/interfaces/articles/ArticleContent.js"
+import { ArticlePreview } from "#src/types/interfaces/articles/ArticlePreview.js"
+import { TypeofArticleFiltersSchema } from "#src/types/schemas/article/ArticleFilters.schema.js"
+import { TypeofAdvancedArticleSchema } from "#src/types/schemas/article/ArticlePatch.schema.js"
 
 export interface ArticleServiceAbstract {
     getArticleById(id: number): Promise<ArticlePreview>

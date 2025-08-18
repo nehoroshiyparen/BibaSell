@@ -1,5 +1,5 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
-import { Article } from "./Article.model";
+import { Article } from "./Article.model.js";
 
 export class Heading extends Model {
     declare id: number
@@ -10,7 +10,7 @@ export class Heading extends Model {
         this.init({
             id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
             title: {type: DataTypes.STRING, allowNull: false },
-            articleId: { type: DataTypes.INTEGER, allowNull: false }
+            article_id: { type: DataTypes.INTEGER, allowNull: false }
         }, {
             sequelize,
             modelName: 'Heading',

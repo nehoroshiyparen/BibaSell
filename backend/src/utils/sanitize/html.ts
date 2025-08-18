@@ -10,7 +10,7 @@ function sanitizeHtmlContent(html: string): string {
     ],
     allowedAttributes: {
       a: ["href", "name", "target"],
-      img: ["src", "alt", "title"],
+      img: ["#src", "alt", "title"],
     },
   })
 }

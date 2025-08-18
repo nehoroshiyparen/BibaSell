@@ -1,14 +1,14 @@
 import { Sequelize } from "sequelize";
 import { inject, injectable } from "inversify";
-import { Person } from "src/database/models/Person.model";
-import { TypeofPersonArraySchema } from "src/types/schemas/person/PersonArraySchema";
-import { ApiError } from "src/utils/ApiError/ApiError";
-import { RethrowApiError } from "src/utils/ApiError/RethrowApiError";
-import { PersonServiceAbstract } from "../types/abstractions/services/person.service.abstraction";
-import { TYPES } from "src/di/types";
-import { Reward } from "src/database/models/Reward.model";
-import { TypeofPersonFiltersSchema } from "src/types/schemas/person/PersonFilters.schema";
-import { DatabaseImpl } from "src/database/database.impl";
+import { Person } from "#src/database/models/Person.model.js";
+import { TypeofPersonArraySchema } from "#src/types/schemas/person/PersonArraySchema.js";
+import { ApiError } from "#src/utils/ApiError/ApiError.js";
+import { RethrowApiError } from "#src/utils/ApiError/RethrowApiError.js";
+import { PersonServiceAbstract } from "../types/abstractions/services/person.service.abstraction.js";
+import { TYPES } from "#src/di/types.js";
+import { Reward } from "#src/database/models/Reward.model.js";
+import { TypeofPersonFiltersSchema } from "#src/types/schemas/person/PersonFilters.schema.js";
+import { DatabaseImpl } from "#src/database/database.impl.js";
 
 @injectable()
 export class PersonServiceImpl implements PersonServiceAbstract {

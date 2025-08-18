@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { PersonSchema } from './Person.schema'
+import { PersonSchema } from './Person.schema.js'
 
 
 export const PersonArrayJsonSchema = z.object({

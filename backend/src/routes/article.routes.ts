@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { inject, injectable } from "inversify";
-import { ArticleControllerImpl } from "src/controllers/article.controller";
-import { TYPES } from "src/di/types";
-import { RouterAbstract } from "src/types/abstractions";
+import { ArticleControllerImpl } from "#src/controllers/article.controller.js";
+import { TYPES } from "#src/di/types.js";
+import { RouterAbstract } from "#src/types/abstractions/index.js";
 
 @injectable()
 export class ArticleRouter implements RouterAbstract {

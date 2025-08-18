@@ -1,2 +1,2 @@
-export { SendResponse } from './SendResponse'
-export { SendError } from './SendError'
+export { SendResponse } from './SendResponse.js'
+export { SendError } from './SendError.js'
