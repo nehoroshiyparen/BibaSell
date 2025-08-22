@@ -9,6 +9,7 @@ services:
     volumes:
       - ./backend:/app
       - node_modules:/app/node_modules
+      - ./uploads:/app/uploads
     environment:
       - DB_HOST=db
       - DB_PORT=5432
@@ -17,6 +18,15 @@ services:
       - DB_NAME=BIBACELL
     depends_on:
       - db
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    volumes: 
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./uploads:/var/www/uploads
+    ports:
+      - "8080:80"
     restart: unless-stopped
 
   client:

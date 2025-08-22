@@ -4,12 +4,13 @@ import { status } from "#src/consts/index.js";
 import { TYPES } from "#src/di/types.js";
 import { ArticleServiceAbstract } from "#src/types/abstractions/services/article.service.abstraction.js";
 import { ArticleFiltersSchema } from "#src/types/schemas/article/ArticleFilters.schema.js";
-import { ArticlePatchSchema } from "#src/types/schemas/article/ArticlePatch.schema.js";
+import { ArticleCreateSchema } from "#src/types/schemas/article/ArticlePatch.schema.js";
 import { SendError, SendResponse } from "#src/utils/http/index.js";
 import { ValidateObjectFieldsNotNull } from "#src/utils/validations/objectFieldsNotNull.validate.js";
 import { ValidateId } from "#src/utils/validations/ids/id.validate.js";
 import { ValidateIdArray } from "#src/utils/validations/ids/idArray.validate.js";
 import { ApiError } from "#src/utils/ApiError/ApiError.js";
+import { ArticleUpdateSchema } from "#src/types/schemas/article/ArticleUpdate.schema.js";
 
 @injectable()
 export class ArticleControllerImpl {
@@ -85,7 +86,7 @@ export class ArticleControllerImpl {
             const options = req.body
 
             ValidateObjectFieldsNotNull(options)
-            const validatedOptions = ArticlePatchSchema.parse(options)
+            const validatedOptions = ArticleCreateSchema.parse(options)
             
             const article = await this.articleService.createArticle(validatedOptions)
 
@@ -97,10 +98,10 @@ export class ArticleControllerImpl {
 
     async updateArticle(req: Request, res: Response) {
         try {
-            const { id, ...options }= req.body
+            const { id, options }= req.body
 
             ValidateObjectFieldsNotNull(options)
-            const validatedOptions = ArticlePatchSchema.parse(options)
+            const validatedOptions = ArticleUpdateSchema.parse(options)
 
             const article = await this.articleService.updateArcticle(id, validatedOptions)
 
@@ -112,7 +113,7 @@ export class ArticleControllerImpl {
 
     async bulkDeleteArticles(req: Request, res: Response) {
         try {
-            const ids = String(req.query).split(',').map(Number)
+            const ids = String(req.query.ids).split(',').map(Number)
 
             ValidateIdArray(ids)
 

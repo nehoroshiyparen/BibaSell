@@ -7,6 +7,7 @@ export class Person extends Model {
     declare description?: string
     declare rank?: string
     declare comments?: string
+    declare image_url?: string
 
     static initialize(sequelize: Sequelize) {
         this.init({
@@ -16,6 +17,7 @@ export class Person extends Model {
             description: { type: DataTypes.TEXT, allowNull: true },
             rank: { type: DataTypes.TEXT, allowNull: true },
             comments: { type: DataTypes.TEXT, allowNull: true },
+            image_url: { type: DataTypes.STRING, allowNull: true, defaultValue: 'default.jpg' }
         }, {
             sequelize: sequelize,
             modelName: 'Person',

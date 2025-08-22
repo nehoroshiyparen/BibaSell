@@ -6,6 +6,6 @@ export interface PersonServiceAbstract {
     getPersonById(id: number): Promise<Person>;
     getPersons(offset: number, limit: number): Promise<Person[] | null>;
     getFilteredPersons(filters: TypeofPersonFiltersSchema): Promise<Person[] | null>
-    bulkCreatePersons(data: TypeofPersonArraySchema): Promise<{ status: number }>;
+    bulkCreatePersons(data: TypeofPersonArraySchema, fileConfig: { tempDirPath: string, files?: Express.Multer.File[] | undefined }): Promise<{ status: number }>;
     bulkDeletePersons(ids: number[]): Promise<{ status: number }>;
 }

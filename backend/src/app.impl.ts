@@ -40,21 +40,25 @@ export class AppImpl implements AppAbstract {
     }
 
     public async setup() {
-        this.#database.registerModels([Person, Reward, PersonRewards, Article, Heading])
-        await this.#database.setup()
+        try {
+            this.#database.registerModels([Person, Reward, PersonRewards, Article, Heading])
+            await this.#database.setup()
 
-        this.redis.setup()
+            this.redis.setup()
 
-        this.#app.use(express.json())
-        
-        this.#app.use(this.#router)
-        this.setupMiddlewares(this.#middlewares)
+            this.#app.use(express.json())
+            this.#app.use(this.#router)
+            this.setupMiddlewares(this.#middlewares)
 
-        this.#redis.startRedisPing()
+            this.#redis.startRedisPing()
 
-        this.#app.listen(this.port, () => {
-            console.log(`App '${this.name}' started on port ${this.port}`)
-        })
+            this.#app.listen(this.port, () => {
+                console.log(`App '${this.name}' started on port ${this.port}`)
+            })
+        } catch (err) {
+            console.error('Error during app setup:', err)
+            process.exit(1)
+        }
     }
 
     private setupMiddlewares(middlewares: RequestHandler[]) {

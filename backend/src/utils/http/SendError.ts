@@ -4,6 +4,7 @@ import { ApiError } from "../ApiError/ApiError.js";
 import { errorCodes } from "#src/consts/errorCodes.js";
 import { status } from "#src/consts/status.js";
 import { isError } from "../typeGuards/isError.js";
+import { ZodError } from "zod";
 
 export function SendError(
     res: Response,
@@ -21,7 +22,14 @@ export function SendError(
         errorStatus = e.status
         errorCode = e.code ? e.code : ''
         errorMessage = e.message
-        responseMessage = 'Predicted error'
+        responseMessage = 'Request processing error'
+    } else if (e instanceof ZodError) {
+        errorStatus = status.BAD_REQUEST
+        errorCode = 'ZOD_VALIDATION_ERROR'
+        errorMessage = e.issues[0].message
+        responseMessage = 'Validation error'
+        
+        console.log(errorMessage)
     } else {
         if (isError(e)) {
             console.log('Unknown error', e)

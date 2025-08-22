@@ -9,6 +9,8 @@ import { TYPES } from "#src/di/types.js";
 import { Reward } from "#src/database/models/Reward.model.js";
 import { TypeofPersonFiltersSchema } from "#src/types/schemas/person/PersonFilters.schema.js";
 import { DatabaseImpl } from "#src/database/database.impl.js";
+import { moveFileToFinal } from "#src/utils/fileHandlers/moveFileToFinal.js";
+import { removeDir } from "#src/utils/fileHandlers/removeDir.js";
 
 @injectable()
 export class PersonServiceImpl implements PersonServiceAbstract {
@@ -72,11 +74,11 @@ export class PersonServiceImpl implements PersonServiceAbstract {
         }
     }
     
-    async bulkCreatePersons(persons: TypeofPersonArraySchema): Promise<{ status: number }> {
+    async bulkCreatePersons(persons: TypeofPersonArraySchema, fileConfig: { tempDirPath: string, files?: Express.Multer.File[] | undefined }): Promise<{ status: number }> {
         const errorLimit = Math.max(Math.floor(persons.length / 2), 1);
         let errorCounter = 0;
-        
-        console.log(persons)
+
+        console.log(fileConfig.tempDirPath)
     
         try {
             for (const person of persons) {
@@ -84,12 +86,16 @@ export class PersonServiceImpl implements PersonServiceAbstract {
                     await this.sequelize.transaction(async (t) => {
                         await Reward.create(person, { transaction: t });
                     });
+
+                    moveFileToFinal(fileConfig.tempDirPath, person.name, 'persons')
                 } catch (e) {
                     console.log(`Error creating person: ${person.name}`, e);
                     errorCounter++;
                     if (errorCounter >= errorLimit) break;
                 }
             }
+
+            removeDir(fileConfig.tempDirPath)
     
             if (errorCounter > 0 && errorCounter < errorLimit) {
                 return { status: 206 };
@@ -135,4 +141,8 @@ export class PersonServiceImpl implements PersonServiceAbstract {
             throw RethrowApiError(`Service error: Method - bulkDeletePersons`, e);
         }
     }
+
+    private async bulkCreateImages(files: Express.Multer.File[] | undefined) {
+
+    } 
 }

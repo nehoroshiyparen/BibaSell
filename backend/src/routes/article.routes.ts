@@ -25,7 +25,7 @@ export class ArticleRouter implements RouterAbstract {
 
         this.router.put('/update', this.articleController.updateArticle.bind(this.articleController))
 
-        this.router.delete('/pack', this.articleController.bulkDeleteArticles.bind(this.articleController))
+        this.router.delete('/bulk', this.articleController.bulkDeleteArticles.bind(this.articleController))
     }
 
     getRouter(): Router {

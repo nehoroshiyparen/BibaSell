@@ -15,4 +15,7 @@ export const ENV = {
     REDIS_HOST: process.env.REDIS_HOST || '',
     REDIS_PORT: Number(process.env.REDIS_PORT),
     REDIS_PASSWORD: process.env.REDIS_PASSWORD || '',
+
+    MULTER_UPLOAD_PATH: process.env.MULTER_UPLOAD_PATH ?? '',
+    MULTER_GAP_DIR_PATH: process.env.MULTER_GAP_DIR_PATH ?? ''
 }

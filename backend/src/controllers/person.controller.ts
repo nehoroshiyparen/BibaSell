@@ -97,7 +97,12 @@ export class PersonControllerImpl {
             const dataPack = req.body
             const validatedData = PersonArrayJsonSchema.parse(dataPack)
 
-            const { status } =  await this.personService.bulkCreatePersons(validatedData.data)
+            const fileConfig = {
+                tempDirPath: req.tempUploadDir!,
+                files: req.files as Express.Multer.File[] | undefined,
+            }
+
+            const { status } =  await this.personService.bulkCreatePersons(validatedData.data, fileConfig)
 
             SendResponse(res, status, status === 201 ? `Persons created` : status === 206 ? `Persons created partilly` : `Persons weren't created. To much invalid data`, null)
         } catch (e) {
