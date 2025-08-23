@@ -7,7 +7,8 @@ services:
     ports:
       - '7812:7812'
     volumes:
-      - ./backend:/app
+      - ./backend:/app:cached
+      - node_modules_app:/app/node_modules
       - ./uploads:/app/uploads
     environment:
       - DB_HOST=db
@@ -68,3 +69,4 @@ volumes:
   pgdata:
   node_modules:
   redis_data:
+  node_modules_app:

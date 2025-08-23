@@ -1,14 +1,17 @@
-FROM node:18
+FROM node:22
 
 WORKDIR /app
 
+# Копируем только манифесты
 COPY package*.json ./
 
-RUN npm install multer @types/multer --save
-RUN npm install
+# Чистая установка всех зависимостей под Linux
+RUN npm ci
 
+# Копируем остальной код
 COPY . .
 
 EXPOSE 7812
 
+# dev-скрипт с esbuild
 CMD ["npm", "run", "dev"]

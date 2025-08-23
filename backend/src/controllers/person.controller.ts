@@ -98,12 +98,12 @@ export class PersonControllerImpl {
             const dataPack = req.body
             const validatedData = PersonArrayJsonSchema.parse(dataPack)
 
-            const fileConfig: FileConfig = {
-                tempDirPath: req.tempUploadDir!,
-                files: req.files as Express.Multer.File[] | undefined,
-            }
-
-            console.log(fileConfig)
+            const fileConfig: FileConfig | undefined = 
+            req.tempUploadDir ? 
+                {
+                    tempDirPath: req.tempUploadDir,
+                    files: req.files as Express.Multer.File[] | undefined,
+                } : undefined
 
             const { status } =  await this.personService.bulkCreatePersons(validatedData.data, fileConfig)
 

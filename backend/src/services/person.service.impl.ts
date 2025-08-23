@@ -75,7 +75,7 @@ export class PersonServiceImpl implements PersonServiceAbstract {
         }
     }
     
-    async bulkCreatePersons(persons: TypeofPersonArraySchema, fileConfig: FileConfig): Promise<{ status: number }> {
+    async bulkCreatePersons(persons: TypeofPersonArraySchema, fileConfig: FileConfig | undefined): Promise<{ status: number }> {
         const errorLimit = Math.max(Math.floor(persons.length / 2), 1);
         let errorCounter = 0;
     
@@ -86,7 +86,8 @@ export class PersonServiceImpl implements PersonServiceAbstract {
                         await Person.create(person, { transaction: t });
                     });
 
-                    moveFileToFinal(fileConfig.tempDirPath, person.name, 'persons')
+                    fileConfig && moveFileToFinal(fileConfig.tempDirPath, person.name, 'persons')
+                    
                 } catch (e) {
                     console.log(`Error creating person: ${person.name}`, e);
                     errorCounter++;
@@ -94,7 +95,7 @@ export class PersonServiceImpl implements PersonServiceAbstract {
                 }
             }
 
-            removeDir(fileConfig.tempDirPath)
+            fileConfig && removeDir(fileConfig.tempDirPath)
     
             if (errorCounter > 0 && errorCounter < errorLimit) {
                 return { status: 206 };

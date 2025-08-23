@@ -6,6 +6,7 @@ import path from 'path'
 
 const UPLOAD_BASE = path.join(process.cwd(), '..', 'uploads', 'temp');
 
+// не срабатывает, когда нет прикрепленных файлов, поэтому нужно это учитывать
 export const diskStorage = multer.diskStorage({
     destination: (req, _file, cb) => {
         const tempDir = createUniqueDir()
