@@ -10,6 +10,7 @@ import { ValidatePaginationParams } from "#src/utils/validations/paginationParam
 import { ValidateObjectFieldsNotNull } from "#src/utils/validations/objectFieldsNotNull.validate.js";
 import { ValidateIdArray } from "#src/utils/validations/ids/idArray.validate.js";
 import { PersonFiltersSchema } from "#src/types/schemas/person/PersonFilters.schema.js";
+import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
 
 @injectable()
 export class PersonControllerImpl {
@@ -97,10 +98,12 @@ export class PersonControllerImpl {
             const dataPack = req.body
             const validatedData = PersonArrayJsonSchema.parse(dataPack)
 
-            const fileConfig = {
+            const fileConfig: FileConfig = {
                 tempDirPath: req.tempUploadDir!,
                 files: req.files as Express.Multer.File[] | undefined,
             }
+
+            console.log(fileConfig)
 
             const { status } =  await this.personService.bulkCreatePersons(validatedData.data, fileConfig)
 

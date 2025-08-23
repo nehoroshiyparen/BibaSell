@@ -1,10 +1,11 @@
-import "express-serve-static-core"
-import 'express'
-import 'multer'
+import * as express from 'express'
 
-declare module "express-serve-static-core" {
-  interface Request {
-    tempUploadDir?: string;
-    files?: Express.Multer.File[];
+declare global {
+  namespace Express {
+    interface Request {
+      tempUploadDir?: string
+    }
   }
 }
+
+export {}

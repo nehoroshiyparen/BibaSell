@@ -11,6 +11,7 @@ import { TypeofPersonFiltersSchema } from "#src/types/schemas/person/PersonFilte
 import { DatabaseImpl } from "#src/database/database.impl.js";
 import { moveFileToFinal } from "#src/utils/fileHandlers/moveFileToFinal.js";
 import { removeDir } from "#src/utils/fileHandlers/removeDir.js";
+import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
 
 @injectable()
 export class PersonServiceImpl implements PersonServiceAbstract {
@@ -74,17 +75,15 @@ export class PersonServiceImpl implements PersonServiceAbstract {
         }
     }
     
-    async bulkCreatePersons(persons: TypeofPersonArraySchema, fileConfig: { tempDirPath: string, files?: Express.Multer.File[] | undefined }): Promise<{ status: number }> {
+    async bulkCreatePersons(persons: TypeofPersonArraySchema, fileConfig: FileConfig): Promise<{ status: number }> {
         const errorLimit = Math.max(Math.floor(persons.length / 2), 1);
         let errorCounter = 0;
-
-        console.log(fileConfig.tempDirPath)
     
         try {
             for (const person of persons) {
                 try {
                     await this.sequelize.transaction(async (t) => {
-                        await Reward.create(person, { transaction: t });
+                        await Person.create(person, { transaction: t });
                     });
 
                     moveFileToFinal(fileConfig.tempDirPath, person.name, 'persons')
@@ -105,7 +104,7 @@ export class PersonServiceImpl implements PersonServiceAbstract {
     
             return { status: 201 };
         } catch (e) {
-            throw RethrowApiError(`Service error: Method - bulkDeletePersons`, e);
+            throw RethrowApiError(`Service error: Method - bulkCreatePersons`, e);
         }
     }
 
@@ -135,14 +134,10 @@ export class PersonServiceImpl implements PersonServiceAbstract {
             } else if (errorCounter >= errorLimit) {
                 return { status: 400 };
             }
-    
+
             return { status: 201 };
         } catch (e) {
             throw RethrowApiError(`Service error: Method - bulkDeletePersons`, e);
         }
     }
-
-    private async bulkCreateImages(files: Express.Multer.File[] | undefined) {
-
-    } 
 }
