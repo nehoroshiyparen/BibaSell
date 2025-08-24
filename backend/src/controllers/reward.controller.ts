@@ -2,13 +2,14 @@ import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
 import { TYPES } from "#src/di/types.js";
 import { RewardServiceAbstract } from "#src/types/abstractions/services/reward.service.abstraction.js";
-import { RewardArrayJsonSchema } from "#src/types/schemas/reward/RewardArray.schema.js";
+import { RewardArraySchema } from "#src/types/schemas/reward/RewardArray.schema.js";
 import { SendError, SendResponse } from "#src/utils/http/index.js";
 import { ValidateObjectFieldsNotNull } from "#src/utils/validations/objectFieldsNotNull.validate.js";
 import { ValidateId } from "#src/utils/validations/ids/id.validate.js";
 import { ValidateIdArray } from "#src/utils/validations/ids/idArray.validate.js";
 import { ValidatePaginationParams } from "#src/utils/validations/paginationParams.validate.js";
 import { RewardFiltersSchema } from "#src/types/schemas/reward/RewardFilters.schema.js";
+import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface";
 
 @injectable()
 export class RewardControllerImpl {
@@ -55,8 +56,6 @@ export class RewardControllerImpl {
         try {
             const filters = req.body
 
-            console.log(filters)
-
             ValidateObjectFieldsNotNull(filters)
             const validatedFilters = RewardFiltersSchema.parse(filters)
 
@@ -70,11 +69,18 @@ export class RewardControllerImpl {
 
     async bulkCreateRewards(req: Request, res: Response) {
         try {
-            const data = req.body
-            
-            const validatedData = RewardArrayJsonSchema.parse(data)
+            const data = JSON.parse(req.body.data)
+        
+            const validatedData = RewardArraySchema.parse(data)
 
-            const { status } = await this.rewardService.bulkCreateRewards(validatedData.data)
+            const fileConfig: FileConfig | undefined = 
+                req.tempUploadDir ? 
+                    {
+                        tempDirPath: req.tempUploadDir,
+                        files: req.files as Express.Multer.File[] | undefined
+                    } : undefined
+
+            const { status } = await this.rewardService.bulkCreateRewards(validatedData, fileConfig)
 
             SendResponse(res, status, status === 201 ? `Rewards created` : status === 206 ? `Rewards created partilly` : `Rewards weren't created. To much invalid data`, null)
         } catch (e) {

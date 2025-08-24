@@ -2,6 +2,8 @@ import { Router } from "express";
 import { inject, injectable } from "inversify";
 import { RewardControllerImpl } from "#src/controllers/reward.controller.js";
 import { TYPES } from "#src/di/types.js";
+import { prepareTempDir } from "#src/middlewares/prepareTempDir.middleware";
+import { upload } from "#src/storage/multer.store";
 
 @injectable()
 export class RewardRouter {
@@ -19,7 +21,7 @@ export class RewardRouter {
         this.router.post('/filtered', this.rewardController.getFilteredRewards.bind(this.rewardController))
         this.router.get('/:id', this.rewardController.getRewardById.bind(this.rewardController))
 
-        this.router.patch('/bulk', this.rewardController.bulkCreateRewards.bind(this.rewardController))
+        this.router.patch('/bulk', prepareTempDir, upload.array('files'), this.rewardController.bulkCreateRewards.bind(this.rewardController))
         
         this.router.delete('/bulk', this.rewardController.bulkDeleteRewards.bind(this.rewardController))
     }

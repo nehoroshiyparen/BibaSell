@@ -95,11 +95,8 @@ export class PersonControllerImpl {
      */
     async bulkCreatePersons(req: Request, res: Response) {
         try {
-            console.log(req.body.data)
-
             const dataPack = JSON.parse(req.body.data)
 
-            console.log(dataPack)
             const validatedData = PersonArraySchema.parse(dataPack)
 
             const fileConfig: FileConfig | undefined = 

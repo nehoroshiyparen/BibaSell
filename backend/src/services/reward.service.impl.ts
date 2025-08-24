@@ -8,6 +8,10 @@ import { ApiError } from "#src/utils/ApiError/ApiError.js";
 import { Sequelize } from "sequelize";
 import { TYPES } from "#src/di/types.js";
 import { DatabaseImpl } from "#src/database/database.impl.js";
+import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface";
+import { moveFileToFinal } from "#src/utils/fileHandlers/moveFileToFinal";
+import { removeFile } from "#src/utils/fileHandlers/removeFile";
+import { removeDir } from "#src/utils/fileHandlers/removeDir";
 
 @injectable()
 export class RewardServiceImpl implements RewardServiceAbstract {
@@ -57,22 +61,27 @@ export class RewardServiceImpl implements RewardServiceAbstract {
         return candidates
     }
 
-    async bulkCreateRewards(rewards: RewardArray): Promise<{ status: number }> {
+    async bulkCreateRewards(rewards: RewardArray, fileConfig: FileConfig | undefined): Promise<{ status: number }> {
         const errorLimit = Math.max(Math.floor(rewards.length / 2), 1);
         let errorCounter = 0;
     
         try {
             for (const reward of rewards) {
                 try {
+                    const image_url = fileConfig ? moveFileToFinal(fileConfig.tempDirPath, reward.label, 'rewards') : null
+
                     await this.sequelize.transaction(async (t) => {
-                        await Reward.create(reward, { transaction: t });
+                        await Reward.create({ ...reward, image_url }, { transaction: t });
                     });
                 } catch (e) {
                     console.log(`Error creating reward: ${reward.label}`, e);
+                    removeFile(reward.label, 'rewards')
                     errorCounter++;
                     if (errorCounter >= errorLimit) break;
                 }
             }
+
+            fileConfig && removeDir(fileConfig.tempDirPath)
     
             if (errorCounter > 0 && errorCounter < errorLimit) {
                 return { status: 206 };
@@ -87,7 +96,7 @@ export class RewardServiceImpl implements RewardServiceAbstract {
     }
 
     async bulkDeleteRewards(ids: number[]): Promise<{ status: number }> {
-        const errorLimit = Math.floor(ids.length / 2);
+        const errorLimit = Math.max(Math.floor(ids.length / 2), 1);
         let errorCounter = 0;
     
         try {
@@ -95,12 +104,18 @@ export class RewardServiceImpl implements RewardServiceAbstract {
                 try {
                     if (errorCounter >= errorLimit) break;
 
+                    const reward = await Reward.findByPk(id)
+
+                    if (!reward) throw ApiError.BadRequest(`Reward with id: ${id} is not found`)
+
                     await this.sequelize.transaction(async (t) => {
                         await Reward.destroy({
                             where: { id },
                             transaction: t
                         });
                     });
+
+                    removeFile(reward.label, 'rewards', reward.image_url)
                 } catch (e) {
                     errorCounter++;
                     console.log(`Error while deleting reward with id: ${id} \n Error: ${e}`);

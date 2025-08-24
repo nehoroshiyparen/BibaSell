@@ -120,7 +120,7 @@ export class PersonServiceImpl implements PersonServiceAbstract {
 
                     const person = await Person.findByPk(id)
 
-                    if (!person) throw ApiError.NotFound(`Person with id: ${id} is not found and wasnt deleted`)
+                    if (!person) throw ApiError.NotFound(`Person with id: ${id} is not found`)
 
                     await this.sequelize.transaction(async (t) => {
                         await Person.destroy({
