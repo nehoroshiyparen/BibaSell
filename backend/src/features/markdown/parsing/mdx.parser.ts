@@ -3,25 +3,27 @@ import * as runtime from 'react/jsx-runtime';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { pathToFileURL } from 'node:url';
+import { ArticleFileInfo } from '#src/types/interfaces/files/ArticleFileInfo.interface';
+import { fileRender } from '../render/file.render';
 
-export async function MdxParser(mdxContent: string) {
-  // Если у тебя есть путь (файл), лучше передать {path, value}, иначе можно передать {value}
-  // baseUrl помогает корректно разрешать import / import.meta.url внутри MDX.
-  const baseUrl = pathToFileURL(process.cwd() + '/').toString(); // или import.meta.url если вызов из модуля
+export async function MdxParser(markdown: string, files?: ArticleFileInfo[]) {
+  if (files && files.length > 0) {
+    markdown = fileRender(markdown, files)
+  }
 
-  // evaluate компилирует + выполняет MDX, принимает runtime как набор значений (jsx helpers)
+  const baseUrl = pathToFileURL(process.cwd() + '/').toString()
+
   const mdxModule = await evaluate(
-    { value: mdxContent },           // можно передать { path, value } если есть реальный файл
-    { ...runtime, baseUrl }         // runtime + опции (development, remarkPlugins и т.д.)
+    { value: markdown },  
+    { ...runtime, baseUrl }       
   );
 
   const MDXContent = mdxModule.default;
   if (!MDXContent) throw new Error('MDX compile/evaluate returned no default export');
 
-  // Теперь рендерим как обычный React-компонент
   const html = renderToString(
     React.createElement(MDXContent as any, {
-      components: {} // передай свои компоненты, если нужно
+      components: {}
     })
   );
 

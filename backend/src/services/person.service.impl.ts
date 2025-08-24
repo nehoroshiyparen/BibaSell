@@ -73,7 +73,7 @@ export class PersonServiceImpl implements PersonServiceAbstract {
             RethrowApiError(`Service error: Method - getFilteredPersons`, e)
         }
     }
-    
+
     async bulkCreatePersons(persons: TypeofPersonArraySchema, fileConfig: FileConfig | undefined): Promise<{ status: number }> {
         const errorLimit = Math.max(Math.floor(persons.length / 2), 1);
         let errorCounter = 0;

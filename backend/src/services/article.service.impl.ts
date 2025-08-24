@@ -19,6 +19,15 @@ import { RethrowApiError } from "#src/utils/ApiError/RethrowApiError.js";
 import { cleanup } from "#src/utils/helper/object.cleanup.js";
 import { sanitizeMarkdownToText } from "#src/utils/sanitize/markdown.js";
 import { TypeofArticleUpdateSchema } from "#src/types/schemas/article/ArticleUpdate.schema.js";
+import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface";
+import { createDir } from "#src/utils/fileHandlers/createDir";
+import { moveFileToFinal } from "#src/utils/fileHandlers/moveFileToFinal";
+import { ArticleFile } from "#src/database/models/ArticleFiles.model";
+import { removeFile } from "#src/utils/fileHandlers/removeFile";
+import { generateUuid } from "#src/utils/fileHandlers/generateUuid";
+import { ArticleFileInfo } from "#src/types/interfaces/files/ArticleFileInfo.interface";
+import { fileParser } from "#src/features/markdown/parsing/file.parser";
+import { removeDir } from "#src/utils/fileHandlers/removeDir";
 
 @injectable()
 export class ArticleServiceImpl implements ArticleServiceAbstract {
@@ -164,45 +173,18 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
         }
     }
 
-    async createArticle(options: TypeofAdvancedArticleSchema): Promise<Article> {
+    async createArticle(options: TypeofAdvancedArticleSchema, fileConfig: FileConfig | undefined): Promise<Article> {
         const transaction = await this.sequelize.transaction()
         try {
-            const { content_markdown, headings, ...articleOpt } = options
+            const article = await this._createArticleRecord(options, transaction)
+            const extractedFiles: string[] = fileParser(options.content_markdown)
+            const savedFiles = fileConfig ? await this._processFiles(fileConfig, article.id, extractedFiles, transaction) : []
+            const contentHtml = await this._renderMarkdownWithFiles(options.content_markdown, savedFiles)
 
-            const slug = getSlug(options.title)
-
-            const processedHeadings  = headingParser(options.content_markdown)
-            headings?.forEach((heading) => processedHeadings.push(heading.title))
-            processedHeadings.push(articleOpt.title)
-
-            const content_html = await MdxParser(options.content_markdown)
-
-            const article = await Article.create({
-                ...articleOpt,
-                slug,
-                content_markdown
-            }, { transaction })
-
-            await Promise.all(
-                processedHeadings.map(async (heading) => {
-                    try {
-                        console.log(heading)
-
-                        await Heading.create({
-                            title: heading,
-                            article_id: article.id,
-                        }, { transaction })
-                    } catch (e) {
-                        throw ApiError.BadRequest(`Error while creating heading: ${heading}`, undefined, e)
-                    }
-                })
-            )
-
-            const key = this.redis.joinKeys([redisIdPrefixes.content_html, `${article.id}`])
-            this.redis.setValue(key, content_html)
+            await this._createHeadings(options, article.id, transaction)
+            await this._cacheHtml(article.id, contentHtml)
 
             await transaction.commit()
-
             return article
         } catch (e) {
             await transaction.rollback()
@@ -228,15 +210,14 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
 
             if (content_markdown) {
                 const content_html = await MdxParser(content_markdown)
-                const key = this.redis.joinKeys([redisIdPrefixes.content_html, `${id}`])
-                this.redis.setValue(key, content_html)
+                await this._cacheHtml(article.id, content_html)
 
                 const processedHeadings = headingParser(content_markdown)
                 processedHeadings.forEach((head) => headings?.push({title: head}))
             }
 
             if (headings || content_markdown) {
-                await this.updateHeadings(article.id, headings, transaction)
+                await this._updateHeadings(article.id, headings, transaction)
             }
 
             await article.reload({ transaction })
@@ -283,13 +264,47 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
         }
     }
 
-    /**
+    private async _createArticleRecord(
+        options: TypeofAdvancedArticleSchema,
+        transaction: Transaction
+    ): Promise<Article> {
+        const { content_markdown, headings, ...articleOpt } = options
+        const slug = getSlug(articleOpt.title)
+
+        console.log('[epqfoqpmjkio')
+
+        return await Article.create({
+            ...articleOpt,
+            slug,
+            content_markdown
+        }, { transaction })
+    }
+
+    private async _createHeadings(
+        options: TypeofAdvancedArticleSchema,
+        articleId: number,
+        transaction: Transaction
+    ) {
+        const processedHeadings = headingParser(options.content_markdown)
+        options.headings?.forEach(h => processedHeadings.push(h.title))
+        processedHeadings.push(options.title)
+
+        await Promise.all(
+            processedHeadings.map(h => Heading.create({ title: h, article_id: articleId }, { transaction }))
+        )
+    }
+
+        /**
      * 
      * @param id - Article ID
      * @param headings - New headings
      * @param transaction - Sequelize transaction
     */
-    private async updateHeadings(id: number, headings: { title: string }[], transaction?: Transaction) {
+    private async _updateHeadings(
+        id: number, 
+        headings: { title: string }[], 
+        transaction?: Transaction
+    ): Promise<void> {
         const existingHeadings = await Article.findByPk(id, {
             attributes: [],
             include: [
@@ -326,5 +341,42 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
                 }, { transaction })
             }) ?? []
         )
+    }
+
+    private async _processFiles(fileConfig: FileConfig, articleId: number, extractedFiles: string[], transaction: Transaction): Promise<ArticleFileInfo[]> {
+        const dirpath = createDir(String(articleId))
+        const savedFiles: ArticleFileInfo[] = []
+
+        for (const file of fileConfig.files || []) {
+            if (!extractedFiles.some(f => f.toLowerCase() === file.filename.toLowerCase())) continue
+            const uuid = generateUuid()
+            try {
+                const imageUrl = moveFileToFinal(fileConfig.tempDirPath, file.filename, `articles/${articleId}`, uuid)
+                await ArticleFile.create({
+                    article_id: articleId,
+                    path: imageUrl,
+                    originalName: file.filename
+                }, { transaction })
+
+                console.log(imageUrl)
+                savedFiles.push({ originalName: file.filename, path: imageUrl! })
+                console.log(savedFiles)
+            } catch (e) {
+                removeFile(uuid, dirpath)
+            }
+        }
+
+        removeDir(fileConfig.tempDirPath)
+
+        return savedFiles
+    }
+
+    private async _renderMarkdownWithFiles(markdown: string, savedFiles: ArticleFileInfo[]): Promise<string> {
+        return await MdxParser(markdown, savedFiles)
+    }
+
+    private async _cacheHtml(articleId: number, html: string) {
+        const key = this.redis.joinKeys([redisIdPrefixes.content_html, `${articleId}`])
+        await this.redis.setValue(key, html)
     }
 }

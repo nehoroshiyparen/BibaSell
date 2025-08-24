@@ -8,28 +8,31 @@ const __dirname = path.dirname(__filename);
 
 const UPLOAD_BASE = path.join(__dirname, '../../../uploads')
 
-export function moveFileToFinal(tempDirPath: string, title: string, dir: string) {
-    const destDir = path.join(UPLOAD_BASE, 'final', dir)
+export function moveFileToFinal(tempDirPath: string, filename: string, relativeDir: string, newFilename?: string) {
+    const destDir = path.join(UPLOAD_BASE, 'final', relativeDir)
+    if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true })
 
-    const pngPath = path.join(tempDirPath, `${title}.png`);
-    const jpgPath = path.join(tempDirPath, `${title}.jpg`);
-    const jpegPath = path.join(tempDirPath, `${title}.jpeg`);
+    let sourceFile: string | null = null
 
-    let sourceFile: string | null = null;
-
-    if (fs.existsSync(pngPath)) {
-        sourceFile = pngPath;
-    } else if (fs.existsSync(jpgPath)) {
-        sourceFile = jpgPath;
-    } else if (fs.existsSync(jpegPath)) {
-        sourceFile = jpegPath;
+    const ext = path.extname(filename)
+    if (ext) {
+        const basePath = path.join(tempDirPath, filename)
+        if (fs.existsSync(basePath)) sourceFile = basePath
+    } else {
+        for (const e of ['.png', '.jpg', '.jpeg']) {
+            const p = path.join(tempDirPath, filename + e)
+            if (fs.existsSync(p)) {
+                sourceFile = p
+                break
+            }
+        }
     }
 
-    if (sourceFile) {
-        const ext = path.extname(sourceFile)
-        const filePath = path.join(destDir, `${title}${ext}`)
-        fs.renameSync(sourceFile, filePath)
+    if (!sourceFile) throw new Error(`File not found: ${filename}`)
 
-        return filePath
-    }
+    const finalName = (newFilename || path.basename(filename, ext)) + path.extname(sourceFile)
+    const filePath = path.join(destDir, finalName)
+    fs.renameSync(sourceFile, filePath)
+
+    return filePath
 }

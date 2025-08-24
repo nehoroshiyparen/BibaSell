@@ -11,6 +11,7 @@ import { PersonRewards } from './database/models/PersonRewards.model.js'
 import { RedisImpl } from './redis/redis.impl.js'
 import { Heading } from './database/models/Heading.model.js'
 import { Article } from './database/models/Article.model.js'
+import { ArticleFile } from './database/models/ArticleFiles.model.js'
 
 @injectable()
 export class AppImpl implements AppAbstract {
@@ -41,7 +42,7 @@ export class AppImpl implements AppAbstract {
 
     public async setup() {
         try {
-            this.#database.registerModels([Person, Reward, PersonRewards, Article, Heading])
+            this.#database.registerModels([Person, Reward, PersonRewards, Article, Heading, ArticleFile])
             await this.#database.setup()
 
             this.redis.setup()

@@ -11,6 +11,7 @@ import { ValidateId } from "#src/utils/validations/ids/id.validate.js";
 import { ValidateIdArray } from "#src/utils/validations/ids/idArray.validate.js";
 import { ApiError } from "#src/utils/ApiError/ApiError.js";
 import { ArticleUpdateSchema } from "#src/types/schemas/article/ArticleUpdate.schema.js";
+import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface";
 
 @injectable()
 export class ArticleControllerImpl {
@@ -83,12 +84,19 @@ export class ArticleControllerImpl {
 
     async craeteArticle(req: Request, res: Response) {
         try {
-            const options = req.body
+            const options = JSON.parse(req.body.data)
 
             ValidateObjectFieldsNotNull(options)
             const validatedOptions = ArticleCreateSchema.parse(options)
+
+            const fileConfig: FileConfig | undefined = 
+                req.tempUploadDir ? 
+                    {
+                        tempDirPath: req.tempUploadDir,
+                        files: req.files as Express.Multer.File[] | undefined,
+                    } : undefined
             
-            const article = await this.articleService.createArticle(validatedOptions)
+            const article = await this.articleService.createArticle(validatedOptions, fileConfig)
 
             SendResponse(res, status.CREATED, `Article created`, article)
         } catch (e) {

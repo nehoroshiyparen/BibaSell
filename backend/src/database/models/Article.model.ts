@@ -1,5 +1,6 @@
 import { DataTypes, Model, NonAttribute, Sequelize } from "sequelize";
 import { Heading } from "./Heading.model.js";
+import { ArticleFile } from "./ArticleFiles.model.js";
 
 export class Article extends Model {
     declare id: number;
@@ -50,5 +51,11 @@ export class Article extends Model {
             onDelete: 'CASCADE',
             as: 'headings'
         });
+
+        this.hasMany(ArticleFile, {
+            foreignKey: 'article_id',
+            onDelete: 'CASCADE',
+            as: 'files'
+        })
     }
 }
