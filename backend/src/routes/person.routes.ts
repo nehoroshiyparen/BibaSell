@@ -3,6 +3,7 @@ import { inject, injectable } from "inversify";
 import { PersonControllerImpl } from "#src/controllers/person.controller.js";
 import { TYPES } from "#src/di/types.js";
 import { upload } from "#src/storage/multer.store.js";
+import { prepareTempDir } from "#src/middlewares/prepareTempDir.middleware";
 
 @injectable()
 export class PersonRouter {
@@ -20,7 +21,7 @@ export class PersonRouter {
         this.router.post('/filtered', this.personController.getFilteredPersons.bind(this.personController))
         this.router.get('/:id', this.personController.getPersonById.bind(this.personController))
 
-        this.router.patch('/bulk', upload.array('files'), this.personController.bulkCreatePersons.bind(this.personController))
+        this.router.patch('/bulk', prepareTempDir, upload.array('files'), this.personController.bulkCreatePersons.bind(this.personController))
 
         this.router.delete('/bulk', this.personController.bulkDeletePersons.bind(this.personController))
     }

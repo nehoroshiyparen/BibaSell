@@ -1,17 +1,14 @@
 import multer from 'multer'
-import fs from 'fs'
-import { ENV } from '#src/config/index.js'
-import { createUniqueDir } from '#src/utils/fileHandlers/createUniqueDir.js'
 import path from 'path'
 
-const UPLOAD_BASE = path.join(process.cwd(), '..', 'uploads', 'temp');
+const UPLOAD_BASE = path.join(process.cwd(), '..', '..', 'uploads', 'temp');
 
-// не срабатывает, когда нет прикрепленных файлов, поэтому нужно это учитывать
 export const diskStorage = multer.diskStorage({
     destination: (req, _file, cb) => {
-        const tempDir = createUniqueDir()
-        req.tempUploadDir = tempDir
-        cb(null, ENV.MULTER_GAP_DIR_PATH);
+        if (!req.tempUploadDir) {
+            return cb(new Error('Temporary upload directory not set'), '');
+        }
+        cb(null, req.tempUploadDir);
     },
     filename: (_req, file, cb) => {
         cb(null, file.originalname)

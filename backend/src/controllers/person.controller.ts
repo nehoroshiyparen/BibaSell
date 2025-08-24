@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { PersonArrayJsonSchema } from '../types/schemas/person/PersonArraySchema.js'
+import { PersonArrayJsonSchema, PersonArraySchema } from '../types/schemas/person/PersonArraySchema.js'
 import { SendError, SendResponse } from "#src/utils/http/index.js";
 import { status } from "#src/consts/status.js";
 import { PersonServiceAbstract } from "#src/types/abstractions/services/person.service.abstraction.js";
@@ -95,8 +95,12 @@ export class PersonControllerImpl {
      */
     async bulkCreatePersons(req: Request, res: Response) {
         try {
-            const dataPack = req.body
-            const validatedData = PersonArrayJsonSchema.parse(dataPack)
+            console.log(req.body.data)
+
+            const dataPack = JSON.parse(req.body.data)
+
+            console.log(dataPack)
+            const validatedData = PersonArraySchema.parse(dataPack)
 
             const fileConfig: FileConfig | undefined = 
             req.tempUploadDir ? 
@@ -105,7 +109,7 @@ export class PersonControllerImpl {
                     files: req.files as Express.Multer.File[] | undefined,
                 } : undefined
 
-            const { status } =  await this.personService.bulkCreatePersons(validatedData.data, fileConfig)
+            const { status } =  await this.personService.bulkCreatePersons(validatedData, fileConfig)
 
             SendResponse(res, status, status === 201 ? `Persons created` : status === 206 ? `Persons created partilly` : `Persons weren't created. To much invalid data`, null)
         } catch (e) {

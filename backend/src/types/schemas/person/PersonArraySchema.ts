@@ -8,5 +8,4 @@ export const PersonArrayJsonSchema = z.object({
 
 export const PersonArraySchema = z.array(PersonSchema)
 
-
 export type TypeofPersonArraySchema = z.infer<typeof PersonArraySchema>

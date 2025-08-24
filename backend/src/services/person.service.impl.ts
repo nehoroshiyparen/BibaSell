@@ -12,6 +12,7 @@ import { DatabaseImpl } from "#src/database/database.impl.js";
 import { moveFileToFinal } from "#src/utils/fileHandlers/moveFileToFinal.js";
 import { removeDir } from "#src/utils/fileHandlers/removeDir.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
+import { removeFile } from "#src/utils/fileHandlers/removeFile.js";
 
 @injectable()
 export class PersonServiceImpl implements PersonServiceAbstract {
@@ -24,8 +25,6 @@ export class PersonServiceImpl implements PersonServiceAbstract {
     }
 
     async getPersonById(id: number) {
-        console.log(id)
-
         try {
             const person = await Person.findByPk(id, {
                 include: [
@@ -82,14 +81,15 @@ export class PersonServiceImpl implements PersonServiceAbstract {
         try {
             for (const person of persons) {
                 try {
-                    await this.sequelize.transaction(async (t) => {
-                        await Person.create(person, { transaction: t });
-                    });
+                    const image_url = fileConfig ? moveFileToFinal(fileConfig.tempDirPath, person.name, 'persons') : null
 
-                    fileConfig && moveFileToFinal(fileConfig.tempDirPath, person.name, 'persons')
+                    await this.sequelize.transaction(async (t) => {
+                        await Person.create({...person, image_url }, { transaction: t });
+                    });
                     
                 } catch (e) {
                     console.log(`Error creating person: ${person.name}`, e);
+                    removeFile(person.name, 'persons')
                     errorCounter++;
                     if (errorCounter >= errorLimit) break;
                 }
@@ -110,7 +110,7 @@ export class PersonServiceImpl implements PersonServiceAbstract {
     }
 
     async bulkDeletePersons(ids: number[]): Promise<{ status: number }> {
-        const errorLimit = Math.floor(ids.length / 2);
+        const errorLimit = Math.max(Math.floor(ids.length / 2), 1)
         let errorCounter = 0;
     
         try {
@@ -118,12 +118,18 @@ export class PersonServiceImpl implements PersonServiceAbstract {
                 try {
                     if (errorCounter >= errorLimit) break;
 
+                    const person = await Person.findByPk(id)
+
+                    if (!person) throw ApiError.NotFound(`Person with id: ${id} is not found and wasnt deleted`)
+
                     await this.sequelize.transaction(async (t) => {
                         await Person.destroy({
                             where: { id },
                             transaction: t
                         });
                     });
+
+                    removeFile(person.name, 'persons', person.image_url)
                 } catch (e) {
                     errorCounter++;
                     console.log(`Error while deleting person with id: ${id} \n Error: ${e}`);
@@ -136,7 +142,7 @@ export class PersonServiceImpl implements PersonServiceAbstract {
                 return { status: 400 };
             }
 
-            return { status: 201 };
+            return { status: 200 };
         } catch (e) {
             throw RethrowApiError(`Service error: Method - bulkDeletePersons`, e);
         }
