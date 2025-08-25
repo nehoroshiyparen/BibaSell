@@ -20,14 +20,15 @@ import { cleanup } from "#src/utils/helper/object.cleanup.js";
 import { sanitizeMarkdownToText } from "#src/utils/sanitize/markdown.js";
 import { TypeofArticleUpdateSchema } from "#src/types/schemas/article/ArticleUpdate.schema.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface";
-import { createDir } from "#src/utils/fileHandlers/createDir";
+import { createDir } from "#src/utils/fileHandlers/create/createDir";
 import { moveFileToFinal } from "#src/utils/fileHandlers/moveFileToFinal";
 import { ArticleFile } from "#src/database/models/ArticleFiles.model";
-import { removeFile } from "#src/utils/fileHandlers/removeFile";
+import { removeFile } from "#src/utils/fileHandlers/remove/removeFile";
 import { generateUuid } from "#src/utils/fileHandlers/generateUuid";
 import { ArticleFileInfo } from "#src/types/interfaces/files/ArticleFileInfo.interface";
 import { fileParser } from "#src/features/markdown/parsing/file.parser";
-import { removeDir } from "#src/utils/fileHandlers/removeDir";
+import { removeDir } from "#src/utils/fileHandlers/remove/removeDir";
+import { UPLOAD_BASE } from "#src/utils/fileHandlers/config";
 
 @injectable()
 export class ArticleServiceImpl implements ArticleServiceAbstract {
@@ -192,43 +193,56 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
         }
     }
 
-    async updateArcticle(id: number, options: TypeofArticleUpdateSchema): Promise<{ article: Article, headings: Heading[] | null }> {
-        const transaction = await this.sequelize.transaction()
-        try {
-            const { content_markdown, headings, ...articleOpt } = options
 
-            const article = await Article.findByPk(id)
-            if (!article) throw ApiError.NotFound(`Article with id: ${id} not found`)
-
-            const slug = options.title ? getSlug(options.title) : undefined
-            headings.push({title: options.title ?? article.title})
-
-            const updateData = cleanup({ ...articleOpt, slug, content_markdown })
-            if (Object.keys(updateData).length === 0) throw ApiError.BadRequest('Nothing to update. Request data is empty');
-
+    //нужно предусмотреть ситуацию, когда файл будет указан в разметке, но не прикреплен. Такой нужно удалять из разметки
+    async updateArcticle(
+        id: number,
+        options: TypeofArticleUpdateSchema,
+        fileConfig: FileConfig | undefined
+    ): Promise<{ article: Article, headings: Heading[] | null }> {
+    const transaction = await this.sequelize.transaction();
+    try {
+        const article = await this._findArticleWithFiles(id);
+        const updateData = this._prepareUpdateData(options, article);
+        
+        if (Object.keys(updateData).length) {
             await Article.update(updateData, { where: { id }, transaction });
-
-            if (content_markdown) {
-                const content_html = await MdxParser(content_markdown)
-                await this._cacheHtml(article.id, content_html)
-
-                const processedHeadings = headingParser(content_markdown)
-                processedHeadings.forEach((head) => headings?.push({title: head}))
-            }
-
-            if (headings || content_markdown) {
-                await this._updateHeadings(article.id, headings, transaction)
-            }
-
-            await article.reload({ transaction })
-            await transaction.commit()
-
-            const newHeadings = await Article.findByPk(id, { attributes: [], include: [{ model: Heading, as: 'headings', attributes: ['id', 'title'] }] })
-            return { article: article, headings: newHeadings?.headings ?? null }
-        } catch (e) {
-            await transaction.rollback()
-            RethrowApiError(`Service error: Method - updateArcticle`, e)
         }
+
+        const extractedFiles = fileParser(options.content_markdown ?? article.content_markdown);
+        
+        if (options.files?.delete?.length) {
+            await this._deleteFiles(options.files.delete, transaction);
+        }
+
+        const savedFiles = fileConfig
+            ? await this._processFiles(fileConfig, id, extractedFiles, transaction)
+            : [];
+
+        const filesForMarkdown = this._getFilesForMarkdown(article.files || [], options);
+        savedFiles.push(...filesForMarkdown);
+
+        if (options.content_markdown) {
+            const contentHtml = await MdxParser(options.content_markdown, savedFiles);
+            await this._cacheHtml(article.id, contentHtml);
+
+            const processedHeadings = headingParser(options.content_markdown);
+            options.headings?.push(...processedHeadings.map(h => ({ title: h })));
+        }
+
+        if (options.headings || options.content_markdown) {
+            await this._updateHeadings(article.id, options.headings ?? [], transaction);
+        }
+
+        await article.reload({ transaction });
+        await transaction.commit();
+
+        const newHeadings = await this._getArticleHeadings(id);
+        return { article, headings: newHeadings };
+    } catch (e) {
+        await transaction.rollback();
+        RethrowApiError(`Service error: Method - updateArcticle`, e);
+    }
     }
 
     async bulkDeleteArticles(ids: number[]): Promise<{ status: number }> {
@@ -239,6 +253,9 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
            for (const id of ids) {
                 try {
                     if (errorCounter >= errorLimit) break
+                    
+                    const article = await Article.findByPk(id)
+                    if (!article) throw ApiError.NotFound(`Article with id: ${id} do not exists`)
 
                     await this.sequelize.transaction(async (t) => {
                         await Article.destroy({
@@ -246,6 +263,10 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
                             transaction: t
                         })
                     })
+
+                    this._deleteRedisValue(id)
+
+                    removeDir(UPLOAD_BASE + `/final/articles/${id}`)
                 } catch (e) {
                     errorCounter++
                     console.log(`Error while deleting article with id: ${id} \n Error: ${e}`)
@@ -270,8 +291,6 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
     ): Promise<Article> {
         const { content_markdown, headings, ...articleOpt } = options
         const slug = getSlug(articleOpt.title)
-
-        console.log('[epqfoqpmjkio')
 
         return await Article.create({
             ...articleOpt,
@@ -352,6 +371,7 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
             const uuid = generateUuid()
             try {
                 const imageUrl = moveFileToFinal(fileConfig.tempDirPath, file.filename, `articles/${articleId}`, uuid)
+                console.log(file.filename)
                 await ArticleFile.create({
                     article_id: articleId,
                     path: imageUrl,
@@ -362,6 +382,7 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
                 savedFiles.push({ originalName: file.filename, path: imageUrl! })
                 console.log(savedFiles)
             } catch (e) {
+                console.log(`File ${file.filename} was removed`, e)
                 removeFile(uuid, dirpath)
             }
         }
@@ -375,8 +396,51 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
         return await MdxParser(markdown, savedFiles)
     }
 
+    private async _deleteRedisValue(articleId: number) {
+        const key = this.redis.joinKeys([redisIdPrefixes.content_html, `${articleId}`])
+        await this.redis.deleteValue(key)
+    }
+
     private async _cacheHtml(articleId: number, html: string) {
         const key = this.redis.joinKeys([redisIdPrefixes.content_html, `${articleId}`])
         await this.redis.setValue(key, html)
+    }
+
+    private async _findArticleWithFiles(id: number) {
+        const article = await Article.findByPk(id, {
+            include: [{ model: ArticleFile, as: 'files', attributes: ['id', 'path', 'originalName'] }]
+        });
+        if (!article) throw ApiError.NotFound(`Article with id: ${id} not found`);
+        return article;
+    }
+
+    private _prepareUpdateData(options: TypeofArticleUpdateSchema, article: Article) {
+        const { content_markdown, headings, ...articleOpt } = options;
+        const slug = options.title ? getSlug(options.title) : undefined;
+        headings?.push({ title: options.title ?? article.title });
+        return cleanup({ ...articleOpt, slug, content_markdown });
+    }
+
+    private async _deleteFiles(fileIds: number[], transaction: any) {
+        for (const id of fileIds) {
+            const file = await ArticleFile.findByPk(id);
+            if (!file) continue;
+            await ArticleFile.destroy({ where: { id }, transaction });
+            removeFile('', '', file.path);
+        }
+    }
+
+    private _getFilesForMarkdown(files: ArticleFile[], options: TypeofArticleUpdateSchema): ArticleFileInfo[] {
+        return files
+            .filter(f => !options.files?.delete?.includes(f.id))
+            .map(f => ({ path: f.path, originalName: f.originalName }));
+    }
+
+    private async _getArticleHeadings(id: number) {
+        const result = await Article.findByPk(id, {
+            attributes: [],
+            include: [{ model: Heading, as: 'headings', attributes: ['id', 'title'] }]
+        });
+        return result?.headings ?? null;
     }
 }

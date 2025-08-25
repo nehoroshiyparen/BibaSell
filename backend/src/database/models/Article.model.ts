@@ -20,6 +20,7 @@ export class Article extends Model {
     declare is_published: boolean;
 
     declare readonly headings?: NonAttribute<Heading[]>;
+    declare readonly files?: NonAttribute<ArticleFile[]>;
 
     static initialize(sequelize: Sequelize) {
         this.init({

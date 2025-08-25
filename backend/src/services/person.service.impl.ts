@@ -10,9 +10,9 @@ import { Reward } from "#src/database/models/Reward.model.js";
 import { TypeofPersonFiltersSchema } from "#src/types/schemas/person/PersonFilters.schema.js";
 import { DatabaseImpl } from "#src/database/database.impl.js";
 import { moveFileToFinal } from "#src/utils/fileHandlers/moveFileToFinal.js";
-import { removeDir } from "#src/utils/fileHandlers/removeDir.js";
+import { removeDir } from "#src/utils/fileHandlers/remove/removeDir.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
-import { removeFile } from "#src/utils/fileHandlers/removeFile.js";
+import { removeFile } from "#src/utils/fileHandlers/remove/removeFile.js";
 
 @injectable()
 export class PersonServiceImpl implements PersonServiceAbstract {

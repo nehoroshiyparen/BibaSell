@@ -10,8 +10,8 @@ import { TYPES } from "#src/di/types.js";
 import { DatabaseImpl } from "#src/database/database.impl.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface";
 import { moveFileToFinal } from "#src/utils/fileHandlers/moveFileToFinal";
-import { removeFile } from "#src/utils/fileHandlers/removeFile";
-import { removeDir } from "#src/utils/fileHandlers/removeDir";
+import { removeFile } from "#src/utils/fileHandlers/remove/removeFile";
+import { removeDir } from "#src/utils/fileHandlers/remove/removeDir";
 
 @injectable()
 export class RewardServiceImpl implements RewardServiceAbstract {

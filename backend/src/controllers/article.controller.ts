@@ -106,12 +106,19 @@ export class ArticleControllerImpl {
 
     async updateArticle(req: Request, res: Response) {
         try {
-            const { id, options }= req.body
+            const { id, options }= JSON.parse(req.body.data)
 
             ValidateObjectFieldsNotNull(options)
             const validatedOptions = ArticleUpdateSchema.parse(options)
 
-            const article = await this.articleService.updateArcticle(id, validatedOptions)
+            const fileConfig: FileConfig | undefined = 
+                req.tempUploadDir ? 
+                {
+                    tempDirPath: req.tempUploadDir,
+                    files: req.files as Express.Multer.File[] | undefined
+                } : undefined
+
+            const article = await this.articleService.updateArcticle(id, validatedOptions, fileConfig)
 
             SendResponse(res, status.OK, `Article updated`, article)
         } catch (e) {
