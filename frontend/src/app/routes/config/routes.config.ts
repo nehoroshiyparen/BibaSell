@@ -3,6 +3,7 @@ import Test from "../../../widgets/test.widget";
 import MainLayout from "../../layouts/main.layout";
 import LoadingScreen from "src/widgets/LoadingScreen/LoadingScreen";
 import CatSpinner from "src/shared/ui/spinners/cat.spinner";
+import Home from "src/pages/home/Home";
 
 export type AppRoute = {
     layout: ComponentType<{ children: React.ReactElement }>,
@@ -31,7 +32,7 @@ export const appRoutes: AppRoute[] = [
             },
         },
         path: '/',
-        element: Test,
+        element: Home,
         protected: false
     },
     {

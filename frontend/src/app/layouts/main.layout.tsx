@@ -1,10 +1,12 @@
+import Header from "src/widgets/Header/Header"
+
 const MainLayout = ({ children }: { children: React.ReactElement }) => {
     return (
-        <div className="flex min-h-screen flex-col">
-            <div className="flex h-[100px] w-screen">
-                
+        <div className="flex flex-col">
+            <div className="header flex h-50 w-full fixed inset-0  z-50 justify-center">
+                <Header/>
             </div>
-            <div className="flex-1 text-[5rem] font-bold">
+            <div className="_container flex-1 flex justify-center">
                 {children}
             </div>
         </div>

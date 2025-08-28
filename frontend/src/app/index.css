@@ -1,7 +1,86 @@
 @import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap');
 
 :root {
     background: #ffe5b4;
+    color: #1b1b1b;
 
-    font-size: 4px;
+    font-size: 8px;
+
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
 }
+
+#root {
+    display: flex;
+}
+
+html, body { overflow-x: hidden; }
+
+._big-p {
+        font-size: 13rem;
+        line-height: 12rem;
+}
+
+._casual-span {
+    font-size: 3rem;
+    line-height: 3.5rem;
+}
+
+@theme {
+  --breakpoint-sm: 1280px;
+  --breakpoint-md: 1920px;
+  --breakpoint-lg: 2560px;
+}
+
+._block {
+    @apply w-screen sm:max-w-[1280px] md:max-w-[1920px] lg:max-w-[2560px]
+}
+
+@media (width >= 1280px) {
+    :root {
+            font-size: 8px;
+    }
+
+    ._big-p {
+        font-size: 9.5rem;
+        line-height: 8.5rem;
+    }
+
+    ._casual-span {
+        font-size: 3rem;
+        line-height: 3.5rem;
+    }
+}
+
+@media (width >= 1920px) {
+    :root {
+            font-size: 10px;
+    }
+
+    ._big-p {
+        font-size: 13rem;
+        line-height: 12rem;
+    }
+
+    ._casual-span {
+        font-size: 3.5rem;
+        line-height: 4rem;
+    }
+}
+
+@media (width >= 2560px) {
+    :root {
+            font-size: 12px;
+    }
+
+    ._big-p {
+        font-size: 15rem;
+        line-height: 14rem;
+    }
+
+    ._casual-span {
+        font-size: 3rem;
+        line-height: 3.5rem;
+    }
+} 

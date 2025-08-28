@@ -10,7 +10,7 @@ const LoadingScreen = ({ spinner, show }: { spinner: React.ReactElement, show: b
             setDisplay(true)
         } else {
             const opacityTimeout = setTimeout(() => setOpacity(false), 200)
-            const displayTimeout = setTimeout(() => setDisplay(false), 300);
+            const displayTimeout = setTimeout(() => setDisplay(false), 400);
             return () =>  { 
                 clearTimeout(opacityTimeout)
                 clearTimeout(displayTimeout)
@@ -21,7 +21,7 @@ const LoadingScreen = ({ spinner, show }: { spinner: React.ReactElement, show: b
     if (!display) return null
 
     return (
-        <div className={`fixed inset-0 flex items-center justify-center select-none pointer-events-none z-50 bg-[#ffe5b4] transition-opacity duration-100 ${
+        <div className={`fixed inset-0 flex items-center justify-center select-none pointer-events-none z-1000 bg-[#ffe5b4] transition-opacity duration-200 ${
                 opacity ? "opacity-100" : "opacity-0"}
             `}>
             <div className={`absolute inset-0 bg-[#ffd17c] opacity-40`}></div>

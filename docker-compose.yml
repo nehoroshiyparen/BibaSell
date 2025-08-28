@@ -24,7 +24,7 @@ services:
     image: nginx:alpine
     volumes: 
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./uploads:/var/www/uploads
+      - ./uploads/final:/usr/share/nginx/uploads/final:ro
     ports:
       - "8080:80"
     restart: unless-stopped
