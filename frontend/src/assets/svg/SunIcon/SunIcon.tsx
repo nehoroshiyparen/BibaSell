@@ -1,7 +1,7 @@
 interface SunIconProps {
-size?: string;
-color?: string;
-className?: string;
+    size?: string;
+    color?: string;
+    className?: string;
 }
 
 

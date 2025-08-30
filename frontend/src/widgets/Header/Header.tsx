@@ -2,12 +2,13 @@ import { Link } from "react-router-dom"
 import ThemeButton from "./components/HeaderButtons/ThemeButton/ThemeButton"
 import HeaderLogo from "./components/HeaderLogo/HeaderLogo"
 import AnotherButton from "./components/HeaderButtons/AnotherButton/AnotherButton"
+import './Header.css'
 
 const Header = () => {
     return (
-        <div className="w-full h-full grid grid-cols-[1fr_3fr_1fr] box-border pl-10 pr-10 sm:max-w-[1280px] md:max-w-[1920px] lg:max-w-[2560px]">
+        <div className="w-full h-50 grid grid-cols-[1fr_3fr_1fr] box-border pl-10 pr-10 sm:max-w-[1280px] md:max-w-[1920px] lg:max-w-[2560px]">
             <HeaderLogo link="/"/>
-            <div className="h-full flex justify-center text-5xl text-[#1b1b1b] items-center gap-15 ">
+            <div className="h-full flex justify-center text-5xl text-text items-center gap-15 ">
                 <div>
                     <Link to={'/'}>
                         ГАЛЛЕРЕЯ ПАМЯТИ

@@ -1,14 +1,36 @@
+/* Fonts */
+
 @import 'tailwindcss';
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap');
 
-:root {
-    background: #ffe5b4;
-    color: #1b1b1b;
+@font-face {
+    font-family: 'Bounded';
+    src: url('../assets/fonts/Bounded-Regular.ttf');
+}
 
+@font-face {
+    font-family: 'BoundedLight';
+    src: url('../assets/fonts/Bounded-ExtraLight.ttf');
+}
+
+/* Root */
+
+:root {
     font-size: 8px;
 
-    font-family: "Montserrat", sans-serif;
-    font-weight: 500;
+    --color-bg: #ffe5b4;
+    --color-text: #000000;
+    --color-secondary-text: #ffffff;
+    --color-third-text: #961e1e;
+    --color-accent: #dbbc83;
+    --color-secondary-accent: #FF6600;
+    --color-third-accent: #fc9f61;
+
+    --font-base: 'Bounded', sans-serif;
+    --font-base-light: 'BoundedLight', sans-serif;
+
+    background: var(--color-bg);
+    color: var(--color-text);
 }
 
 #root {
@@ -17,24 +39,38 @@
 
 html, body { overflow-x: hidden; }
 
+/*  */
+
 ._big-p {
-        font-size: 13rem;
-        line-height: 12rem;
+        font-size: 9.5rem;
+        line-height: 8.5rem;
+
+        font-family: 'Bounded', sans-serif;
 }
 
 ._casual-span {
     font-size: 3rem;
     line-height: 3.5rem;
+
+    font-family: 'BoundedLight', sans-serif;
 }
+
+/* Media */
 
 @theme {
-  --breakpoint-sm: 1280px;
-  --breakpoint-md: 1920px;
-  --breakpoint-lg: 2560px;
-}
+    --breakpoint-sm: 1280px;
+    --breakpoint-md: 1920px;
+    --breakpoint-lg: 2560px;
 
-._block {
-    @apply w-screen sm:max-w-[1280px] md:max-w-[1920px] lg:max-w-[2560px]
+    --color-bg: #ffe5b4;
+    --color-text: #000000;
+    --color-secondary-text: #ffffff;
+    --color-accent: #dbbc83;
+    --color-secondary-accent: #FF6600;
+    --color-third-accent: #fc9f61;
+
+    --font-base: 'Bounded', sans-serif;
+    --font-base-light: 'BoundedLight', sans-serif;
 }
 
 @media (width >= 1280px) {
@@ -43,8 +79,8 @@ html, body { overflow-x: hidden; }
     }
 
     ._big-p {
-        font-size: 9.5rem;
-        line-height: 8.5rem;
+        font-size: 8rem;
+        line-height: 7rem;
     }
 
     ._casual-span {
@@ -59,8 +95,8 @@ html, body { overflow-x: hidden; }
     }
 
     ._big-p {
-        font-size: 13rem;
-        line-height: 12rem;
+        font-size: 10rem;
+        line-height: 9rem;
     }
 
     ._casual-span {
@@ -75,8 +111,8 @@ html, body { overflow-x: hidden; }
     }
 
     ._big-p {
-        font-size: 15rem;
-        line-height: 14rem;
+        font-size: 11rem;
+        line-height: 10rem;
     }
 
     ._casual-span {
