@@ -1,4 +1,5 @@
-import Header from "src/widgets/Header/Header"
+import Footer from "src/widgets/Footer/Footer"
+import Header from "src/widgets/Header/ui/Header"
 
 const MainLayout = ({ children }: { children: React.ReactElement }) => {
     return (
@@ -9,6 +10,7 @@ const MainLayout = ({ children }: { children: React.ReactElement }) => {
             <div className="_container flex-1 flex justify-center">
                 {children}
             </div>
+            <Footer/>
         </div>
     )
 }

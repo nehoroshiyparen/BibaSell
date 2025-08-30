@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
-import ThemeButton from "./components/HeaderButtons/ThemeButton/ThemeButton"
-import HeaderLogo from "./components/HeaderLogo/HeaderLogo"
-import AnotherButton from "./components/HeaderButtons/AnotherButton/AnotherButton"
+import ThemeButton from "../components/ThemeButton"
+import HeaderLogo from "../components/HeaderLogo"
+import AnotherButton from "../components/AnotherButton"
 import './Header.css'
 
 const Header = () => {

@@ -1,8 +1,7 @@
 import type { ComponentType } from "react";
-import Test from "../../../widgets/test.widget";
 import MainLayout from "../../layouts/main.layout";
-import LoadingScreen from "src/widgets/LoadingScreen/LoadingScreen";
-import CatSpinner from "src/shared/ui/spinners/cat.spinner";
+import LoadingScreen from "src/shared/ui/LoadingScreen/LoadingScreen";
+import CatSpinner from "src/shared/ui/Spinners/cat.spinner";
 import Home from "src/pages/home/Home";
 
 export type AppRoute = {
@@ -33,20 +32,6 @@ export const appRoutes: AppRoute[] = [
         },
         path: '/',
         element: Home,
-        protected: false
-    },
-    {
-        layout: MainLayout,
-        loader: {
-            loadingScreen: LoadingScreen,
-            spinner: {
-                component: CatSpinner,
-                width: 200,
-                height: 200,
-            },
-        },
-        path: '/pets',
-        element: Test,
         protected: false
     }
 ]

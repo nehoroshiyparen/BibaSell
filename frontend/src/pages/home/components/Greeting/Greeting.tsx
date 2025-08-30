@@ -1,6 +1,5 @@
-import ArrowIcon from "src/assets/svg/ArrowIcon/ArrowIcon"
-import AddMember from "./GreetingButtons/AddMember"
-import FindMember from "./GreetingButtons/FindMember"
+import AddMember from "./buttons/AddMember"
+import FindMember from "./buttons/FindMember"
 
 export const Greeting = () => {
     return (
