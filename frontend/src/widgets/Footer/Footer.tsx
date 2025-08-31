@@ -5,7 +5,7 @@ import OdnoklasnkiIcon from 'src/assets/svg/OdnoklasnikiIcon/OdnoklasnikiIcon'
 
 const Footer = () => {
     return (
-        <section className="flex justify-center h-[90vh] overflow-hidden _footer-gradient">
+        <footer className="flex justify-center h-[90vh] overflow-hidden _footer-gradient w-screen">
             <div className="w-full sm:max-w-[1280px] md:max-w-[1920px] lg:max-w-[2560px] flex flex-col box-border pt-50 pl-40 pr-40 relative">
                 <div className="flex flex-col gap-30">
                     <div className="w-full flex justify-center gap-20">
@@ -105,7 +105,7 @@ const Footer = () => {
                     </span>
                 </div>
             </div>
-        </section>
+        </footer>
     )
 }
 
