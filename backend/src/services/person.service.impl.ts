@@ -9,10 +9,12 @@ import { TYPES } from "#src/di/types.js";
 import { Reward } from "#src/database/models/Reward.model.js";
 import { TypeofPersonFiltersSchema } from "#src/types/schemas/person/PersonFilters.schema.js";
 import { DatabaseImpl } from "#src/database/database.impl.js";
-import { moveFileToFinal } from "#src/utils/fileHandlers/moveFileToFinal.js";
-import { removeDir } from "#src/utils/fileHandlers/remove/removeDir.js";
+import { moveFileToFinal } from "#src/utils/fileUtils/moveFileToFinal.js";
+import { removeDir } from "#src/utils/fileUtils/remove/removeDir.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
-import { removeFile } from "#src/utils/fileHandlers/remove/removeFile.js";
+import { removeFile } from "#src/utils/fileUtils/remove/removeFile.js";
+import { getRelativePath } from "#src/utils/fileUtils/getRelativePath.js";
+import { getSlug } from "#src/utils/slugging/getSlug.js";
 
 @injectable()
 export class PersonServiceImpl implements PersonServiceAbstract {
@@ -27,6 +29,27 @@ export class PersonServiceImpl implements PersonServiceAbstract {
     async getPersonById(id: number) {
         try {
             const person = await Person.findByPk(id, {
+                    include: [
+                        {
+                            model: Reward,
+                            as: 'rewards',
+                            through: { attributes: [] }
+                        }
+                    ]
+                })
+
+            if (!person) throw ApiError.NotFound('Person not found')
+
+            return person
+        } catch (e) {
+            RethrowApiError(`Service error: Method - getPersonById`, e)
+        }
+    }
+
+    async getPersonBySlug(slug: string) {
+        try {
+            const person = await Person.findOne({
+                where: { slug },
                 include: [
                     {
                         model: Reward,
@@ -36,13 +59,11 @@ export class PersonServiceImpl implements PersonServiceAbstract {
                 ]
             })
 
-            if (!person) {
-                throw ApiError.NotFound('Person not found')
-            }
+            if (!person) throw ApiError.NotFound('Person not found')
 
-            return person
+            return person 
         } catch (e) {
-            RethrowApiError(`Service error: Method - getPersonById`, e)
+            RethrowApiError(`Service error: Method - getPersonBySlug`, e)
         }
     }
 
@@ -81,10 +102,13 @@ export class PersonServiceImpl implements PersonServiceAbstract {
         try {
             for (const person of persons) {
                 try {
-                    const image_url = fileConfig ? moveFileToFinal(fileConfig.tempDirPath, person.name, 'persons') : null
+                    const filepath = fileConfig ? moveFileToFinal(fileConfig.tempDirPath, person.name, 'persons') : null
+                    const image_url = getRelativePath(filepath, 'persons')
+
+                    const slug = getSlug(person.name)
 
                     await this.sequelize.transaction(async (t) => {
-                        await Person.create({...person, image_url }, { transaction: t });
+                        await Person.create({...person, image_url, slug }, { transaction: t });
                     });
                     
                 } catch (e) {
@@ -94,7 +118,7 @@ export class PersonServiceImpl implements PersonServiceAbstract {
                     if (errorCounter >= errorLimit) break;
                 }
             }
-
+ 
             fileConfig && removeDir(fileConfig.tempDirPath)
     
             if (errorCounter > 0 && errorCounter < errorLimit) {

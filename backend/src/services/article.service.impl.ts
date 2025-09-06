@@ -19,16 +19,17 @@ import { RethrowApiError } from "#src/utils/ApiError/RethrowApiError.js";
 import { cleanup } from "#src/utils/helper/object.cleanup.js";
 import { sanitizeMarkdownToText } from "#src/utils/sanitize/markdown.js";
 import { TypeofArticleUpdateSchema } from "#src/types/schemas/article/ArticleUpdate.schema.js";
-import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface";
-import { createDir } from "#src/utils/fileHandlers/create/createDir";
-import { moveFileToFinal } from "#src/utils/fileHandlers/moveFileToFinal";
-import { ArticleFile } from "#src/database/models/ArticleFiles.model";
-import { removeFile } from "#src/utils/fileHandlers/remove/removeFile";
-import { generateUuid } from "#src/utils/fileHandlers/generateUuid";
-import { ArticleFileInfo } from "#src/types/interfaces/files/ArticleFileInfo.interface";
-import { fileParser } from "#src/features/markdown/parsing/file.parser";
-import { removeDir } from "#src/utils/fileHandlers/remove/removeDir";
-import { UPLOAD_BASE } from "#src/utils/fileHandlers/config";
+import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
+import { createDir } from "#src/utils/fileUtils/create/createDir.js";
+import { moveFileToFinal } from "#src/utils/fileUtils/moveFileToFinal.js";
+import { ArticleFile } from "#src/database/models/ArticleFiles.model.js";
+import { removeFile } from "#src/utils/fileUtils/remove/removeFile.js";
+import { generateUuid } from "#src/utils/fileUtils/generateUuid.js";
+import { ArticleFileInfo } from "#src/types/interfaces/files/ArticleFileInfo.interface.js";
+import { fileParser } from "#src/features/markdown/parsing/file.parser.js";
+import { removeDir } from "#src/utils/fileUtils/remove/removeDir.js";
+import { UPLOAD_BASE } from "#src/utils/fileUtils/config.js";
+import { getRelativePath } from "#src/utils/fileUtils/getRelativePath.js";
 
 @injectable()
 export class ArticleServiceImpl implements ArticleServiceAbstract {
@@ -370,16 +371,17 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
             if (!extractedFiles.some(f => f.toLowerCase() === file.filename.toLowerCase())) continue
             const uuid = generateUuid()
             try {
-                const imageUrl = moveFileToFinal(fileConfig.tempDirPath, file.filename, `articles/${articleId}`, uuid)
-                console.log(file.filename)
+                const filepath = moveFileToFinal(fileConfig.tempDirPath, file.filename, `articles/${articleId}`, uuid)
+                
+                const image_url = getRelativePath(filepath, 'articles')
+
                 await ArticleFile.create({
                     article_id: articleId,
-                    path: imageUrl,
+                    path: image_url,
                     originalName: file.filename
                 }, { transaction })
 
-                console.log(imageUrl)
-                savedFiles.push({ originalName: file.filename, path: imageUrl! })
+                savedFiles.push({ originalName: file.filename, path: filepath! })
                 console.log(savedFiles)
             } catch (e) {
                 console.log(`File ${file.filename} was removed`, e)

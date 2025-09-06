@@ -40,6 +40,18 @@ export class PersonControllerImpl {
         }
     }
 
+    async getPersonBySlug(req: Request, res: Response) {
+        try {
+            const slug = String(req.params.slug)
+
+            const person = await this.personService.getPersonBySlug(slug)
+
+            SendResponse(res, status.OK, `Person fetched`, person)
+        } catch (e) {
+            SendError(res, e)
+        }
+    }
+
     /**
      * Пагинационный запрос. Возвращает массив объектов Person
      * @param req В query запроса ожидается offset и limit

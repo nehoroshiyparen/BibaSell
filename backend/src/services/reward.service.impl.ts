@@ -8,10 +8,12 @@ import { ApiError } from "#src/utils/ApiError/ApiError.js";
 import { Sequelize } from "sequelize";
 import { TYPES } from "#src/di/types.js";
 import { DatabaseImpl } from "#src/database/database.impl.js";
-import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface";
-import { moveFileToFinal } from "#src/utils/fileHandlers/moveFileToFinal";
-import { removeFile } from "#src/utils/fileHandlers/remove/removeFile";
-import { removeDir } from "#src/utils/fileHandlers/remove/removeDir";
+import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
+import { moveFileToFinal } from "#src/utils/fileUtils/moveFileToFinal.js";
+import { removeFile } from "#src/utils/fileUtils/remove/removeFile.js";
+import { removeDir } from "#src/utils/fileUtils/remove/removeDir.js";
+import { getRelativePath } from "#src/utils/fileUtils/getRelativePath.js";
+import { getSlug } from "#src/utils/slugging/getSlug.js";
 
 @injectable()
 export class RewardServiceImpl implements RewardServiceAbstract {
@@ -68,10 +70,13 @@ export class RewardServiceImpl implements RewardServiceAbstract {
         try {
             for (const reward of rewards) {
                 try {
-                    const image_url = fileConfig ? moveFileToFinal(fileConfig.tempDirPath, reward.label, 'rewards') : null
+                    const filepath = fileConfig ? moveFileToFinal(fileConfig.tempDirPath, reward.label, 'rewards') : null
+                    const image_url = getRelativePath(filepath, 'rewards')
+
+                    const slug = getSlug(reward.label)
 
                     await this.sequelize.transaction(async (t) => {
-                        await Reward.create({ ...reward, image_url }, { transaction: t });
+                        await Reward.create({ ...reward, image_url, slug }, { transaction: t });
                     });
                 } catch (e) {
                     console.log(`Error creating reward: ${reward.label}`, e);
