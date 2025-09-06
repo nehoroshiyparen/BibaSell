@@ -2,6 +2,7 @@ import { DataTypes, Model, Sequelize } from "sequelize";
 
 export class Reward extends Model {
     declare id: number;
+    declare slug: string;
     declare label: string;
     declare realeseDate: string;
     declare count: number;
@@ -12,6 +13,7 @@ export class Reward extends Model {
     static initialize(sequelize: Sequelize) {
         this.init({
             id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+            slug: { type: DataTypes.STRING, unique: true, allowNull: true },
             label: { type: DataTypes.STRING, allowNull: false, unique: true },
             realeseDate: { type: DataTypes.STRING, allowNull: false },
             count: { type: DataTypes.INTEGER, defaultValue: 0 },

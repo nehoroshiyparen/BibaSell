@@ -2,6 +2,7 @@ import { DataTypes, Model, Sequelize } from "sequelize";
 
 export class Person extends Model {
     declare id: number
+    declare slug: string;
     declare name: string
     declare addition?: string
     declare description?: string
@@ -12,6 +13,7 @@ export class Person extends Model {
     static initialize(sequelize: Sequelize) {
         this.init({
             id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+            slug: { type: DataTypes.STRING, unique: true, allowNull: true },
             name: { type: DataTypes.STRING, allowNull: false },
             addition: { type: DataTypes.TEXT, allowNull: true },
             description: { type: DataTypes.TEXT, allowNull: true },

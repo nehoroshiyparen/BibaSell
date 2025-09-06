@@ -1,5 +1,5 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
-import { Article } from "./Article.model";
+import { Article } from "./Article.model.js";
 
 export class ArticleFile extends Model {
     declare id: number;
