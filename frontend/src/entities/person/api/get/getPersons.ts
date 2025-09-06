@@ -9,5 +9,6 @@ export const getPersonsApi = async (offset: number, limit: number): Promise<Pers
         method: 'GET',
     }
 
-    return request<undefined, PersonPreview[]>(req)    
+    const data = await request<undefined, PersonPreview[]>(req)
+    return data    
 }

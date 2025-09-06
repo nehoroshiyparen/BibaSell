@@ -1,5 +1,7 @@
 export interface PersonPreview {
     id: number,
+    slug: string,
     name: string,
-    image: string,
+    description: string,
+    image_url: string,
 }

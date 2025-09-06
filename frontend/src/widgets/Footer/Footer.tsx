@@ -9,7 +9,7 @@ const Footer = () => {
             <div className="w-full sm:max-w-[1280px] md:max-w-[1920px] lg:max-w-[2560px] flex flex-col box-border pt-50 pl-40 pr-40 relative">
                 <div className="flex flex-col gap-30">
                     <div className="w-full flex justify-center gap-20">
-                        <div className="_big-p text-text">
+                        <div className="_big-p text-t">
                             <p>aaaaaaaa@mail.ru</p>
                             <p>0 (000) 000 00 00</p>
                         </div>
@@ -25,73 +25,73 @@ const Footer = () => {
                     </div>
                     <div className="flex justify-between text-[2.5rem] font-base-light font-bold w-full">
                         <div className='flex flex-col gap-6'>
-                            <div className='text-secondary-accent'>
+                            <div className='text-as'>
                                 <span>
                                     Галлерея памяти
                                 </span>
                             </div>
-                            <div className='text-text'>
+                            <div className='text-t'>
                                 <span>
                                     Участники
                                 </span>
                             </div>
-                            <div className='text-text'>
+                            <div className='text-t'>
                                 <span>
                                     Награды
                                 </span>
                             </div>
-                            <div className='text-text'>
+                            <div className='text-t'>
                                 <span>
                                     Карты
                                 </span>
                             </div>
                         </div>
                         <div className='flex flex-col gap-6'>
-                            <div className='text-secondary-accent'>
+                            <div className='text-as'>
                                 <span>
                                     Библиотека
                                 </span>
                             </div>
-                            <div className='text-text'>
+                            <div className='text-t'>
                                 <span>
                                     Статьи
                                 </span>
                             </div>
-                            <div className='text-text'>
+                            <div className='text-t'>
                                 <span>
                                     Литература
                                 </span>
                             </div>
                         </div>
                         <div className='flex flex-col gap-6'>
-                            <div className='text-secondary-accent'>
+                            <div className='text-as'>
                                 <span>
                                     О нас
                                 </span>
                             </div>
-                            <div className='text-text'>
+                            <div className='text-t'>
                                 <span>
                                     Контакты
                                 </span>
                             </div>
-                            <div className='text-text'>
+                            <div className='text-t'>
                                 <span>
                                     О проекте
                                 </span>
                             </div>
-                            <div className='text-text'>
+                            <div className='text-t'>
                                 <span>
                                     Новости
                                 </span>
                             </div>
                         </div>
                         <div className='flex flex-col gap-6 max-w-140'>
-                            <div className='text-text'>
+                            <div className='text-t'>
                                 <span>
                                     Адрес СПБГУТ
                                 </span>
                             </div>
-                            <div className='text-text'>
+                            <div className='text-t'>
                                 <span>
                                     Санкт-Петербург, набережная реки Мойки, д. 61, литера А.
                                 </span>
@@ -99,7 +99,7 @@ const Footer = () => {
                         </div>
                     </div>
                 </div>
-                <div className='absolute bottom-40 left-0 _casual-span text-secondary-text pl-20'>
+                <div className='absolute bottom-40 left-0 _casual-span text-ts pl-20'>
                     <span>
                         @ Официальный сайт проекта  «Бессметртный полк СПбГУТ»
                     </span>

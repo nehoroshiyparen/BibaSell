@@ -4,10 +4,10 @@ export default {
     extend: {
       colors: {
         bg: "var(--color-bg)",
-        text: "var(--color-text)",
-        text_sec: "var(--color-secondary-text)",
-        text_trd: "var(--color-third-text)",
-        accent: "var(--color-accent)",
+        text: "var(--color-t)",
+        text_sec: "var(--color-ts)",
+        text_trd: "var(--color-tt)",
+        accent: "var(--color-ta)",
       },
       screens: {
         s: '1280px',

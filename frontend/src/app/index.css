@@ -19,12 +19,12 @@
     font-size: 8px;
 
     --color-bg: #ffe5b4;
-    --color-text: #000000;
-    --color-secondary-text: #ffffff;
-    --color-third-text: #961e1e;
-    --color-accent: #dbbc83;
-    --color-secondary-accent: #FF6600;
-    --color-third-accent: #fc9f61;
+    --color-text: #000000; /* text */
+    --color-ts: #ffffff; /* text-secondary */
+    --color-tt: #961e1e; /* text-third */
+    --color-ta: #dbbc83; /* text-accent */
+    --color-as: #FF6600; /* accent-secondary */ 
+    --color-at: #fc9f61; /* accent-third */
 
     --font-base: 'Bounded', sans-serif;
     --font-base-light: 'BoundedLight', sans-serif;
@@ -64,10 +64,10 @@ html, body { overflow-x: hidden; }
 
     --color-bg: #ffe5b4;
     --color-text: #000000;
-    --color-secondary-text: #ffffff;
-    --color-accent: #dbbc83;
-    --color-secondary-accent: #FF6600;
-    --color-third-accent: #fc9f61;
+    --color-ts: #ffffff;
+    --color-ta: #dbbc83;
+    --color-as: #FF6600;
+    --color-at: #fc9f61;
 
     --font-base: 'Bounded', sans-serif;
     --font-base-light: 'BoundedLight', sans-serif;

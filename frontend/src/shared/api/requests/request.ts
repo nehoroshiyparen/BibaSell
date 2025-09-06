@@ -6,7 +6,7 @@ import type { ApiResponse } from "../types/ApiResponse"
 // сюда заебошить обработку ошибок
 export const request = async <Req, Res>(req: ApiRequest<Req, Res>): Promise<Res> => {
     const response = await api.request<ApiResponse<Res>>({
-        url: req.url,
+        url: 'http://localhost:7812' + '/api' + req.url,
         method: req.method,
         data: req.data,
         params: req.params,
@@ -14,6 +14,5 @@ export const request = async <Req, Res>(req: ApiRequest<Req, Res>): Promise<Res>
     })
 
     const data = handleApiResponse(response, response.status)
-
     return data
 }
