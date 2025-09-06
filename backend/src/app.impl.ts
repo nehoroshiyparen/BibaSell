@@ -1,4 +1,5 @@
 import express, { Express, RequestHandler, Router } from 'express'
+import cors from 'cors'
 import { IndexRouter } from '#src/routes/index.js'
 import { AppAbstract, DatabaseAbstract } from './types/abstractions/index.js'
 import { inject, injectable } from 'inversify'
@@ -48,6 +49,7 @@ export class AppImpl implements AppAbstract {
             this.redis.setup()
 
             this.#app.use(express.json())
+            this.#app.use(cors())
             this.#app.use(this.#router)
             this.setupMiddlewares(this.#middlewares)
 

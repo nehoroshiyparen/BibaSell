@@ -1,7 +1,6 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url';
-import { ApiError } from '../ApiError/ApiError';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,8 +30,8 @@ export function moveFileToFinal(tempDirPath: string, filename: string, relativeD
     if (!sourceFile) throw new Error(`File not found: ${filename}`)
 
     const finalName = (newFilename || path.basename(filename, ext)) + path.extname(sourceFile)
-    const filePath = path.join(destDir, finalName)
-    fs.renameSync(sourceFile, filePath)
+    const filepath = path.join(destDir, finalName)
+    fs.renameSync(sourceFile, filepath)
 
-    return filePath
+    return filepath
 }
