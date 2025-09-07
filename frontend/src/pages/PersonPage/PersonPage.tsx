@@ -19,8 +19,8 @@ const PersonPage = () => {
     }, [])
 
     return (
-        <div className="w-full flex flex-col items-center sm:max-w-[1280px] md:max-w-[1920px] lg:max-w-[2560px]">
-            <div>
+        <div className="w-full flex flex-col items-center">
+            <div className="w-full h-50">
 
             </div>
             {person 

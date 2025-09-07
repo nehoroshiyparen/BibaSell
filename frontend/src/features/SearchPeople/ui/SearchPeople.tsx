@@ -1,6 +1,12 @@
+import type { RootState } from "src/app/store"
+import { useAppDispatch, useAppSelector } from "src/app/store/hooks"
 import SearchIcon from "src/assets/svg/SearchIcon/SearchIcon"
+import { setSearchQuery } from "src/entities/person/model"
 
 const SearchPeople = () => {
+    const dispatch = useAppDispatch()
+    const searchQuery = useAppSelector((state: RootState) => state.person.searchQuery)
+
     return (
         <div className="flex-col gap-12 w-full sm:max-w-[1280px] md:max-w-[1920px] lg:max-w-[2560px] flex box-border pl-10 pr-10">
             <div className="_big-p text-center">
@@ -20,6 +26,8 @@ const SearchPeople = () => {
                     type="text"
                     placeholder="..."
                     className="text-3xl text-ts font-base flex-1 h-full outline-none placeholder-at"
+                    value={searchQuery}
+                    onChange={e => dispatch(setSearchQuery(e.target.value))}
                 />
             </form>
         </div>

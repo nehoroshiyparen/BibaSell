@@ -4,11 +4,10 @@ import { startLoading, stopLoading } from "src/app/store/slices/loader.slice";
 import { cleanEror, setError } from "src/app/store/slices/error.slice";
 import { request } from "./request";
 import { handleError } from "src/shared/lib/handlers/handleError";
+import type { AppDispatch } from "src/app/store";
 
-export const requestWithRedux = async <Req, Res>(req: ApiRequest<Req, Res>) => {
-    const dispatch = useAppDispatch()
+export const requestWithRedux = async <Req, Res>(req: ApiRequest<Req, Res>, dispatch: AppDispatch) => {
     try {
-        dispatch(startLoading())
         dispatch(cleanEror())
 
         const data = await request<Req, Res>(req)
@@ -17,7 +16,5 @@ export const requestWithRedux = async <Req, Res>(req: ApiRequest<Req, Res>) => {
         const handledError = handleError(e)
         dispatch(setError({ code: handledError.code, message: handledError.message }))
         throw e
-    } finally {
-        dispatch(stopLoading())
     }
 }

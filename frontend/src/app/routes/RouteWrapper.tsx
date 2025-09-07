@@ -3,6 +3,7 @@ import { useAppSelector } from "../store/hooks"
 import type { AppRoute } from "./config/routes.config"
 import PrivateRoute from "./PrivateRoute"
 import PublicRoute from "./PublicRoute"
+import { useEffect } from "react"
 
 type RouteWrapperProps = {
     route: AppRoute,

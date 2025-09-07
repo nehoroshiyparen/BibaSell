@@ -2,10 +2,10 @@ import { bulkDeletePersonsApi, getFilteredPersonsApi, getPersonByIdApi, getPerso
 import type { PersonAdvanced } from "../model/types/PersonAdvanced";
 import type { PersonFilters } from "../model/types/PersonFilters";
 import { pushPersons, setPersons } from "../model";
-import { store } from "src/app/store";
+import { store, type AppDispatch } from "src/app/store";
 
-export const getPersonById = async (id: number) => {
-    const fetchedPerson = await getPersonByIdApi(id)
+export const getPersonById = async (id: number, dispatch: AppDispatch) => {
+    const fetchedPerson = await getPersonByIdApi(id, dispatch)
 
     return fetchedPerson
 }
