@@ -1,4 +1,4 @@
-import { Sequelize } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import { inject, injectable } from "inversify";
 import { Person } from "#src/database/models/Person.model.js";
 import { TypeofPersonArraySchema } from "#src/types/schemas/person/PersonArraySchema.js";
@@ -81,13 +81,27 @@ export class PersonServiceImpl implements PersonServiceAbstract {
         }
     }
 
-    async getFilteredPersons(filters: TypeofPersonFiltersSchema): Promise<Person[] | null> {
+    async getFilteredPersons(filters: TypeofPersonFiltersSchema, offset?: number, limit?: number): Promise<Person[] | null> {
         try {
+            const where: any = {}
+
+            if (filters.name) {
+                where.name = { [Op.iLike]: `%${filters.name}%` }
+            }
+
+            if (filters.rank) {
+                where.rank = { [Op.iLike]: `%${filters.rank}%`}
+            }
+
+            if (Object.keys(where).length === 0) throw ApiError.BadRequest('Invalid filter params')
+
             const candidates = await Person.findAll({
-                where: {
-                    ...filters
-                }
+                where,
+                offset,
+                limit
             })
+
+            console.log(candidates, where)
 
             return candidates
         } catch (e) {
@@ -103,7 +117,7 @@ export class PersonServiceImpl implements PersonServiceAbstract {
             for (const person of persons) {
                 try {
                     const filepath = fileConfig ? moveFileToFinal(fileConfig.tempDirPath, person.name, 'persons') : null
-                    const image_url = getRelativePath(filepath, 'persons')
+                    const image_url = filepath ? getRelativePath(filepath, 'persons') : undefined
 
                     const slug = getSlug(person.name)
 

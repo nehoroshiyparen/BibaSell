@@ -19,7 +19,7 @@ export class Person extends Model {
             description: { type: DataTypes.TEXT, allowNull: true },
             rank: { type: DataTypes.TEXT, allowNull: true },
             comments: { type: DataTypes.TEXT, allowNull: true },
-            image_url: { type: DataTypes.STRING, allowNull: true, defaultValue: 'default.jpg' }
+            image_url: { type: DataTypes.STRING, allowNull: true }
         }, {
             sequelize: sequelize,
             modelName: 'Person',

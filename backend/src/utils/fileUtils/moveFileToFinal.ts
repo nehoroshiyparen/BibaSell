@@ -27,7 +27,10 @@ export function moveFileToFinal(tempDirPath: string, filename: string, relativeD
         }
     }
 
-    if (!sourceFile) throw new Error(`File not found: ${filename}`)
+    if (!sourceFile) {
+        console.warn(`File not found: ${filename}`)
+        return 
+    }
 
     const finalName = (newFilename || path.basename(filename, ext)) + path.extname(sourceFile)
     const filepath = path.join(destDir, finalName)

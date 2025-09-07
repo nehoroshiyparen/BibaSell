@@ -85,12 +85,13 @@ export class PersonControllerImpl {
         try {
             const filters = req.body
 
-            console.log(filters, req.body)
+            const offset = Number(req.query.offset) || 0
+            const limit = Math.min(Number(req.query.limit) || 20, 100)
 
             ValidateObjectFieldsNotNull(filters)
             const validatedFilters = PersonFiltersSchema.parse(filters)
 
-            const persons = await this.personService.getFilteredPersons(validatedFilters)
+            const persons = await this.personService.getFilteredPersons(validatedFilters, offset, limit)
 
             SendResponse(res, status.OK, persons?.length !== 0 ? `Persons fetched` : `No candidates found`, persons)
         } catch (e) {

@@ -7,7 +7,7 @@ export interface PersonServiceAbstract {
     getPersonById(id: number): Promise<Person>;
     getPersonBySlug(slug: string): Promise<Person>;
     getPersons(offset: number, limit: number): Promise<Person[] | null>;
-    getFilteredPersons(filters: TypeofPersonFiltersSchema): Promise<Person[] | null>
+    getFilteredPersons(filters: TypeofPersonFiltersSchema, offset?: number, limit?: number): Promise<Person[] | null>
     bulkCreatePersons(data: TypeofPersonArraySchema, fileConfig: FileConfig | undefined): Promise<{ status: number }>;
     bulkDeletePersons(ids: number[]): Promise<{ status: number }>;
 }
