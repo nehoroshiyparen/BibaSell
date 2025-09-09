@@ -5,10 +5,10 @@ type PersonFeedParams = {
     persons: PersonPreview[]
 }
 
-const PersonFeed: React.FC<PersonFeedParams> = (props) => {
+const PersonFeed: React.FC<PersonFeedParams> = ({ persons }) => {
     return (
-        <div className="_feed flex flex-col w-full max-w-850 gap-20">
-            {props.persons.map(person => (
+        <div className="_feed-persons flex flex-col w-full max-w-850 gap-20">
+            {persons.map(person => (
                 <PersonFeedPreview person={person} key={person.id}/>
             ))}
         </div>

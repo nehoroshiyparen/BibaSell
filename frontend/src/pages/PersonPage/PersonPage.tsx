@@ -10,12 +10,12 @@ const PersonPage = () => {
     const { slug } = useParams<{ slug: string }>()
 
     useEffect(() => {
-        const fetchPerson = async() => {
+        const fetch = async() => {
             const data = await getPersonBySlugApi(slug!)
             setPerson(data)
         }
 
-        fetchPerson()
+        fetch()
     }, [])
 
     return (

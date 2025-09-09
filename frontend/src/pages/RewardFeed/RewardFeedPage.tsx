@@ -1,26 +1,28 @@
 import { useEffect, useRef } from "react"
-import { usePersons } from "src/entities/person/hooks/usePersons"
-import SearchPeople from "src/features/SearchPeople/ui/SearchPeople"
-import PersonFeed from "src/widgets/PersonFeed/PersonFeed"
-import EmptyFeed from "../../shared/ui/Feed/EmptyFeed"
-import { useAppDispatch, useAppSelector } from "src/app/store/hooks"
 import type { RootState } from "src/app/store"
-import FeedLoad from "../../shared/ui/Feed/FeedLoad"
-import { setLoading } from "src/entities/person/model"
+import { useAppDispatch, useAppSelector } from "src/app/store/hooks"
+import { useRewards } from "src/entities/reward/hooks/useRewards"
+import { setLoading } from "src/entities/reward/model"
+import SearchRewards from "src/features/SearchRewards/SearchRewards"
+import EmptyFeed from "src/shared/ui/Feed/EmptyFeed"
+import FeedLoad from "src/shared/ui/Feed/FeedLoad"
+import RewardFeed from "src/widgets/RewardsFeed/RewardFeed"
 
-const PersonFeedPage = () => {
+const RewardFeedPage = () => {
+    const { load, loadWithFilters } = useRewards()
+
     const dispatch = useAppDispatch()
-    const { load, loadWithFilters } = usePersons()
+    const rewards = useAppSelector((state: RootState) => state.reward.rewards)
+    const filteredRewards = useAppSelector((state: RootState) => state.reward.filteredRewards)
+    const page = useAppSelector((state: RootState) => state.reward.page)
+    const hasMore = useAppSelector((state: RootState) => state.reward.hasMore)
+    const searchQuery = useAppSelector((state: RootState) => state.reward.searchQuery)
+    const isLoading = useAppSelector((state: RootState) => state.reward.isLoading)
 
-    const persons = useAppSelector((state: RootState) => state.person.persons)
-    const filteredPersons = useAppSelector((state: RootState) => state.person.filteredPersons)
-    const page = useAppSelector((state: RootState) => state.person.page)
-    const hasMore = useAppSelector((state: RootState) => state.person.hasMore) 
-    const searchQuery = useAppSelector((state: RootState) => state.person.searchQuery)
-    const isLoading = useAppSelector((state: RootState) => state.person.isLoading)
-    
+    const hasFilter = searchQuery.trim() !== ''
+    const isEmpty = hasFilter && filteredRewards.length === 0
+
     const bottomRef = useRef<HTMLDivElement | null>(null)
-
     let debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     const loadData = async() => {
@@ -29,7 +31,7 @@ const PersonFeedPage = () => {
         if (searchQuery.trim() === '') {
             await load(page)
         } else {
-            await loadWithFilters({ name: searchQuery }, page)
+            await loadWithFilters({ label: searchQuery }, page)
         }
     }
 
@@ -41,7 +43,7 @@ const PersonFeedPage = () => {
         dispatch(setLoading(true))
 
         debounceTimer.current = setTimeout(async() => {
-            loadWithFilters({name: searchQuery}, page)
+            loadWithFilters({label: searchQuery}, page)
         }, 1000)
     }
 
@@ -68,24 +70,21 @@ const PersonFeedPage = () => {
         return () => observer.disconnect()
     }, [bottomRef.current, page, hasMore, searchQuery])
 
-    const hasFilter = searchQuery.trim() !== ''
-    const isEmpty = hasFilter && filteredPersons.length === 0
-
     return (
         <div className="w-screen flex justify-center">
             <div className="w-full box-border pl-70 pr-70">
                 <div className="flex flex-col gap-20 box-border pt-25 items-center">
-                    <SearchPeople/>
-                    
+                    <SearchRewards/>
+
                     {isLoading ? (
-                        <FeedLoad/>
+                            <FeedLoad/>
                         ) : (
                             isEmpty ? (
                                 <EmptyFeed searchQuery={searchQuery}/>
                             ) : (
                                 <>
-                                    <PersonFeed persons={hasFilter ? filteredPersons : persons}/>
-                                    {persons && <div ref={bottomRef}/>}
+                                    <RewardFeed rewards={hasFilter ? filteredRewards : rewards}/>
+                                    {rewards && <div ref={bottomRef}/>}
                                 </>
                             )
                         )
@@ -96,4 +95,4 @@ const PersonFeedPage = () => {
     )
 }
 
-export default PersonFeedPage
+export default RewardFeedPage

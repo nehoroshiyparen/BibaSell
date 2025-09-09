@@ -17,7 +17,7 @@ export function usePersons() {
 
     const loadWithFilters = async(filters: PersonFilters, page: number, limit?: number) => {
         try {
-            dispatch(await fetchPersonsWithFilters({ filters, page, limit }))
+            await dispatch(fetchPersonsWithFilters({ filters, page, limit }))
         } catch (e) {
             console.log(e)
         }

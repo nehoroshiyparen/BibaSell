@@ -24,7 +24,8 @@
     --color-tt: #961e1e; /* text-third */
     --color-ta: #dbbc83; /* text-accent */
     --color-as: #FF6600; /* accent-secondary */ 
-    --color-at: #fc9f61; /* accent-third */
+    --color-a: #fc9f61; /* accent-third */
+    --color-ad: #C7A2823D; /* accent-dim */ 
 
     --font-base: 'Bounded', sans-serif;
     --font-base-light: 'BoundedLight', sans-serif;
@@ -68,6 +69,7 @@ html, body { overflow-x: hidden; }
     --color-ta: #dbbc83;
     --color-as: #FF6600;
     --color-at: #fc9f61;
+    --color-ad: #C7A2823D; 
 
     --font-base: 'Bounded', sans-serif;
     --font-base-light: 'BoundedLight', sans-serif;

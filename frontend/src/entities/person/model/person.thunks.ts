@@ -8,7 +8,7 @@ type FetchPersonArgs = {
     limit?: number
 }
 
-type FetchPersonsWithFilters = {
+type FetchPersonsWithFiltersArg = {
     filters: PersonFilters,
     page: number,
     limit?: number
@@ -29,7 +29,7 @@ export const fetchPersons = createAsyncThunk<PersonPreview[], FetchPersonArgs>(
 
 export const fetchPersonsWithFilters = createAsyncThunk<
     PersonPreview[],
-    FetchPersonsWithFilters
+    FetchPersonsWithFiltersArg
 >('person/fetchPersonsWithFilters', async ({ filters, page, limit }, { rejectWithValue }) => {
     try {
         const data = await getFilteredPersonsApi(filters, page * 10, limit ?? 10)

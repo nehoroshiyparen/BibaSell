@@ -5,6 +5,8 @@ import CatSpinner from "src/shared/ui/Spinners/cat.spinner";
 import Home from "src/pages/Home/Home";
 import PersonFeedPage from "src/pages/PersonFeed/PersonFeedPage";
 import PersonPage from "src/pages/PersonPage/PersonPage";
+import RewardFeedPage from "src/pages/RewardFeed/RewardFeedPage";
+import RewardPage from "src/pages/RewardPage/RewardPage";
 
 export type AppRoute = {
     layout: ComponentType<{ children: React.ReactElement }>,
@@ -63,5 +65,33 @@ export const appRoutes: AppRoute[] = [
         path: '/persons/:slug',
         element: PersonPage,
         protected: false
-    }
+    },
+    {
+        layout: MainLayout,
+        loader: {
+            loadingScreen: LoadingScreen,
+            spinner: {
+                component: CatSpinner,
+                width: 200,
+                height: 200,
+            },
+        },
+        path: '/rewards',
+        element: RewardFeedPage,
+        protected: false
+    },
+    {
+        layout: MainLayout,
+        loader: {
+            loadingScreen: LoadingScreen,
+            spinner: {
+                component: CatSpinner,
+                width: 200,
+                height: 200,
+            },
+        },
+        path: '/rewards/:slug',
+        element: RewardPage,
+        protected: false
+    },
 ]

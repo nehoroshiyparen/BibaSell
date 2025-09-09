@@ -8,6 +8,7 @@ export const handleApiResponse = <T>(res: AxiosResponse<ApiResponse<T>>, status:
     if (status >= 200 && status < 300) {
         return data as T
     } else {
+        console.log(error?.code, error?.message)
         throw new ClientError(status, error?.code ?? 'UNKNOWN', error?.message ?? 'Unknown error')
     }
 }

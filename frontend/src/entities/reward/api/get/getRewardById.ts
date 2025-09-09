@@ -1,7 +1,7 @@
 import type { ApiRequest } from "src/shared/api/types/ApiRequest";
 import type { RewardAdvanced } from "../../model/types/RewardAdvanced";
 import { RewardApiUrl } from "..";
-import { requestWithRedux } from "src/shared/api/requests/requestWithRedux";
+import { request } from "src/shared/api";
 
 export const getRewardByIdApi = async (id: number): Promise<RewardAdvanced> => {
     const req: ApiRequest<number, RewardAdvanced> = {
@@ -10,5 +10,5 @@ export const getRewardByIdApi = async (id: number): Promise<RewardAdvanced> => {
         params: { id }
     }
 
-    return requestWithRedux<number, RewardAdvanced>(req)
+    return request<number, RewardAdvanced>(req)
 }

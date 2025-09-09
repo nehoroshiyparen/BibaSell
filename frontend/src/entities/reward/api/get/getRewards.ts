@@ -1,7 +1,7 @@
 import type { ApiRequest } from "src/shared/api/types/ApiRequest";
 import type { RewardPreview } from "../../model/types/RewardPerview";
 import { RewardApiUrl } from "..";
-import { requestWithRedux } from "src/shared/api/requests/requestWithRedux";
+import { request } from "src/shared/api";
 
 export const getRewardsApi = async (offset: number, limit: number): Promise<RewardPreview[]> => {
     const req: ApiRequest<undefined, RewardPreview[]> = {
@@ -9,5 +9,8 @@ export const getRewardsApi = async (offset: number, limit: number): Promise<Rewa
         method: 'GET',
     }
 
-    return requestWithRedux<undefined, RewardPreview[]>(req)
+    const data = await request<undefined, RewardPreview[]>(req)
+
+    console.log(data)
+    return data
 }

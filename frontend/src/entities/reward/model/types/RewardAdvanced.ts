@@ -5,4 +5,5 @@ export interface RewardAdvanced {
     description: string,
     count: number,
     realeseDate: Date,
+    image_url: string
 }
