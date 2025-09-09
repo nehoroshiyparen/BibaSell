@@ -11,7 +11,7 @@ import { ValidateId } from "#src/utils/validations/ids/id.validate.js";
 import { ValidateIdArray } from "#src/utils/validations/ids/idArray.validate.js";
 import { ApiError } from "#src/utils/ApiError/ApiError.js";
 import { ArticleUpdateSchema } from "#src/types/schemas/article/ArticleUpdate.schema.js";
-import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface";
+import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
 
 @injectable()
 export class ArticleControllerImpl {

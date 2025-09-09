@@ -5,7 +5,7 @@ import { TypeofRewardSchema } from "#src/types/schemas/reward/Reward.schema.js";
 import { RewardArray } from "#src/types/schemas/reward/RewardArray.schema.js";
 import { RethrowApiError } from "#src/utils/ApiError/RethrowApiError.js";
 import { ApiError } from "#src/utils/ApiError/ApiError.js";
-import { Sequelize } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import { TYPES } from "#src/di/types.js";
 import { DatabaseImpl } from "#src/database/database.impl.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
@@ -29,13 +29,25 @@ export class RewardServiceImpl implements RewardServiceAbstract {
         try {
             const reward = await Reward.findByPk(id)
 
-            if (!reward) {
-                throw ApiError.NotFound(`Reward not found`)
-            }
+            if (!reward) throw ApiError.NotFound(`Reward not found`)
 
             return reward
         } catch (e) {
             RethrowApiError(`Service error: Method - getRewardById`, e)
+        }
+    }
+
+    async getRewardBySlug(slug: string): Promise<Reward> {
+        try {
+            const reward = await Reward.findOne({
+                where: { slug }
+            })
+
+            if (!reward) throw ApiError.NotFound(`Reward not found`)
+
+            return reward 
+        } catch (e) {
+            RethrowApiError(`Service error: Method - getRewards`, e)
         }
     }
 
@@ -44,7 +56,8 @@ export class RewardServiceImpl implements RewardServiceAbstract {
             const rewards = await Reward.findAll({
                 offset,
                 limit,
-                where: {}
+                where: {},
+                attributes: ['id', 'slug', 'label', 'image_url']
             })
 
             return rewards
@@ -53,14 +66,24 @@ export class RewardServiceImpl implements RewardServiceAbstract {
         }
     }
 
-    async getFilteredRewards(filters: TypeofRewardSchema): Promise<Reward[] | null> {
-        const candidates = await Reward.findAll({
-            where: {
-                ...filters
-            }
-        })
+    async getFilteredRewards(filters: TypeofRewardSchema, offset?: number, limit?: number): Promise<Reward[] | null> {
+        try {
+            const where: any = {}
 
-        return candidates
+            if (filters.label) {
+                where.label = { [Op.iLike]: `%${filters.label}%` }
+            }
+            
+            const candidates = await Reward.findAll({
+                where,
+                offset,
+                limit
+            })
+
+            return candidates
+        } catch (e) {
+            RethrowApiError(`Service error: Method - getFilteredRewards`, e)
+        }
     }
 
     async bulkCreateRewards(rewards: RewardArray, fileConfig: FileConfig | undefined): Promise<{ status: number }> {
@@ -71,7 +94,7 @@ export class RewardServiceImpl implements RewardServiceAbstract {
             for (const reward of rewards) {
                 try {
                     const filepath = fileConfig ? moveFileToFinal(fileConfig.tempDirPath, reward.label, 'rewards') : null
-                    const image_url = getRelativePath(filepath, 'rewards')
+                    const image_url = filepath ? getRelativePath(filepath, 'rewards') : undefined 
 
                     const slug = getSlug(reward.label)
 

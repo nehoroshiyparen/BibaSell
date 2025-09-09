@@ -101,8 +101,6 @@ export class PersonServiceImpl implements PersonServiceAbstract {
                 limit
             })
 
-            console.log(candidates, where)
-
             return candidates
         } catch (e) {
             RethrowApiError(`Service error: Method - getFilteredPersons`, e)

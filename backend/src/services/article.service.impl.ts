@@ -371,9 +371,8 @@ export class ArticleServiceImpl implements ArticleServiceAbstract {
             if (!extractedFiles.some(f => f.toLowerCase() === file.filename.toLowerCase())) continue
             const uuid = generateUuid()
             try {
-                const filepath = moveFileToFinal(fileConfig.tempDirPath, file.filename, `articles/${articleId}`, uuid)
-                
-                const image_url = getRelativePath(filepath, 'articles')
+                const filepath = fileConfig ? moveFileToFinal(fileConfig.tempDirPath, file.filename, `articles/${articleId}`, uuid) : null
+                const image_url = filepath ? getRelativePath(filepath, 'articles') : undefined
 
                 await ArticleFile.create({
                     article_id: articleId,

@@ -9,7 +9,7 @@ import { ValidateId } from "#src/utils/validations/ids/id.validate.js";
 import { ValidateIdArray } from "#src/utils/validations/ids/idArray.validate.js";
 import { ValidatePaginationParams } from "#src/utils/validations/paginationParams.validate.js";
 import { RewardFiltersSchema } from "#src/types/schemas/reward/RewardFilters.schema.js";
-import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface";
+import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
 
 @injectable()
 export class RewardControllerImpl {
@@ -24,6 +24,18 @@ export class RewardControllerImpl {
             ValidateId(id)
 
             const reward = await this.rewardService.getRewardById(id)
+
+            SendResponse(res, 200, `Reward fetched`, reward)
+        } catch (e) {
+            SendError(res, e)
+        }
+    }
+
+    async getRewardBySlug(req: Request, res: Response) {
+        try {
+            const slug = String(req.params.slug)
+
+            const reward = await this.rewardService.getRewardBySlug(slug)
 
             SendResponse(res, 200, `Reward fetched`, reward)
         } catch (e) {
@@ -56,10 +68,13 @@ export class RewardControllerImpl {
         try {
             const filters = req.body
 
+            const offset = Number(req.query.offset)
+            const limit = Number(req.query.limit)
+
             ValidateObjectFieldsNotNull(filters)
             const validatedFilters = RewardFiltersSchema.parse(filters)
 
-            const rewards = await this.rewardService.getFilteredRewards(validatedFilters)
+            const rewards = await this.rewardService.getFilteredRewards(validatedFilters, offset, limit)
 
             SendResponse(res, 200, rewards ? `Rewards fetched` : `No candidates found`, rewards)
         } catch (e) {
