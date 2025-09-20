@@ -3,10 +3,10 @@ import * as runtime from 'react/jsx-runtime';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { pathToFileURL } from 'node:url';
-import { ArticleFileInfo } from '#src/types/interfaces/files/ArticleFileInfo.interface';
+import { MDXArticleFileInfo } from '#src/types/interfaces/files/MDXArticleFileInfo.interface';
 import { fileRender } from '../render/file.render';
 
-export async function MdxParser(markdown: string, files?: ArticleFileInfo[]) {
+export async function MdxParser(markdown: string, files?: MDXArticleFileInfo[]) {
   if (files && files.length > 0) {
     markdown = fileRender(markdown, files)
   }

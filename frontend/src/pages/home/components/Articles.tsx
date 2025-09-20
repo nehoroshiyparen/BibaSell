@@ -2,7 +2,7 @@ import ArrowIcon from "src/assets/svg/ArrowIcon/ArrowIcon"
 import BookIcon from "src/assets/svg/BookIcon/BookIcon"
 import SearchIcon from "src/assets/svg/SearchIcon/SearchIcon"
 
-const Article = () => {
+const MDXArticle = () => {
     return (
         <div className="w-full h-full flex flex-col justify-center gap-35">
             <div className="_big-p text-textw-full text-center">
@@ -34,7 +34,7 @@ const Article = () => {
                     <div className="relative z-1 flex flex-col justify-between h-full">
                         <div className="flex flex-col gap-8">
                             <div className="text-textfont-base text-7xl/15">
-                                КНИГИ
+                                МОНОГРАФИИ
                             </div>
                             <div className="font-base text-4xl/14 box-border pl-6">
                                 Собрание полезных материалов по предмету истории
@@ -57,4 +57,4 @@ const Article = () => {
     )
 }
 
-export default Article
+export default MDXArticle

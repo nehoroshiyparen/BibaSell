@@ -2,7 +2,7 @@ import './Home.css'
 import GreetingBlock from "./ui/GreetingBlock"
 import CardsBlock from "./ui/CardsBlock"
 import MapsBlock from "./ui/MapsBlock"
-import ArticleBlock from "./ui/ArticleBlock"
+import MDXArticleBlock from "./ui/MDXArticleBlock"
 
 const Home = () => {
     return (
@@ -10,7 +10,7 @@ const Home = () => {
             <GreetingBlock/>
             <CardsBlock/>
             <MapsBlock/>
-            <ArticleBlock/>
+            <MDXArticleBlock/>
         </div>
     )
 }

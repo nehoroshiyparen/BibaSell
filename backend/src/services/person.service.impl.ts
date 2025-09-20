@@ -1,12 +1,12 @@
 import { Op, Sequelize } from "sequelize";
 import { inject, injectable } from "inversify";
-import { Person } from "#src/database/models/Person.model.js";
+import { Person } from "#src/database/models/Person/Person.model.js";
 import { TypeofPersonArraySchema } from "#src/types/schemas/person/PersonArraySchema.js";
 import { ApiError } from "#src/utils/ApiError/ApiError.js";
 import { RethrowApiError } from "#src/utils/ApiError/RethrowApiError.js";
-import { PersonServiceAbstract } from "../types/abstractions/services/person.service.abstraction.js";
+import { IPersonService } from "../types/contracts/persons/person.service.interface.js";
 import { TYPES } from "#src/di/types.js";
-import { Reward } from "#src/database/models/Reward.model.js";
+import { Reward } from "#src/database/models/Reward/Reward.model.js";
 import { TypeofPersonFiltersSchema } from "#src/types/schemas/person/PersonFilters.schema.js";
 import { DatabaseImpl } from "#src/database/database.impl.js";
 import { moveFileToFinal } from "#src/utils/fileUtils/moveFileToFinal.js";
@@ -17,7 +17,7 @@ import { getRelativePath } from "#src/utils/fileUtils/getRelativePath.js";
 import { getSlug } from "#src/utils/slugging/getSlug.js";
 
 @injectable()
-export class PersonServiceImpl implements PersonServiceAbstract {
+export class PersonServiceImpl implements IPersonService {
     private sequelize: Sequelize
 
     constructor(

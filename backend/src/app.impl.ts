@@ -1,21 +1,21 @@
 import express, { Express, RequestHandler, Router } from 'express'
 import cors from 'cors'
 import { IndexRouter } from '#src/routes/index.js'
-import { AppAbstract, DatabaseAbstract } from './types/abstractions/index.js'
+import { IApp, IDatabase } from './types/contracts/index.js'
 import { inject, injectable } from 'inversify'
 import { DatabaseImpl } from './database/database.impl.js'
 import { TYPES } from './di/types.js'
 import { ENV } from './config/index.js'
-import { Person } from './database/models/Person.model.js'
-import { Reward } from './database/models/Reward.model.js'
-import { PersonRewards } from './database/models/PersonRewards.model.js'
+import { Person } from './database/models/Person/Person.model.js'
+import { Reward } from './database/models/Reward/Reward.model.js'
+import { PersonRewards } from './database/models/Associations/PersonRewards.model.js'
 import { RedisImpl } from './redis/redis.impl.js'
-import { Heading } from './database/models/Heading.model.js'
-import { Article } from './database/models/Article.model.js'
-import { ArticleFile } from './database/models/ArticleFiles.model.js'
+import { Heading } from './database/models/MDXArticle/Heading.model.js'
+import { MDXArticle } from './database/models/MDXArticle.model.js'
+import { MDXArticleFile } from './database/models/MDXArticle/MDXArticleFiles.model.js'
 
 @injectable()
-export class AppImpl implements AppAbstract {
+export class AppImpl implements IApp {
     public name: string = 'NN'
     public port: number
 
@@ -43,7 +43,7 @@ export class AppImpl implements AppAbstract {
 
     public async setup() {
         try {
-            this.#database.registerModels([Person, Reward, PersonRewards, Article, Heading, ArticleFile])
+            this.#database.registerModels([Person, Reward, PersonRewards, MDXArticle, Heading, MDXArticleFile])
             await this.#database.setup()
 
             this.redis.setup()

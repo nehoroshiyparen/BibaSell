@@ -1,11 +1,11 @@
 import { Sequelize } from 'sequelize';
 import { injectable } from 'inversify';
-import { DatabaseAbstract } from '../types/abstractions/index.js';
-import { ISequelizeModel } from '#src/types/abstractions/sequelize.model.abstraction.js';
+import { IDatabase } from '../types/contracts/index.js';
+import { ISequelizeModel } from '#src/types/contracts/core/sequelize.model.interface.js';
 import { sequelize as sequelizeConfig } from './config.js';
 
 @injectable()
-export class DatabaseImpl implements DatabaseAbstract {
+export class DatabaseImpl implements IDatabase {
   private sequelize: Sequelize;
 
   constructor() {

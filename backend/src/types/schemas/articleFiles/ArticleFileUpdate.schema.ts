@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const ArticleFileUpdateSchema = z.object({
+export const MDXArticleFileUpdateSchema = z.object({
     delete: z.array(z.number()).optional().nullable(),
 }).strict()
-export type TypeofArticleFileUpdateSchema = z.infer<typeof ArticleFileUpdateSchema>
+export type TypeofMDXArticleFileUpdateSchema = z.infer<typeof MDXArticleFileUpdateSchema>

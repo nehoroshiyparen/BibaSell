@@ -1,12 +1,12 @@
 import { injectable } from "inversify";
 import { Redis } from "ioredis";
-import { RedisAbstract } from "#src/types/abstractions/redis.abstraction.js";
+import { IRedis } from "#src/types/contracts/core/redis.interface.js";
 import { redisConfig } from "./config.js";
 import { ENV } from "#src/config/index.js";
 import { ApiError } from "#src/utils/ApiError/ApiError.js";
 
 @injectable()
-export class RedisImpl implements RedisAbstract {
+export class RedisImpl implements IRedis {
     private redis: Redis
 
     constructor () {

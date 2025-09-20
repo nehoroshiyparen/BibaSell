@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { PersonArrayJsonSchema, PersonArraySchema } from '../types/schemas/person/PersonArraySchema.js'
 import { SendError, SendResponse } from "#src/utils/http/index.js";
 import { status } from "#src/consts/status.js";
-import { PersonServiceAbstract } from "#src/types/abstractions/services/person.service.abstraction.js";
+import { IPersonService } from "#src/types/contracts/persons/person.service.interface.js";
 import { injectable, inject } from "inversify";
 import { TYPES } from "#src/di/types.js";
 import { ValidateId } from "#src/utils/validations/ids/id.validate.js";
@@ -15,7 +15,7 @@ import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js"
 @injectable()
 export class PersonControllerImpl {
     constructor (
-        @inject(TYPES.PersonService) private personService: PersonServiceAbstract
+        @inject(TYPES.PersonService) private personService: IPersonService
     ) {}
 
     /**
