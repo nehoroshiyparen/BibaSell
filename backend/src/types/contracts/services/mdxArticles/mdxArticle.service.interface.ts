@@ -1,4 +1,4 @@
-import { MDXArticle } from "#src/database/models/MDXArticle.model.js"
+import { MDXArticle } from "#src/database/models/MDXArticle/MDXArticle.model.js"
 import { Heading } from "#src/database/models/MDXArticle/Heading.model.js"
 import { MDXArticleContent } from "#src/types/interfaces/mdxArticles/MDXArticleContent.js"
 import { MDXArticlePreview } from "#src/types/interfaces/mdxArticles/MDXArticlePreview.js"

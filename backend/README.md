@@ -55,3 +55,40 @@
 
  - Нужно сделать обработку ошибок от Зода !!!
  
+
+### 26.09.25
+1. Навести порядок в моделях
+    - Сделать простейший CRUD для PdfArticle (пока без файлов, без авторов):
+        - createArticle (только title + extractedText)
+        - getArticleById
+        - getArticles
+        - updateArticle
+        - deleteArticle
+    Результат: API возвращает и сохраняет статьи в БД.
+
+2. Поднять ElasticSearch
+    - Добавить ElasticSearch в docker-compose.yml
+    - Сделать индекс pdf_articles с полями: id, title, extractedText
+    - Написать сервис elastic.service.ts для операций ( ну или по другому это называется ну тип как редис ):
+        - indexArticle(article: PdfArticle)
+        - searchArticles(query: string)
+        - deleteArticle(id: number)
+    Результат: можно искать статьи по тексту/заголовку
+
+3. Связка CRUD + ElasticSearch
+    - При создании статьи → сразу индексировать её в ElasticSearch.
+    - При обновлении статьи → обновлять индекс.
+    - При удалении статьи → удалять из индекса.
+    - Реализовать метод getFilteredArticles(text, heading, authors) так, чтобы запрос шел в ElasticSearch
+    Результат: CRUD работает, поиск работает, данные синхронизируются
+
+4. Авторы
+    - Поднять Author + PdfArticleAuthors
+    - В createArticle указывать список авторов
+    - При getArticleById и getArticles возвращать список авторов
+    - Индексировать авторов в ElasticSearch (чтобы можно было искать по ним)
+    Результат: статьи привязываются к авторам, поиск по авторам возможен
+
+5. Что пока не трогаем
+    - Файлы (пусть будет extractedText строкой в базе для начала).
+    - S3 / локальное хранение

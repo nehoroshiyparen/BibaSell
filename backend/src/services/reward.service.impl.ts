@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { IRewardService } from "#src/types/contracts/rewards/reward.service.interface.js";
+import { IRewardService } from "#src/types/contracts/services/rewards/reward.service.interface.js";
 import { Reward } from "#src/database/models/Reward/Reward.model.js";
 import { TypeofRewardSchema } from "#src/types/schemas/reward/Reward.schema.js";
 import { RewardArray } from "#src/types/schemas/reward/RewardArray.schema.js";

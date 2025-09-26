@@ -4,7 +4,7 @@ import { Person } from "#src/database/models/Person/Person.model.js";
 import { TypeofPersonArraySchema } from "#src/types/schemas/person/PersonArraySchema.js";
 import { ApiError } from "#src/utils/ApiError/ApiError.js";
 import { RethrowApiError } from "#src/utils/ApiError/RethrowApiError.js";
-import { IPersonService } from "../types/contracts/persons/person.service.interface.js";
+import { IPersonService } from "../types/contracts/services/persons/person.service.interface.js";
 import { TYPES } from "#src/di/types.js";
 import { Reward } from "#src/database/models/Reward/Reward.model.js";
 import { TypeofPersonFiltersSchema } from "#src/types/schemas/person/PersonFilters.schema.js";

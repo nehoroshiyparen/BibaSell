@@ -1,13 +1,13 @@
 import { Container } from "inversify";
 import { PersonServiceImpl } from "#src/services/person.service.impl.js";
 import { TYPES } from "./types.js";
-import { IPersonService } from "#src/types/contracts/persons/person.service.interface.js";
+import { IPersonService } from "#src/types/contracts/services/persons/person.service.interface.js";
 import { PersonControllerImpl } from "#src/controllers/person.controller.js";
 import { PersonRouter } from "#src/routes/person.routes.js";
 import { IndexRouter } from "#src/routes/index.js";
 import { IApp, IDatabase } from "#src/types/contracts/index.js";
 import { DatabaseImpl } from "#src/database/database.impl.js";
-import { IRewardService } from "#src/types/contracts/rewards/reward.service.interface.js";
+import { IRewardService } from "#src/types/contracts/services/rewards/reward.service.interface.js";
 import { RewardServiceImpl } from "#src/services/reward.service.impl.js";
 import { RewardControllerImpl } from "#src/controllers/reward.controller.js";
 import { RewardRouter } from "#src/routes/reward.routes.js";

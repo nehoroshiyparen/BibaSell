@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
 import { TYPES } from "#src/di/types.js";
-import { IRewardService } from "#src/types/contracts/rewards/reward.service.interface.js";
+import { IRewardService } from "#src/types/contracts/services/rewards/reward.service.interface.js";
 import { RewardArraySchema } from "#src/types/schemas/reward/RewardArray.schema.js";
 import { SendError, SendResponse } from "#src/utils/http/index.js";
 import { ValidateObjectFieldsNotNull } from "#src/utils/validations/objectFieldsNotNull.validate.js";
@@ -45,8 +45,7 @@ export class RewardControllerImpl {
 
     async getRewards(req: Request, res: Response) {
         try {
-            const offset = Number(req.query.offset)
-            const limit = Number(req.query.limit)
+            const [offset, limit] = ['offset', 'limit'].map(k => Number(req.query[k]))
 
             ValidatePaginationParams(offset, limit)
 
@@ -68,8 +67,7 @@ export class RewardControllerImpl {
         try {
             const filters = req.body
 
-            const offset = Number(req.query.offset)
-            const limit = Number(req.query.limit)
+            const [offset, limit] = ['offset', 'limit'].map(k => Number(req.query[k]))
 
             ValidateObjectFieldsNotNull(filters)
             const validatedFilters = RewardFiltersSchema.parse(filters)

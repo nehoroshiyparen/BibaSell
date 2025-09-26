@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { PersonArrayJsonSchema, PersonArraySchema } from '../types/schemas/person/PersonArraySchema.js'
 import { SendError, SendResponse } from "#src/utils/http/index.js";
 import { status } from "#src/consts/status.js";
-import { IPersonService } from "#src/types/contracts/persons/person.service.interface.js";
+import { IPersonService } from "#src/types/contracts/services/persons/person.service.interface.js";
 import { injectable, inject } from "inversify";
 import { TYPES } from "#src/di/types.js";
 import { ValidateId } from "#src/utils/validations/ids/id.validate.js";

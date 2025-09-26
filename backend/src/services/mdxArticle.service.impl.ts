@@ -9,7 +9,7 @@ import { headingParser } from "#src/features/markdown/parsing/heading.parser.js"
 import { MdxParser } from "#src/features/markdown/parsing/mdx.parser.js";
 import { getSlug } from "#src/utils/slugging/getSlug.js";
 import { RedisImpl } from "#src/redis/redis.impl.js";
-import { IMDXArticleService } from "#src/types/contracts/mdxArticles/mdxArticle.service.interface.js";
+import { IMDXArticleService } from "#src/types/contracts/services/mdxArticles/mdxArticle.service.interface.js";
 import { MDXArticleContent } from "#src/types/interfaces/mdxArticles/MDXArticleContent.js";
 import { MDXArticlePreview } from "#src/types/interfaces/mdxArticles/MDXArticlePreview.js";
 import { TypeofMDXArticleFiltersSchema } from "#src/types/schemas/mdxArticle/MDXArticleFilters.schema.js";

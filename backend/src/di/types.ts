@@ -6,6 +6,7 @@ export const TYPES = {
     PersonService: Symbol.for('PersonService'),
     RewardService: Symbol.for('RewardService'),
     MDXArticleService: Symbol.for('MDXArticleService'),
+    PdfArticleService: Symbol.for('PdfArticleService'),
     
     PersonController: Symbol.for('PersonController'),
     RewardController: Symbol.for('RewardController'),

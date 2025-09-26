@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
 import { status } from "#src/consts/index.js";
 import { TYPES } from "#src/di/types.js";
-import { IMDXArticleService } from "#src/types/contracts/mdxArticles/mdxArticle.service.interface.js";
+import { IMDXArticleService } from "#src/types/contracts/services/mdxArticles/mdxArticle.service.interface.js";
 import { MDXArticleFiltersSchema } from "#src/types/schemas/mdxArticle/MDXArticleFilters.schema.js";
 import { MDXArticleCreateSchema } from "#src/types/schemas/mdxArticle/MDXArticlePatch.schema.js";
 import { SendError, SendResponse } from "#src/utils/http/index.js";
