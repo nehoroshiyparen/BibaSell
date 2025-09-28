@@ -11,12 +11,12 @@ export interface IPdfArticleService {
     getArticles(
         offset: number, 
         limit: number
-    ): Promise<TypeofPdfAcrticlePreviewSchema>
+    ): Promise<TypeofPdfAcrticlePreviewSchema[]>
     getFilteredArticles(
         filters: TypeofPdfArticleFiltersSchema,
         offset?: number,
         limit?: number,
-    ): Promise<TypeofPdfAcrticlePreviewSchema>
+    ): Promise<TypeofPdfAcrticlePreviewSchema[]>
     createArticle(
         options: TypeofPdfArticlePatchSchema, 
         fileConfig: FileConfig | undefined

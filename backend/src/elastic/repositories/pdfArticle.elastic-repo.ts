@@ -2,6 +2,7 @@ import { TYPES } from "#src/di/types.js";
 import { inject, injectable } from "inversify";
 import { ElasticEntity } from "#src/types/interfaces/elastic/ElastucEntity.js";
 import { IElastic } from "#src/types/contracts/core/elastic.interface.js";
+import { PdfArticle } from "#src/database/models/PdfArticle/PdfArticle.model.js";
 
 @injectable()
 export class PdfArticleElasticRepo {
@@ -18,10 +19,10 @@ export class PdfArticleElasticRepo {
     }
 
     async searchArticles(query: Record<string, string>, offset?: number, limit?: number) {
-        return this.elastic.searchDocument(this.index, query, offset, limit)
+        return this.elastic.searchDocument<PdfArticle>(this.index, query, offset, limit)
     }
 
-    async deleteArticle(id: number) {
+    async destroyArticle(id: number) {
         return this.elastic.deleteDocument(this.index, id)
     }
 }

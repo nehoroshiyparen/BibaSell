@@ -67,7 +67,7 @@ export class ElasticImpl implements IElastic {
         return res.hits.hits.map(hit => hit._source as T)
     }
 
-    async deleteDocument(index: string, id: string | number): Promise<DeleteResponse> {
+    async deleteDocument(index: string, id: string | number): Promise<estypes.DeleteResponse> {
         const res = await this.client.delete({
             index,
             id: String(id)

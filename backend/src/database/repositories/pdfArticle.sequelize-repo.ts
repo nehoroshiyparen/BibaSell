@@ -1,7 +1,7 @@
 import { TYPES } from "#src/di/types.js";
 import { TypeofPdfArticlePatchSchema } from "#src/types/schemas/pdfArticle/PdfArticlePatch.schema.js";
 import { inject, injectable } from "inversify";
-import { Model, Sequelize, where } from "sequelize";
+import { Model, Sequelize, Transaction, where } from "sequelize";
 import { IDatabase } from "#src/types/contracts/index.js";
 import { PdfArticle } from "../models/PdfArticle/PdfArticle.model.js";
 import { TypeofPdfArticleUpdateSchema } from "#src/types/schemas/pdfArticle/PdfArticleUpdate.schema.js";
@@ -24,16 +24,34 @@ export class PdfArticleSequelizeRepo {
     }
 
     async findBypk(id: number): Promise<PdfArticle | null> {
-        const article = await PdfArticle.findByPk(id)
-        return article
+        const article = await PdfArticle.findByPk(id, { 
+            include: 
+                [ 
+                    { 
+                        model: Author,
+                        as: 'authors',
+                    } 
+                ]
+        })
+        return article as PdfArticle & { authors: Author[] } | null
     }
 
     async findAll(offset: number, limit: number): Promise<PdfArticle[]> {
-        const articles = await PdfArticle.findAll({ offset, limit })
+        const articles = await PdfArticle.findAll({ 
+            offset, 
+            limit, 
+            include: 
+                [ 
+                    { 
+                        model: Author,
+                        as: 'authors',
+                    } 
+                ] 
+        })
         return articles
     }
 
-    async findByAuthor(authorName: string): Promise<PdfArticle[]> {
+    async findByAuthor(authorName: string, offset?: number, limit?: number): Promise<PdfArticle[]> {
         const articles = await PdfArticle.findAll({
             include: [
                 {
@@ -51,6 +69,14 @@ export class PdfArticleSequelizeRepo {
         if (!article) throw ApiError.NotFound(`Article with id: ${id} is not exists`)
 
         return await article.update(data)
+    }
+
+    async destroy(id: number, transaction?: Transaction) {
+        await PdfArticle.destroy({ where: { id }, transaction  })
+    }
+
+    async createTransaction(): Promise<Transaction> {
+        return await this.sequelize.transaction()
     }
 
     private async isExists(id: number): Promise<boolean> {

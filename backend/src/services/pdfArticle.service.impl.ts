@@ -1,4 +1,3 @@
-import { DatabaseImpl } from "#src/database/database.impl.js";
 import { PdfArticle } from "#src/database/models/PdfArticle/PdfArticle.model.js";
 import { PdfArticleSequelizeRepo } from "#src/database/repositories/pdfArticle.sequelize-repo.js";
 import { TYPES } from "#src/di/types.js";
@@ -13,6 +12,7 @@ import { TypeofPdfAcrticlePreviewSchema } from "#src/types/schemas/pdfArticle/Pd
 import { TypeofPdfArticleUpdateSchema } from "#src/types/schemas/pdfArticle/PdfArticleUpdate.schema.js";
 import { ApiError } from "#src/utils/ApiError/ApiError.js";
 import { RethrowApiError } from "#src/utils/ApiError/RethrowApiError.js";
+import { arrayToPdfArticlePreview } from "#src/utils/mappings/PdfArticles/arrayToPreview.js";
 import { inject, injectable } from "inversify";
 
 @injectable()
@@ -32,10 +32,10 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         }
     }
 
-    async getArticles(offset: number = 0, limit: number = 10): Promise<TypeofPdfAcrticlePreviewSchema> {
+    async getArticles(offset: number = 0, limit: number = 10): Promise<TypeofPdfAcrticlePreviewSchema[]> {
         try {
             const articles = await this.sequelize.findAll(offset, limit)
-            return articles
+            return arrayToPdfArticlePreview(articles)
         } catch (e) {
             RethrowApiError('Service error: Method - getArticles', e)
         }
@@ -45,7 +45,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         filters: TypeofPdfArticleFiltersSchema,
         offset?: number,
         limit?: number,
-    ): Promise<TypeofPdfAcrticlePreviewSchema> {
+    ): Promise<TypeofPdfAcrticlePreviewSchema[]> {
         try {
             const elasticQuery: Record<string, string> = {}
             if (filters.title) elasticQuery.title = filters.title
@@ -61,23 +61,26 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
             }
 
             if (sequelizeAuthor) {
-                sequelizeCandidates = await this.sequelize.findByAuthors(sequelizeAuthor)
+                sequelizeCandidates = await this.sequelize.findByAuthor(sequelizeAuthor, offset, limit)
             }
 
-            // Если фильтры есть для обеих баз — делаем пересечение по id
-            let finalResults: PdfArticle[]
+            let compaired: PdfArticle[]
             if (elasticCandidates.length && sequelizeCandidates.length) {
                 const sequelizeIds = new Set(sequelizeCandidates.map(a => a.id))
-                finalResults = elasticCandidates.filter(a => sequelizeIds.has(a.id))
+                compaired = elasticCandidates.filter(a => sequelizeIds.has(a.id))
             } else if (elasticCandidates.length) {
-                finalResults = elasticCandidates
+                compaired = elasticCandidates
             } else if (sequelizeCandidates.length) {
-                finalResults = sequelizeCandidates
+                compaired = sequelizeCandidates
             } else {
-                finalResults = []
+                compaired = []
             }
 
-            return finalResults
+            const results = await Promise.all(
+                compaired.map(a => this.sequelize.findBypk(a.id))
+            )
+
+            return arrayToPdfArticlePreview(results)
         } catch (e) {
             RethrowApiError('Service error: Method - getFilteredArticles', e)
         }
@@ -106,16 +109,47 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
     }
 
     async deleteArticle(id: number): Promise<Status> {
+        const transaction = await this.sequelize.createTransaction()
         try {
+            await this.sequelize.destroy(id, transaction)
+            try {
+                await this.elastic.destroyArticle(id)
+            } catch (e) {
+                throw ApiError.Internal(`Elastic delete failed. Rollback sequelize chenges`, `ELASTIC_INTERNAL_ERROR`, e)
+            }
 
+            await transaction.commit()
+
+            return { status: 200 }
         } catch (e) {
+            await transaction.rollback()
             RethrowApiError('Service error: Method - deleteArticle', e)
         }
     }
 
     async bulkDeleteArticles(ids: number[]): Promise<Status> {
-        try {
+        const errorLimit = Math.max(Math.floor(ids.length / 2), 1)
+        let errorCounter = 0
 
+        try {
+            for (const id of ids) {
+                try {
+                    if (errorCounter >= errorLimit) break
+
+                    await this.sequelize.destroy(id)
+                } catch (e) {
+                    errorCounter++
+                    console.log(`Error while deleting article with id: ${id} \n Error: ${e}`)
+                }
+            }
+
+            if (errorCounter > 0 && errorCounter < errorLimit) {
+                return { status: 206 }
+            } else if (errorCounter >= errorLimit) {
+                return { status: 400 }
+            }
+
+            return { status: 200 }
         } catch (e) {
             RethrowApiError('Service error: Method - bulkDeleteArticles', e)
         }
