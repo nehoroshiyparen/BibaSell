@@ -16,6 +16,9 @@ export const ENV = {
     REDIS_PORT: Number(process.env.REDIS_PORT),
     REDIS_PASSWORD: process.env.REDIS_PASSWORD || '',
 
+    ELASTIC_HOST: process.env.ELASTIC_HOST || '',
+    ELASTIC_PORT: Number(process.env.ELASTIC_PORT),
+
     MULTER_UPLOAD_PATH: process.env.MULTER_UPLOAD_PATH ?? '',
     MULTER_GAP_DIR_PATH: process.env.MULTER_GAP_DIR_PATH ?? ''
 }

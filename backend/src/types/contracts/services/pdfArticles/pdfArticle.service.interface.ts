@@ -8,9 +8,14 @@ import { TypeofPdfArticleUpdateSchema } from "#src/types/schemas/pdfArticle/PdfA
 
 export interface IPdfArticleService {
     getArticleById(id: number): Promise<TypeofPdfArticleFullSchema>
-    getArticles(offset: number, limit: number): Promise<TypeofPdfAcrticlePreviewSchema>
+    getArticles(
+        offset: number, 
+        limit: number
+    ): Promise<TypeofPdfAcrticlePreviewSchema>
     getFilteredArticles(
-        filters: TypeofPdfArticleFiltersSchema
+        filters: TypeofPdfArticleFiltersSchema,
+        offset?: number,
+        limit?: number,
     ): Promise<TypeofPdfAcrticlePreviewSchema>
     createArticle(
         options: TypeofPdfArticlePatchSchema, 
