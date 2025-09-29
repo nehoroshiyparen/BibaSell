@@ -1,23 +1,23 @@
 import { Container } from "inversify";
-import { PersonServiceImpl } from "#src/services/person.service.impl.js";
+import { PersonServiceImpl } from "#src/modules/persons/services/person.service.impl.js";
 import { TYPES } from "./types.js";
 import { IPersonService } from "#src/types/contracts/services/persons/person.service.interface.js";
-import { PersonControllerImpl } from "#src/controllers/person.controller.js";
+import { PersonControllerImpl } from "#src/modules/persons/controllers/person.controller.js";
 import { PersonRouter } from "#src/routes/person.routes.js";
 import { IndexRouter } from "#src/routes/index.js";
 import { IApp, IDatabase } from "#src/types/contracts/index.js";
-import { DatabaseImpl } from "#src/database/database.impl.js";
+import { DatabaseImpl } from "#src/infrastructure/sequelize/database.impl.js";
 import { IRewardService } from "#src/types/contracts/services/rewards/reward.service.interface.js";
-import { RewardServiceImpl } from "#src/services/reward.service.impl.js";
-import { RewardControllerImpl } from "#src/controllers/reward.controller.js";
+import { RewardServiceImpl } from "#src/modules/rewards/services/reward.service.impl.js";
+import { RewardControllerImpl } from "#src/modules/rewards/controllers/reward.controller.js";
 import { RewardRouter } from "#src/routes/reward.routes.js";
 import { AppImpl } from "#src/app.impl.js";
-import { IMDXArticleService } from "#src/types/abstractions/services/mdxArticle.service.abstraction.js";
-import { MDXArticleServiceImpl } from "#src/services/mdxArticle.service.impl.js";
-import { MDXArticleControllerImpl } from "#src/controllers/mdxArticle.controller.js";
+import { IMDXArticleService } from "#src/types/contracts/services/mdxArticles/mdxArticle.service.interface.js";
+import { MDXArticleServiceImpl } from "#src/modules/mdxArticles/services/mdxArticle.service.impl.js";
+import { MDXArticleControllerImpl } from "#src/modules/mdxArticles/controllers/mdxArticle.controller.js";
 import { IRedis } from "#src/types/contracts/core/redis.interface.js";
-import { RedisImpl } from "#src/redis/redis.impl.js";
-import { MDXArticleRouter } from "#src/routes/mdxArticle.routes.js";
+import { RedisImpl } from "#src/infrastructure/redis/redis.impl.js";
+import { MDXArticleRouter } from "#src/routes/article.routes.js";
 
 const container = new Container()
 

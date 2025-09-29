@@ -1,7 +1,7 @@
 import { Reward } from "#src/database/models/Reward/Reward.model.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
-import { RewardArray } from "#src/types/schemas/reward/RewardArray.schema.js";
-import { TypeofRewardFiltersSchema } from "#src/types/schemas/reward/RewardFilters.schema.js";
+import { RewardArray } from "#src/modules/rewards/schemas/reward/RewardArray.schema.js";
+import { TypeofRewardFiltersSchema } from "#src/modules/rewards/schemas/reward/RewardFilters.schema.js";
 
 export interface IRewardService {
     getRewardById(id: number): Promise<Reward>;

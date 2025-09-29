@@ -1,7 +1,7 @@
-import { Person } from "#src/database/models/Person/Person.model.js";
+import { Person } from "#src/infrastructure/sequelize/models/Person/Person.model.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
-import { TypeofPersonArraySchema } from "#src/types/schemas/person/PersonArraySchema.js";
-import { TypeofPersonFiltersSchema } from "#src/types/schemas/person/PersonFilters.schema.js";
+import { TypeofPersonArraySchema } from "#src/modules/persons/schemas/PersonArraySchema.js";
+import { TypeofPersonFiltersSchema } from "#src/modules/persons/schemas/PersonFilters.schema.js";
 
 export interface IPersonService {
     getPersonById(id: number): Promise<Person>;

@@ -1,4 +1,4 @@
-import { createUniqueDir } from "#src/utils/fileUtils/create/createUniqueDir.js";
+import { createUniqueDir } from "#src/shared/fileUtils/create/createUniqueDir.js";
 import { NextFunction, Request, Response } from "express";
 
 export function prepareTempDir(req: Request, res: Response, next: NextFunction) {

@@ -1,11 +1,11 @@
-import { MDXArticle } from "#src/database/models/MDXArticle/MDXArticle.model.js"
-import { Heading } from "#src/database/models/MDXArticle/Heading.model.js"
-import { MDXArticleContent } from "#src/types/interfaces/mdxArticles/MDXArticleContent.js"
-import { MDXArticlePreview } from "#src/types/interfaces/mdxArticles/MDXArticlePreview.js"
+import { MDXArticle } from "#src/infrastructure/sequelize/models/MDXArticle/MDXArticle.model.js"
+import { Heading } from "#src/infrastructure/sequelize/models/MDXArticle/Heading.model.js"
+import { MDXArticleContent } from "#src/modules/mdxArticles/interfaces/mdxArticles/MDXArticleContent.js"
+import { MDXArticlePreview } from "#src/modules/mdxArticles/interfaces/mdxArticles/MDXArticlePreview.js" 
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js"
-import { TypeofMDXArticleFiltersSchema } from "#src/types/schemas/mdxArticle/MDXArticleFilters.schema.js"
-import { TypeofAdvancedMDXArticleSchema } from "#src/types/schemas/mdxArticle/MDXArticlePatch.schema.js"
-import { TypeofMDXArticleUpdateSchema } from "#src/types/schemas/mdxArticle/MDXArticleUpdate.schema.js"
+import { TypeofMDXArticleFiltersSchema } from "#src/modules/mdxArticles/schemas/mdxArticle/MDXArticleFilters.schema.js"
+import { TypeofAdvancedMDXArticleSchema } from "#src/modules/mdxArticles/schemas/mdxArticle/MDXArticlePatch.schema.js"
+import { TypeofMDXArticleUpdateSchema } from "#src/modules/mdxArticles/schemas/mdxArticle/MDXArticleUpdate.schema.js"
 
 export interface IMDXArticleService  {
     getMDXArticleById(id: number): Promise<MDXArticlePreview>

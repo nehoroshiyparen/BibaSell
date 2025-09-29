@@ -1,10 +1,10 @@
 import { Router } from "express";
 import { inject, injectable } from "inversify";
-import { MDXArticleControllerImpl } from "#src/controllers/mdxArticle.controller.js";
+import { MDXArticleControllerImpl } from "#src/modules/mdxArticles/controllers/mdxArticle.controller.js";
 import { TYPES } from "#src/di/types.js";
 import { IRouter } from "#src/types/contracts/index.js";
 import { prepareTempDir } from "#src/middlewares/prepareTempDir.middleware.js";
-import { upload } from "#src/storage/multer.store.js";
+import { upload } from "#src/infrastructure/storage/multer.store.js";
 
 @injectable()
 export class MDXArticleRouter implements IRouter {

@@ -1,10 +1,10 @@
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js"
 import { Status } from "#src/types/interfaces/http/Status.interface.js"
-import { TypeofPdfArticleFiltersSchema } from "#src/types/schemas/pdfArticle/PdfArticleFilters.schema.js"
-import { TypeofPdfArticleFullSchema } from "#src/types/schemas/pdfArticle/PdfArticleFull.schema.js"
-import { TypeofPdfArticlePatchSchema } from "#src/types/schemas/pdfArticle/PdfArticlePatch.schema.js"
-import { TypeofPdfAcrticlePreviewSchema } from "#src/types/schemas/pdfArticle/PdfArticlePreview.schema.js"
-import { TypeofPdfArticleUpdateSchema } from "#src/types/schemas/pdfArticle/PdfArticleUpdate.schema.js"
+import { TypeofPdfArticleFiltersSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticleFilters.schema.js"
+import { TypeofPdfArticleFullSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticleFull.schema.js"
+import { TypeofPdfArticlePatchSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticlePatch.schema.js"
+import { TypeofPdfAcrticlePreviewSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticlePreview.schema.js"
+import { TypeofPdfArticleUpdateSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticleUpdate.schema.js"
 
 export interface IPdfArticleService {
     getArticleById(id: number): Promise<TypeofPdfArticleFullSchema>

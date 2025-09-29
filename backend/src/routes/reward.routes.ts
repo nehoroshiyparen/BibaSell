@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { inject, injectable } from "inversify";
-import { RewardControllerImpl } from "#src/controllers/reward.controller.js";
+import { RewardControllerImpl } from "#src/modules/rewards/controllers/reward.controller.js";
 import { TYPES } from "#src/di/types.js";
 import { prepareTempDir } from "#src/middlewares/prepareTempDir.middleware.js";
-import { upload } from "#src/storage/multer.store.js";
+import { upload } from "#src/infrastructure/storage/multer.store.js";
 
 @injectable()
 export class RewardRouter {

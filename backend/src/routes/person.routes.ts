@@ -2,7 +2,7 @@ import { Router } from "express";
 import { inject, injectable } from "inversify";
 import { PersonControllerImpl } from "#src/controllers/person.controller.js";
 import { TYPES } from "#src/di/types.js";
-import { upload } from "#src/storage/multer.store.js";
+import { upload } from "#src/infrastructure/storage/multer.store.js";
 import { prepareTempDir } from "#src/middlewares/prepareTempDir.middleware.js";
 
 @injectable()
