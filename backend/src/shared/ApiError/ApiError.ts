@@ -39,4 +39,8 @@ export class ApiError extends Error {
     static Internal(message = 'Internal error', code?: string, cause?: unknown) {
         return new ApiError(status.INTERNAL_SERVER_ERROR, message, code ? code : errorCodes.INTERNAL_SERVER_ERROR, cause)
     }
+
+    static S3(message = 'S3 storage error', code?: string, cause?: unknown) {
+        return new ApiError(status.INTERNAL_SERVER_ERROR, message, code ? code : 'S3_STORAGE_ERROR', cause)
+    }
 }
