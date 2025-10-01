@@ -2,7 +2,8 @@ import { TYPES } from "#src/di/types.js";
 import { inject, injectable } from "inversify";
 import { ElasticEntity } from "#src/types/interfaces/elastic/ElastucEntity.js";
 import { IElastic } from "#src/types/contracts/core/elastic.interface.js";
-import { PdfArticle } from "#src/database/models/PdfArticle/PdfArticle.model.js";
+import { PdfArticle } from "#src/infrastructure/sequelize/models/PdfArticle/PdfArticle.model.js"; 
+import { MappingTypeMapping } from "node_modules/@elastic/elasticsearch/lib/api/types.js";
 
 @injectable()
 export class PdfArticleElasticRepo {
@@ -15,14 +16,14 @@ export class PdfArticleElasticRepo {
     }
 
     async indexArticle(article: ElasticEntity) {
-        return this.elastic.indexDocument(this.index, article)
+        return await this.elastic.indexDocument(this.index, article)
     }
 
     async searchArticles(query: Record<string, string>, offset?: number, limit?: number) {
-        return this.elastic.searchDocument<PdfArticle>(this.index, query, offset, limit)
+        return await this.elastic.searchDocument<PdfArticle>(this.index, query, offset, limit)
     }
 
     async destroyArticle(id: number) {
-        return this.elastic.deleteDocument(this.index, id)
+        return await this.elastic.deleteDocument(this.index, id)
     }
 }

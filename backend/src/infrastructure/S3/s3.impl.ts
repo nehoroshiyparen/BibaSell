@@ -17,13 +17,14 @@ export class S3Impl implements IS3 {
         this.bucketName = 'history-project-storage'
     }
     
-    async upload(key: string, body: Buffer, contentType?: string): Promise<void> {
+    async upload(key: string, body: Buffer, options?: { contentType?: string, ACL: 'public-read' }): Promise<void> {
         try {
             const command = new PutObjectCommand({
                 Bucket: this.bucketName,
                 Key: key,
                 Body: body,
-                ContentType: contentType
+                ContentType: options?.contentType,
+                ACL: options?.ACL
             })
             await this.client.send(command)
         } catch (e) {

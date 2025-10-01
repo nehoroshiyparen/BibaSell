@@ -7,6 +7,7 @@ import { PdfArticle } from "#src/infrastructure/sequelize/models/PdfArticle/PdfA
 import { TypeofPdfArticleUpdateSchema } from "../schemas/pdfArticle/PdfArticleUpdate.schema.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
 import { Author } from "#src/infrastructure/sequelize/models/Author/Author.model.js";
+import { PdfArticleUpdateDto } from "../types/dto/PdfArticleUpdate.dto.js";
 
 @injectable()
 export class PdfArticleSequelizeRepo {
@@ -18,12 +19,17 @@ export class PdfArticleSequelizeRepo {
         this.sequelize = this.database.getDatabase()
     }
 
-    async create(data: TypeofPdfArticlePatchSchema): Promise<PdfArticle> {
-        const article =  await PdfArticle.create(data)
+    async create(data: TypeofPdfArticlePatchSchema & { extractedText: string, key: string }, transaction?: Transaction): Promise<PdfArticle> {
+        const article =  await PdfArticle.create({
+            title: data.title,
+            publishedAt: new Date(),
+            key: data.key,
+            extractedText: data.extractedText
+        }, { transaction })
         return article
     }
 
-    async findBypk(id: number): Promise<PdfArticle | null> {
+    async findById(id: number): Promise<PdfArticle | null> {
         const article = await PdfArticle.findByPk(id, { 
             include: 
                 [ 
@@ -36,7 +42,16 @@ export class PdfArticleSequelizeRepo {
         return article as PdfArticle & { authors: Author[] } | null
     }
 
-    async findAll(offset: number, limit: number): Promise<PdfArticle[]> {
+    async findByIds(ids: number[], offset = 0, limit = 10): Promise<PdfArticle[]> {
+        const articles = await PdfArticle.findAll({
+            where: { id: ids },
+            offset,
+            limit
+        })
+        return articles
+    }
+
+    async findAll(offset = 0, limit = 10): Promise<PdfArticle[]> {
         const articles = await PdfArticle.findAll({ 
             offset, 
             limit, 
@@ -51,7 +66,7 @@ export class PdfArticleSequelizeRepo {
         return articles
     }
 
-    async findByAuthor(authorName: string, offset?: number, limit?: number): Promise<PdfArticle[]> {
+    async findByAuthor(authorName: string, offset = 0, limit = 10): Promise<PdfArticle[]> {
         const articles = await PdfArticle.findAll({
             include: [
                 {
@@ -64,11 +79,23 @@ export class PdfArticleSequelizeRepo {
         return articles
     }
 
-    async update(id: number, data: TypeofPdfArticleUpdateSchema): Promise<PdfArticle> {
+    async findByAuthorAndIds(author: string, ids: number[], offset = 0, limit = 10): Promise<PdfArticle[]> {
+        const articles = await PdfArticle.findAll({
+            where: {
+                id: ids,
+                author: author
+            },
+            offset,
+            limit
+        })
+        return articles
+    }
+
+    async update(id: number, data: PdfArticleUpdateDto, transaction?: Transaction): Promise<PdfArticle> {
         const article = await PdfArticle.findByPk(id)
         if (!article) throw ApiError.NotFound(`Article with id: ${id} is not exists`)
 
-        return await article.update(data)
+        return await article.update({ ...data, updatedAt: new Date() }, { transaction })
     }
 
     async destroy(id: number, transaction?: Transaction) {

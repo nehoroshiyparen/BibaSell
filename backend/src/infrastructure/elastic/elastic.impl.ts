@@ -34,6 +34,21 @@ export class ElasticImpl implements IElastic {
         }
     }
 
+    async createIndexes(config: Record<string, estypes.MappingTypeMapping>) {
+        const results: Record<string, { success: boolean, error?: any }> = {}
+
+        for (const index of Object.keys(config)) {
+            try {
+                await this.createIndex(index, config[index])
+                results[index] = { success: true }
+            } catch (e) {
+                results[index] = { success: false, error: e }
+            }
+        }
+
+        return results
+    }
+
     async indexDocument<T extends ElasticEntity>(index: string, entity: T): Promise<IndexResponse> {
         const res = await this.client.index({
             index,

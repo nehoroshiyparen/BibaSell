@@ -2,9 +2,9 @@ import { status } from "#src/consts/status.js";
 import { TYPES } from "#src/di/types.js";
 import { IPdfArticleService } from "#src/types/contracts/services/pdfArticles/pdfArticle.service.interface.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
-import { TypeofPdfArticleFiltersSchema } from "#src/types/schemas/pdfArticle/PdfArticleFilters.schema.js";
-import { PdfArticlePatchSchema, TypeofPdfArticlePatchSchema } from "#src/types/schemas/pdfArticle/PdfArticlePatch.schema.js";
-import { PdfArticleUpdateSchema } from "#src/types/schemas/pdfArticle/PdfArticleUpdate.schema.js";
+import { TypeofPdfArticleFiltersSchema } from "../schemas/pdfArticle/PdfArticleFilters.schema.js";
+import { PdfArticlePatchSchema, TypeofPdfArticlePatchSchema } from "../schemas/pdfArticle/PdfArticlePatch.schema.js";
+import { PdfArticleUpdateSchema } from "../schemas/pdfArticle/PdfArticleUpdate.schema.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
 import { SendError } from "#src/shared/http/SendError.js";
 import { SendResponse } from "#src/shared/http/SendResponse.js";
@@ -52,8 +52,8 @@ export class PdfArticleControllerImpl {
         try {
             const fileters: TypeofPdfArticleFiltersSchema = {
                 title: req.query.title?.toString() || '',
-                text: req.query.text?.toString() || '',
-                authors: req.query.authors?.toString() || '',
+                extractedText: req.query.text?.toString() || '',
+                author: req.query.authors?.toString() || '',
             }
 
             ValidateObjectFieldsNotNull(fileters)
@@ -77,7 +77,7 @@ export class PdfArticleControllerImpl {
                 req.tempUploadDir ?
                     {
                         tempDirPath: req.tempUploadDir,
-                        files: req.files as Express.Multer.File[] | undefined
+                        files: (req.files as Express.Multer.File[] | undefined) || []
                     } : undefined
             
             const hasFiles = fileConfig?.files && fileConfig.files.length > 0;
@@ -104,7 +104,7 @@ export class PdfArticleControllerImpl {
                 req.tempUploadDir ?
                     {
                         tempDirPath: req.tempUploadDir,
-                        files: req.files as Express.Multer.File[] | undefined
+                        files: (req.files as Express.Multer.File[] | undefined) || []
                     } : undefined
 
             const hasOptions = validatedOptions && Object.keys(validatedOptions).length > 0;

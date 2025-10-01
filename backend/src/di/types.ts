@@ -4,6 +4,7 @@ export const TYPES = {
     Database: Symbol.for('Database'),
     Redis: Symbol.for('Redis'),
     Elastic: Symbol.for('Elastic'),
+    S3: Symbol.for('S3'),
 
     // Routers
     PersonRouter: Symbol.for('PersonRouter'),
@@ -21,6 +22,9 @@ export const TYPES = {
     RewardService: Symbol.for('RewardService'),
     MDXArticleService: Symbol.for('MDXArticleService'),
     PdfArticleService: Symbol.for('PdfArticleService'),
+
+    // S3 services
+    S3PdfArticleService: Symbol.for('S3PdfArticleService'),
 
     // Sequelize repositories
     PdfArticleSequelizeRepo: Symbol.for('PdfArticleSequelizeRepo'),

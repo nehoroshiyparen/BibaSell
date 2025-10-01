@@ -22,7 +22,7 @@ export interface IPdfArticleService {
         fileConfig: FileConfig | undefined
     ): Promise<TypeofPdfArticleFullSchema>
     updateArticle(
-        otpions: TypeofPdfArticleUpdateSchema, 
+        options: TypeofPdfArticleUpdateSchema, 
         fileConfig: FileConfig | undefined
     ): Promise<TypeofPdfArticleFullSchema>
     deleteArticle(id: number): Promise<Status>

@@ -1,6 +1,7 @@
 import { translitMap } from "./translitMap.js";
 
-export function getSlug(s: string) {
+export function getSlug(s: string | undefined) {
+    if (!s) return null
     return s
         .toLowerCase()
         .split('')

@@ -1,13 +1,13 @@
 import { CreateIndexResult } from "#src/types/interfaces/elastic/CreateIndexResult.js";
 import { ElasticEntity } from "#src/types/interfaces/elastic/ElastucEntity.js";
+import { Status } from "#src/types/interfaces/http/Status.interface.js";
 import { estypes } from "@elastic/elasticsearch";
 import { DeleteResponse, IndexResponse } from "node_modules/@elastic/elasticsearch/lib/api/types.js";
 
 export interface IElastic {
-    createIndex(
-        index: string, 
-        mappings?: estypes.MappingTypeMapping
-    ): Promise<CreateIndexResult>
+    createIndexes(
+        config: Record<string, estypes.MappingTypeMapping>
+    ): Promise<Record<string, { success: boolean, error?: any }>>
     indexDocument<T extends ElasticEntity>(
         index: string, 
         entity: T

@@ -8,9 +8,9 @@ const __dirname = path.dirname(__filename);
 const UPLOAD_BASE = path.join(__dirname, '../../../../uploads')
 
 export function removeFile(filename: string, dir: string, targetFile?: string) {
-    const filePath = targetFile ? targetFile : path.join(UPLOAD_BASE, dir, filename)
+    const key = targetFile ? targetFile : path.join(UPLOAD_BASE, dir, filename)
 
-    if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath); 
+    if (fs.existsSync(key)) {
+        fs.unlinkSync(key); 
     }
 }

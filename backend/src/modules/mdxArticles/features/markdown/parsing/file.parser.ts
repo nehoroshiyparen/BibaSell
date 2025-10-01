@@ -6,9 +6,9 @@ export function fileParser(markdown: string) {
 
     let match: RegExpExecArray | null
     while ((match = regex.exec(markdown)) !== null) {
-        const filePath = match[1] || match[2] // берем src или путь из markdown
-        if (filePath) {
-            const fileName = filePath.split('/').pop() // достаем только имя файла
+        const key = match[1] || match[2] // берем src или путь из markdown
+        if (key) {
+            const fileName = key.split('/').pop() // достаем только имя файла
             if (fileName) files.push(fileName)
         }
     }

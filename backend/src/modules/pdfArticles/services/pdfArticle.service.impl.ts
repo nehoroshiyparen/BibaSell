@@ -14,17 +14,24 @@ import { ApiError } from "#src/shared/ApiError/ApiError.js";
 import { RethrowApiError } from "#src/shared/ApiError/RethrowApiError.js";
 import { arrayToPdfArticlePreview } from "#src/modules/pdfArticles/utils/mappings/arrayToPreview.js";
 import { inject, injectable } from "inversify";
+import { S3PdfArticleService } from "./s3.service.impl.js";
+import { getSlug } from "#src/shared/slugging/getSlug.js";
+import { pdfParse } from "#src/shared/fileUtils/pdf-parse.js";
+import { cleanup } from "#src/shared/helper/object.cleanup.js";
+import { PdfArticleUpdateDto } from "../types/dto/PdfArticleUpdate.dto.js";
+import { generateUuid } from "#src/shared/fileUtils/generateUuid.js";
 
 @injectable()
 export class PdfArticleServiceImpl implements IPdfArticleService {
     constructor(
        @inject(TYPES.PdfArticleSequelizeRepo) private sequelize: PdfArticleSequelizeRepo,
-       @inject(TYPES.PdfArticleElasticRepo) private elastic: PdfArticleElasticRepo
+       @inject(TYPES.PdfArticleElasticRepo) private elastic: PdfArticleElasticRepo,
+       @inject(TYPES.S3PdfArticleService) private s3: S3PdfArticleService,
     ) {}
 
     async getArticleById(id: number): Promise<TypeofPdfArticleFullSchema> {
         try {
-            const article = await this.sequelize.findBypk(id)
+            const article = await this.sequelize.findById(id)
             if (!article) throw ApiError.NotFound(`Article with id: ${id} was not found`)
             return article
         } catch (e) {
@@ -51,36 +58,27 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
             if (filters.title) elasticQuery.title = filters.title
             if (filters.extractedText) elasticQuery.extractedText = filters.extractedText
 
-            const sequelizeAuthor = filters.author || null
+            const author = filters.author || null
 
-            let elasticCandidates: PdfArticle[] = []
-            let sequelizeCandidates: PdfArticle[] = []
-
+            let idsFromElastic: number[] = []
             if (Object.keys(elasticQuery).length) {
-                elasticCandidates = await this.elastic.searchArticles(elasticQuery, offset, limit)
+                const elasticCandidates = await this.elastic.searchArticles(elasticQuery)
+                idsFromElastic = elasticCandidates.map(a => a.id)
             }
 
-            if (sequelizeAuthor) {
-                sequelizeCandidates = await this.sequelize.findByAuthor(sequelizeAuthor, offset, limit)
-            }
+            let articles: PdfArticle[] = []
 
-            let compaired: PdfArticle[]
-            if (elasticCandidates.length && sequelizeCandidates.length) {
-                const sequelizeIds = new Set(sequelizeCandidates.map(a => a.id))
-                compaired = elasticCandidates.filter(a => sequelizeIds.has(a.id))
-            } else if (elasticCandidates.length) {
-                compaired = elasticCandidates
-            } else if (sequelizeCandidates.length) {
-                compaired = sequelizeCandidates
+            if (author && idsFromElastic.length) {
+                articles = await this.sequelize.findByAuthorAndIds(author, idsFromElastic, offset, limit)
+            } else if (author) {
+                articles = await this.sequelize.findByAuthor(author, offset, limit)
+            } else if (idsFromElastic.length) {
+                articles = await this.sequelize.findByIds(idsFromElastic, offset, limit)
             } else {
-                compaired = []
+                articles = await this.sequelize.findAll(offset, limit)
             }
 
-            const results = await Promise.all(
-                compaired.map(a => this.sequelize.findBypk(a.id))
-            )
-
-            return arrayToPdfArticlePreview(results)
+            return arrayToPdfArticlePreview(articles)
         } catch (e) {
             RethrowApiError('Service error: Method - getFilteredArticles', e)
         }
@@ -88,22 +86,66 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
 
     async createArticle(
         options: TypeofPdfArticlePatchSchema, 
-        fileConfig: FileConfig | undefined
+        fileConfig: FileConfig
     ): Promise<TypeofPdfArticleFullSchema> {
-        try {
+        const transaction = await this.sequelize.createTransaction()
+        const S3Key = generateUuid()
 
+        try {
+            const file = fileConfig.files[0] as Express.Multer.File
+
+            await this.s3.uploadArticle(S3Key, file.buffer)
+            const extractedText = await pdfParse(file.buffer, fileConfig.tempDirPath)
+
+            const article = await this.sequelize.create({ ...options, key: S3Key, extractedText: extractedText }, transaction)
+            await this.elastic.indexArticle(article)
+
+            await transaction.commit()
+            return { key: S3Key }
         } catch (e) {
+            try {
+                await this.s3.deleteArticle(S3Key)
+            } catch {}
+            await transaction.rollback()
             RethrowApiError('Service error: Method - createArticle', e)
         }
     }
 
     async updateArticle(
-        otpions: TypeofPdfArticleUpdateSchema, 
+        options: TypeofPdfArticleUpdateSchema, 
         fileConfig: FileConfig | undefined
     ): Promise<TypeofPdfArticleFullSchema> {
-        try {
+        const transaction = await this.sequelize.createTransaction()
+        let oldFileBuffer: Buffer | null = null
+        let needToRollbackElastic: boolean = false
 
+        const article = await this.sequelize.findById(options.id)
+        if (!article) throw ApiError.NotFound(`Article with id: ${options.id} is not found`)
+
+        try {           
+            const slug = getSlug(options.title)
+            const optionsToUpdate: Partial<PdfArticleUpdateDto> = cleanup({
+                title: options.title,
+                slug
+            }) as Partial<PdfArticleUpdateDto>
+
+            const updatedArticle = await this.sequelize.update(options.id, optionsToUpdate, transaction)
+
+            needToRollbackElastic = true
+            await this.elastic.indexArticle(updatedArticle)
+
+            if (fileConfig && fileConfig?.files.length !== 0) {
+                oldFileBuffer = await this.s3.getArticle(article.key)
+                const file = fileConfig.files[0]
+                await this.s3.uploadArticle(updatedArticle.key, file.buffer)
+            }
+
+            await transaction.commit()
+            return updatedArticle
         } catch (e) {
+            await transaction.rollback()
+            if (needToRollbackElastic) await this.rollbackElasticChanges(article)
+            if (oldFileBuffer) await this.rollbackS3Changes(article, oldFileBuffer)
             RethrowApiError('Service error: Method - updateArticle', e)
         }
     }
@@ -152,6 +194,22 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
             return { status: 200 }
         } catch (e) {
             RethrowApiError('Service error: Method - bulkDeleteArticles', e)
+        }
+    }
+
+    private async rollbackElasticChanges(oldArticle: PdfArticle) {
+        try {
+            await this.elastic.indexArticle(oldArticle)
+        } catch (e) {
+            throw ApiError.Internal(`Failed to rollback changes in Elastic, while updating Pdf Article with id: ${oldArticle.id}`, undefined, e)
+        }
+    }
+
+    private async rollbackS3Changes(oldArticle: PdfArticle, oldFileBuffer: Buffer) {
+        try {
+            await this.s3.uploadArticle(oldArticle.key, oldFileBuffer)
+        } catch (e) {
+            throw ApiError.Internal(`Failed to rollback changes in S3, while updating Pdf Article with id: ${oldArticle.id}`)
         }
     }
 }
