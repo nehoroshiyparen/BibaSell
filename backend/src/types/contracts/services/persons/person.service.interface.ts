@@ -8,7 +8,8 @@ export interface IPersonService {
     getPersonById(id: number): Promise<Person>;
     getPersonBySlug(slug: string): Promise<Person>;
     getPersons(offset: number, limit: number): Promise<Person[] | null>;
-    getFilteredPersons(filters: TypeofPersonFiltersSchema, offset?: number, limit?: number): Promise<Person[] | null>
+    getFilteredPersons(filters: TypeofPersonFiltersSchema, offset?: number, limit?: number): Promise<Person[] | null>;
     bulkCreatePersons(data: TypeofPersonArraySchema, fileConfig: FileConfig): Promise<OperationResult>;
+    deletePerson(id: number): Promise<void>;
     bulkDeletePersons(ids: number[]): Promise<OperationResult>;
 }

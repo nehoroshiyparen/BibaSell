@@ -112,16 +112,34 @@ export class PersonControllerImpl {
 
             const validatedData = PersonArraySchema.parse(dataPack)
 
-            const fileConfig: FileConfig | undefined = 
-            req.tempUploadDir ? 
+            const fileConfig: FileConfig =
                 {
-                    tempDirPath: req.tempUploadDir,
+                    tempDirPath: req.tempUploadDir!,
                     files: (req.files as Express.Multer.File[] | undefined) || []
-                } : undefined
+                } 
 
-            const { status } =  await this.personService.bulkCreatePersons(validatedData, fileConfig)
+            const result =  await this.personService.bulkCreatePersons(validatedData, fileConfig)
 
-            SendResponse(res, status, status === 201 ? `Persons created` : status === 206 ? `Persons created partilly` : `Persons weren't created. To much invalid data`, null)
+            SendResponse(
+                res, 
+                result.created === dataPack.length ? 200 : result.created > 0 ? 206 : 400, 
+                result.created === dataPack.length ? `Persons created` : result.created > 0 ? `Persons created partilly` : 'Persons were not created. Too much invalid data', 
+                result
+            )
+        } catch (e) {
+            SendError(res, e)
+        }
+    }
+
+    async deletePerson(req: Request, res: Response) {
+        try {
+            const id = Number(req.params.id)
+
+            ValidateId(id)
+
+            await this.personService.deletePerson(id)
+
+            SendResponse(res, status.OK, 'Person deleted', null)
         } catch (e) {
             SendError(res, e)
         }
@@ -141,9 +159,13 @@ export class PersonControllerImpl {
 
             ValidateIdArray(ids)
 
-            const { status } = await this.personService.bulkDeletePersons(ids)
+            const result = await this.personService.bulkDeletePersons(ids)
 
-            SendResponse(res, status, status === 200 ? `Persons deleted` : status === 206 ? `Persons deleted partilly` : `Persons weren't deleted. To much invalid data`, null)
+            SendResponse(
+                res, 
+                !result.errors ? 200 : Object.keys(result.errors).length < ids.length ? 206 : 400,
+                !result.errors ? `Persons deleted` : Object.keys(result.errors).length ? `Persons deleted partilly` : 'Persons were not deleted. Too much invalid data',
+                result)
         } catch (e) {
             SendError(res, e)
         }

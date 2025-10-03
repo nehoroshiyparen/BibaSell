@@ -24,6 +24,7 @@ export class PersonRouter {
 
         this.router.post('/bulk', prepareTempDir, upload.array('files'), this.personController.bulkCreatePersons.bind(this.personController))
 
+        this.router.delete('/:id', this.personController.deletePerson.bind(this.personController))
         this.router.delete('/bulk', this.personController.bulkDeletePersons.bind(this.personController))
     }
 

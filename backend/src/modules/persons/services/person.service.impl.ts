@@ -79,10 +79,10 @@ export class PersonServiceImpl implements IPersonService {
 
             for (const [index, person] of persons.entries()) {
                 const transaction = await this.sequelize.createTransaction()
+                let S3Key: string | null = null
 
                 try {
                     const file = fileMap.get(person.name)
-                    let S3Key: string | null = null
 
                     if (file) {
                         S3Key = generateUuid()
@@ -100,7 +100,7 @@ export class PersonServiceImpl implements IPersonService {
                     created++
                 } catch (e) {
                     await transaction.rollback()
-
+                    if (S3Key) await this.s3.delete(S3Key)
                     errorStack[index] = {
                         message: isError(e) ? e.message : 'Internal error',
                         code: 'PERSON_CREATE_ERROR'
@@ -118,7 +118,7 @@ export class PersonServiceImpl implements IPersonService {
         }
     }
 
-    async deltePerson(id: number): Promise<void> {
+    async deletePerson(id: number): Promise<void> {
         const transaction = await this.sequelize.createTransaction()
 
         try {

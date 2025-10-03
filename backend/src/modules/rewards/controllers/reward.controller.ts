@@ -95,7 +95,31 @@ export class RewardControllerImpl {
 
             const result = await this.rewardService.bulkCreateRewards(validatedData, fileConfig)
 
-            SendResponse(res, result.success ? 200 : 206, result.success ? `Rewards created` : `Rewards created partilly`, result)
+            SendResponse(
+                res, 
+                result.created === data.length ? 200 : result.created > 0 ? 206 : 400,
+                result.created === data.length ? `Rewards created` : result.created ? `Rewards created partilly` : 'Rewads were not created. Too much invalid data',
+                result
+            )
+        } catch (e) {
+            SendError(res, e)
+        }
+    }
+
+    async deleteReward(req: Request, res: Response) {
+        try {
+            const id = Number(req.params.id)
+
+            ValidateId(id)
+
+            await this.rewardService.deleteReward(id)
+
+            SendResponse(
+                res,
+                200,
+                'Reward deleted',
+                null
+            )
         } catch (e) {
             SendError(res, e)
         }
@@ -109,7 +133,12 @@ export class RewardControllerImpl {
 
             const result = await this.rewardService.bulkDeleteRewards(ids)
 
-            SendResponse(res, result.success ? 200 : 206, result.success ? `Rewards deleted` :  `Rewards deleted partilly`, result)
+            SendResponse(
+                res, 
+                !result.errors ? 200 : result.errors.length < ids.length ? 206 : 400, 
+                !result.errors ? `Rewards deleted` : result.errors.length < ids.length ?  `Rewards deleted partilly` : `Rewards were not deleted. Too much invalid data`, 
+                result
+            )
         } catch (e) {
             SendError(res, e)
         }

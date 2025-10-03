@@ -46,6 +46,8 @@ export class ElasticImpl implements IElastic {
             }
         }
 
+        console.log(`Elastic is connected on port: ${ENV.ELASTIC_PORT}}`)
+
         return results
     }
 

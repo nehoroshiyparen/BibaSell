@@ -140,9 +140,13 @@ export class PdfArticleControllerImpl {
             const ids = req.params.ids.split(',').map(Number)
             ValidateIdArray(ids)
 
-            const { status } = await this.pdfArticleService.bulkDeleteArticles(ids)
+            const result = await this.pdfArticleService.bulkDeleteArticles(ids)
 
-            SendResponse(res, status, status === 200 ? `Articles deleted` : status === 206 ? `Articles deleted partilly` : `Articles weren't deleted. To much invalid data`, null)
+            SendResponse(
+                res, 
+                !result.errors ? 200 : result.errors.length < ids.length ? 206 : 400, 
+                !result.errors ? `Articles deleted` : result.errors.length < ids.length ? `Articles deleted partilly` : `Articles weren't deleted. To much invalid data`,
+                result)
         } catch (e) {
             SendError(res, e)
         }

@@ -24,6 +24,7 @@ export class RewardRouter {
 
         this.router.post('/bulk', prepareTempDir, upload.array('files'), this.rewardController.bulkCreateRewards.bind(this.rewardController))
         
+        this.router.delete('/:id', this.rewardController.deleteReward.bind(this.rewardController))
         this.router.delete('/bulk', this.rewardController.bulkDeleteRewards.bind(this.rewardController))
     }
 

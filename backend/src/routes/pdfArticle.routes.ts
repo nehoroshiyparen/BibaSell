@@ -20,12 +20,12 @@ export class PdfArticleRouter {
         this.router.get('/filtered', this.pdfArticleController.getFilteredArticles.bind(this.pdfArticleController))
         this.router.get('/:id', this.pdfArticleController.getArticleById.bind(this.pdfArticleController))
 
-        this.router.post('/create', prepareTempDir, upload.array('files'), this.pdfArticleController.createArticle.bind(this.pdfArticleController))
+        this.router.post('/', prepareTempDir, upload.array('files'), this.pdfArticleController.createArticle.bind(this.pdfArticleController))
 
-        this.router.put('/update/:id', prepareTempDir, upload.array('files'), this.pdfArticleController.updateArticle.bind(this.pdfArticleController))
+        this.router.put('/:id', prepareTempDir, upload.array('files'), this.pdfArticleController.updateArticle.bind(this.pdfArticleController))
 
-        this.router.delete('/', this.pdfArticleController.bulkDeleteArticles.bind(this.pdfArticleController))
         this.router.delete('/:id', this.pdfArticleController.deleteArticle.bind(this.pdfArticleController))
+        this.router.delete('/bulk', this.pdfArticleController.bulkDeleteArticles.bind(this.pdfArticleController))
     }
 
     getRouter(): Router { return this.router }
