@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { inject, injectable } from "inversify";
-import { PersonControllerImpl } from "#src/controllers/person.controller.js";
+import { PersonControllerImpl } from "#src/modules/persons/controllers/person.controller.js";
 import { TYPES } from "#src/di/types.js";
 import { upload } from "#src/infrastructure/storage/multer.store.js";
 import { prepareTempDir } from "#src/middlewares/prepareTempDir.middleware.js";
@@ -16,13 +16,13 @@ export class PersonRouter {
         this.setup()
     }
 
-    async setup() {
-        this.router.get('/pagination', this.personController.getPersons.bind(this.personController))
+    setup() {
+        this.router.get('/', this.personController.getPersons.bind(this.personController))
         this.router.post('/filtered', this.personController.getFilteredPersons.bind(this.personController))
         this.router.get('/:id', this.personController.getPersonById.bind(this.personController))
         this.router.get('/slug/:slug', this.personController.getPersonBySlug.bind(this.personController))
 
-        this.router.patch('/bulk', prepareTempDir, upload.array('files'), this.personController.bulkCreatePersons.bind(this.personController))
+        this.router.post('/bulk', prepareTempDir, upload.array('files'), this.personController.bulkCreatePersons.bind(this.personController))
 
         this.router.delete('/bulk', this.personController.bulkDeletePersons.bind(this.personController))
     }

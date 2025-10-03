@@ -93,7 +93,7 @@ export class MDXArticleControllerImpl {
                 req.tempUploadDir ? 
                     {
                         tempDirPath: req.tempUploadDir,
-                        files: req.files as Express.Multer.File[] | undefined,
+                        files: (req.files as Express.Multer.File[] | undefined) || [],
                     } : undefined
             
             const mdxArticle = await this.mdxArticleService.createMDXArticle(validatedOptions, fileConfig)
@@ -115,7 +115,7 @@ export class MDXArticleControllerImpl {
                 req.tempUploadDir ? 
                 {
                     tempDirPath: req.tempUploadDir,
-                    files: req.files as Express.Multer.File[] | undefined
+                    files: (req.files as Express.Multer.File[] | undefined) || []
                 } : undefined
 
             const mdxArticle = await this.mdxArticleService.updateArcticle(id, validatedOptions, fileConfig)

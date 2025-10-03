@@ -90,12 +90,12 @@ export class RewardControllerImpl {
                 req.tempUploadDir ? 
                     {
                         tempDirPath: req.tempUploadDir,
-                        files: req.files as Express.Multer.File[] | undefined
+                        files: (req.files as Express.Multer.File[] | undefined) || []
                     } : undefined
 
-            const { status } = await this.rewardService.bulkCreateRewards(validatedData, fileConfig)
+            const result = await this.rewardService.bulkCreateRewards(validatedData, fileConfig)
 
-            SendResponse(res, status, status === 201 ? `Rewards created` : status === 206 ? `Rewards created partilly` : `Rewards weren't created. To much invalid data`, null)
+            SendResponse(res, result.success ? 200 : 206, result.success ? `Rewards created` : `Rewards created partilly`, result)
         } catch (e) {
             SendError(res, e)
         }
@@ -107,9 +107,9 @@ export class RewardControllerImpl {
 
             ValidateIdArray(ids)
 
-            const { status } = await this.rewardService.bulkDeleteRewards(ids)
+            const result = await this.rewardService.bulkDeleteRewards(ids)
 
-            SendResponse(res, status, status === 200 ? `Rewards deleted` : status === 206 ? `Rewards deleted partilly` : `Rewards weren't deleted. To much invalid data`, null)
+            SendResponse(res, result.success ? 200 : 206, result.success ? `Rewards deleted` :  `Rewards deleted partilly`, result)
         } catch (e) {
             SendError(res, e)
         }

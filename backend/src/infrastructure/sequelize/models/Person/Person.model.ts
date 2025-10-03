@@ -8,7 +8,7 @@ export class Person extends Model {
     declare description?: string
     declare rank?: string
     declare comments?: string
-    declare image_url?: string
+    declare key?: string // S3 key
 
     static initialize(sequelize: Sequelize) {
         this.init({

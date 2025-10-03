@@ -14,19 +14,22 @@ import { ApiError } from "#src/shared/ApiError/ApiError.js";
 import { RethrowApiError } from "#src/shared/ApiError/RethrowApiError.js";
 import { arrayToPdfArticlePreview } from "#src/modules/pdfArticles/utils/mappings/arrayToPreview.js";
 import { inject, injectable } from "inversify";
-import { S3PdfArticleService } from "./s3.service.impl.js";
 import { getSlug } from "#src/shared/slugging/getSlug.js";
 import { pdfParse } from "#src/shared/fileUtils/pdf-parse.js";
 import { cleanup } from "#src/shared/helper/object.cleanup.js";
 import { PdfArticleUpdateDto } from "../types/dto/PdfArticleUpdate.dto.js";
 import { generateUuid } from "#src/shared/fileUtils/generateUuid.js";
+import { BaseS3Service } from "#src/infrastructure/S3/baseS3.service.js";
+import { S3PdfArticleServiceImpl } from "./S3PdfArticle.service.impl.js";
+import { OperationResult } from "#src/types/interfaces/http/OperationResult.js";
+import { ErrorStack } from "#src/types/interfaces/http/ErrorStack.interface.js";
 
 @injectable()
 export class PdfArticleServiceImpl implements IPdfArticleService {
     constructor(
        @inject(TYPES.PdfArticleSequelizeRepo) private sequelize: PdfArticleSequelizeRepo,
        @inject(TYPES.PdfArticleElasticRepo) private elastic: PdfArticleElasticRepo,
-       @inject(TYPES.S3PdfArticleService) private s3: S3PdfArticleService,
+       @inject(TYPES.S3PdfArticleService) private s3: S3PdfArticleServiceImpl,
     ) {}
 
     async getArticleById(id: number): Promise<TypeofPdfArticleFullSchema> {
@@ -50,8 +53,8 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
 
     async getFilteredArticles(
         filters: TypeofPdfArticleFiltersSchema,
-        offset?: number,
-        limit?: number,
+        offset = 0,
+        limit = 10,
     ): Promise<TypeofPdfAcrticlePreviewSchema[]> {
         try {
             const elasticQuery: Record<string, string> = {}
@@ -94,17 +97,18 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         try {
             const file = fileConfig.files[0] as Express.Multer.File
 
-            await this.s3.uploadArticle(S3Key, file.buffer)
             const extractedText = await pdfParse(file.buffer, fileConfig.tempDirPath)
 
             const article = await this.sequelize.create({ ...options, key: S3Key, extractedText: extractedText }, transaction)
             await this.elastic.indexArticle(article)
 
+            await this.s3.upload(S3Key, file.buffer)
+
             await transaction.commit()
             return { key: S3Key }
         } catch (e) {
             try {
-                await this.s3.deleteArticle(S3Key)
+                await this.s3.delete(S3Key)
             } catch {}
             await transaction.rollback()
             RethrowApiError('Service error: Method - createArticle', e)
@@ -135,9 +139,9 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
             await this.elastic.indexArticle(updatedArticle)
 
             if (fileConfig && fileConfig?.files.length !== 0) {
-                oldFileBuffer = await this.s3.getArticle(article.key)
+                oldFileBuffer = await this.s3.get(article.key)
                 const file = fileConfig.files[0]
-                await this.s3.uploadArticle(updatedArticle.key, file.buffer)
+                await this.s3.upload(updatedArticle.key, file.buffer)
             }
 
             await transaction.commit()
@@ -150,49 +154,60 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         }
     }
 
-    async deleteArticle(id: number): Promise<Status> {
+    async deleteArticle(id: number): Promise<void> {
         const transaction = await this.sequelize.createTransaction()
+        let oldFileBuffer: Buffer | null = null
+        let needToRollbackElastic = false
+
+        const article = await this.sequelize.findById(id)
+        if (!article) throw ApiError.NotFound(`Article with id: ${id} is not found`)
+
         try {
+            oldFileBuffer = await this.s3.get(article.key)
+
             await this.sequelize.destroy(id, transaction)
-            try {
-                await this.elastic.destroyArticle(id)
-            } catch (e) {
-                throw ApiError.Internal(`Elastic delete failed. Rollback sequelize chenges`, `ELASTIC_INTERNAL_ERROR`, e)
-            }
+            await this.elastic.destroyArticle(id)
+            await this.s3.delete(article.key)
 
             await transaction.commit()
-
-            return { status: 200 }
         } catch (e) {
             await transaction.rollback()
+            if (needToRollbackElastic) await this.rollbackElasticChanges(article)
+            if (oldFileBuffer) await this.rollbackS3Changes(article, oldFileBuffer)
             RethrowApiError('Service error: Method - deleteArticle', e)
         }
     }
 
-    async bulkDeleteArticles(ids: number[]): Promise<Status> {
-        const errorLimit = Math.max(Math.floor(ids.length / 2), 1)
-        let errorCounter = 0
+    async bulkDeleteArticles(ids: number[]): Promise<OperationResult> {
+        const transaction = await this.sequelize.createTransaction()
+        const errorStack: ErrorStack = {}
 
         try {
-            for (const id of ids) {
-                try {
-                    if (errorCounter >= errorLimit) break
+            const articles = await this.sequelize.findAll()
 
-                    await this.deleteArticle(id)
+            const foundIds = articles.map(a => a.id)
+            const missingIds = ids.filter(id => !foundIds.includes(id))
+            for (const id of missingIds) {
+                errorStack[id] = { message: `Article with id ${id} not found`, code: 'PERSON_NOT_FOUND' }
+            }
+
+            await this.sequelize.destroy(ids, transaction)
+
+            for (const article of articles) {
+                try {
+                    await this.s3.delete(article.key)
                 } catch (e) {
-                    errorCounter++
-                    console.log(`Error while deleting article with id: ${id} \n Error: ${e}`)
+                    errorStack[article.id] = { message: 'S3 delete failed', code: 'S3_ERROR' }
                 }
             }
 
-            if (errorCounter > 0 && errorCounter < errorLimit) {
-                return { status: 206 }
-            } else if (errorCounter >= errorLimit) {
-                return { status: 400 }
-            }
+            await transaction.commit()
 
-            return { status: 200 }
+            return Object.keys(errorStack).length > 0
+                ? { success: false, errors: errorStack }
+                : { success: true }
         } catch (e) {
+            await transaction.rollback()
             RethrowApiError('Service error: Method - bulkDeleteArticles', e)
         }
     }
@@ -207,7 +222,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
 
     private async rollbackS3Changes(oldArticle: PdfArticle, oldFileBuffer: Buffer) {
         try {
-            await this.s3.uploadArticle(oldArticle.key, oldFileBuffer)
+            await this.s3.upload(oldArticle.key, oldFileBuffer)
         } catch (e) {
             throw ApiError.Internal(`Failed to rollback changes in S3, while updating Pdf Article with id: ${oldArticle.id}`)
         }

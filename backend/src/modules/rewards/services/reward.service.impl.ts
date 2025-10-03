@@ -7,30 +7,27 @@ import { RethrowApiError } from "#src/shared/ApiError/RethrowApiError.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
 import { Op, Sequelize } from "sequelize";
 import { TYPES } from "#src/di/types.js";
-import { DatabaseImpl } from "#src/infrastructure/sequelize/database.impl.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
-import { moveFileToFinal } from "#src/shared/fileUtils/moveFileToFinal.js";
-import { removeFile } from "#src/shared/fileUtils/remove/removeFile.js";
 import { removeDir } from "#src/shared/fileUtils/remove/removeDir.js";
-import { getRelativePath } from "#src/shared/fileUtils/getRelativePath.js";
 import { getSlug } from "#src/shared/slugging/getSlug.js";
+import { generateUuid } from "#src/shared/fileUtils/generateUuid.js";
+import { S3RewardServiceImpl } from "./S3Reward.service.impl.js";
+import { RewardSequelizeRepo } from "../repositories/reward.sequelize.repo.js";
+import { OperationResult } from "#src/types/interfaces/http/OperationResult.js";
+import { ErrorStack } from "#src/types/interfaces/http/ErrorStack.interface.js";
+import { isError } from "#src/shared/typeGuards/isError.js";
 
 @injectable()
 export class RewardServiceImpl implements IRewardService {
-    private sequelize: Sequelize
-
     constructor(
-        @inject(TYPES.Database) private database: DatabaseImpl
-    ) {
-        this.sequelize = this.database.getDatabase()
-    }
+        @inject(TYPES.RewardSequelizeRepo) private sequelize: RewardSequelizeRepo,
+        @inject(TYPES.S3RewardService) private s3: S3RewardServiceImpl
+    ) {}
 
     async getRewardById(id: number): Promise<Reward> {
         try {
-            const reward = await Reward.findByPk(id)
-
+            const reward = await this.sequelize.findById(id)
             if (!reward) throw ApiError.NotFound(`Reward not found`)
-
             return reward
         } catch (e) {
             RethrowApiError(`Service error: Method - getRewardById`, e)
@@ -39,34 +36,24 @@ export class RewardServiceImpl implements IRewardService {
 
     async getRewardBySlug(slug: string): Promise<Reward> {
         try {
-            const reward = await Reward.findOne({
-                where: { slug }
-            })
-
+            const reward = await this.sequelize.findBySlug(slug)
             if (!reward) throw ApiError.NotFound(`Reward not found`)
-
             return reward 
         } catch (e) {
             RethrowApiError(`Service error: Method - getRewards`, e)
         }
     }
 
-    async getRewards(offset: number, limit: number): Promise<Reward[] | null> {
+    async getRewards(offset = 0, limit = 10): Promise<Reward[] | null> {
         try {
-            const rewards = await Reward.findAll({
-                offset,
-                limit,
-                where: {},
-                attributes: ['id', 'slug', 'label', 'image_url']
-            })
-
+            const rewards = await this.sequelize.findAll(offset, limit)
             return rewards
         } catch (e) {
             RethrowApiError(`Service error: Method - getRewards`, e)
         }
     }
 
-    async getFilteredRewards(filters: TypeofRewardSchema, offset?: number, limit?: number): Promise<Reward[] | null> {
+    async getFilteredRewards(filters: TypeofRewardSchema, offset = 0, limit = 10): Promise<Reward[] | null> {
         try {
             const where: any = {}
 
@@ -74,11 +61,7 @@ export class RewardServiceImpl implements IRewardService {
                 where.label = { [Op.iLike]: `%${filters.label}%` }
             }
             
-            const candidates = await Reward.findAll({
-                where,
-                offset,
-                limit
-            })
+            const candidates = await this.sequelize.findAll(offset, limit, where)
 
             return candidates
         } catch (e) {
@@ -86,79 +69,103 @@ export class RewardServiceImpl implements IRewardService {
         }
     }
 
-    async bulkCreateRewards(rewards: RewardArray, fileConfig: FileConfig | undefined): Promise<{ status: number }> {
-        const errorLimit = Math.max(Math.floor(rewards.length / 2), 1);
-        let errorCounter = 0;
+    async bulkCreateRewards(rewards: RewardArray, fileConfig: FileConfig): Promise<OperationResult> {
+        const errorStack: ErrorStack = {}
+        let created = 0
     
         try {
-            for (const reward of rewards) {
+            const fileMap = new Map(fileConfig.files.map(file => [file.originalname, file]))
+
+            for (const [index, reward] of rewards.entries()) {
+                const transaction = await this.sequelize.createTransaction()
+
                 try {
-                    const filepath = fileConfig ? moveFileToFinal(fileConfig.tempDirPath, reward.label, 'rewards') : null
-                    const image_url = filepath ? getRelativePath(filepath, 'rewards') : undefined 
+                    const file = fileMap.get(reward.label)
+                    let S3Key: string | null = null
 
-                    const slug = getSlug(reward.label)
+                    if (file) {
+                        S3Key = generateUuid()
+                        await this.s3.upload(S3Key, file.buffer)
+                    }
 
-                    await this.sequelize.transaction(async (t) => {
-                        await Reward.create({ ...reward, image_url, slug }, { transaction: t });
-                    });
+                    const slug = getSlug(reward.label)!
+                    await this.sequelize.createReward(
+                        { ...reward, slug }, 
+                        S3Key ? { key: S3Key } : {}, 
+                        transaction
+                    )
+
+                    await transaction.commit()
+                    created++
                 } catch (e) {
-                    console.log(`Error creating reward: ${reward.label}`, e);
-                    removeFile(reward.label, 'rewards')
-                    errorCounter++;
-                    if (errorCounter >= errorLimit) break;
+                    await transaction.rollback()
+
+                    errorStack[index] = {
+                        message: isError(e) ? e.message : 'Internal error',
+                        code: 'REWARD_CREATE_ERROR'
+                    }
                 }
             }
-
-            fileConfig && removeDir(fileConfig.tempDirPath)
     
-            if (errorCounter > 0 && errorCounter < errorLimit) {
-                return { status: 206 };
-            } else if (errorCounter >= errorLimit) {
-                return { status: 400 };
-            }
-    
-            return { status: 201 };
+            return Object.keys(errorStack).length > 0
+                ? { success: false, created, errors: errorStack }
+                : { success: true, created }
         } catch (e) {
             throw RethrowApiError(`Service error: Method - bulkCreateRewards`, e);
+        } finally {
+            fileConfig && removeDir(fileConfig.tempDirPath)
         }
     }
 
-    async bulkDeleteRewards(ids: number[]): Promise<{ status: number }> {
-        const errorLimit = Math.max(Math.floor(ids.length / 2), 1);
-        let errorCounter = 0;
+    async deleteReward(id: number): Promise<void> {
+        const transaction = await this.sequelize.createTransaction()
+
+        try {
+            const reward = await this.sequelize.findById(id)
+            if (!reward) throw ApiError.NotFound(`Reward with id: ${id} is not found`)
+
+            await this.sequelize.destroy(id, transaction)
+            if (reward.key) await this.s3.delete(reward.key)
+            await transaction.commit()     
+        } catch (e) {
+            await transaction.rollback()
+            throw RethrowApiError(`Service error: Method - deleteReward`, e);
+        }
+    }
+
+    async bulkDeleteRewards(ids: number[]): Promise<OperationResult> {
+        const transaction = await this.sequelize.createTransaction()
+        const errorStack: ErrorStack = {}
     
         try {
-            for (const id of ids) {
-                try {
-                    if (errorCounter >= errorLimit) break;
+            const rewards = await this.sequelize.findAll()
 
-                    const reward = await Reward.findByPk(id)
+            const foundIds = rewards.map(r => r.id)
+            const missingIds = ids.filter(id => !foundIds.includes(id))
+            for (const id of missingIds) {
+                errorStack[id] = { message: `Reward with id ${id} not found`, code: 'REWARD_NOT_FOUND' }
+            }
 
-                    if (!reward) throw ApiError.BadRequest(`Reward with id: ${id} is not found`)
+            await this.sequelize.destroy(foundIds, transaction)
 
-                    await this.sequelize.transaction(async (t) => {
-                        await Reward.destroy({
-                            where: { id },
-                            transaction: t
-                        });
-                    });
-
-                    removeFile(reward.label, 'rewards', reward.image_url)
-                } catch (e) {
-                    errorCounter++;
-                    console.log(`Error while deleting reward with id: ${id} \n Error: ${e}`);
+            for (const reward of rewards) {
+                if (reward.key) {
+                    try {
+                        await this.s3.delete(reward.key)
+                    } catch (e) {
+                        errorStack[reward.id] = { message: 'S3 delete failed', code: 'S3_ERROR' }
+                    }
                 }
             }
-    
-            if (errorCounter > 0 && errorCounter < errorLimit) {
-                return { status: 206 };
-            } else if (errorCounter >= errorLimit) {
-                return { status: 400 };
-            }
-    
-            return { status: 200 };
+
+            await transaction.commit()
+
+            return Object.keys(errorStack).length > 0
+                ? { success: false, errors: errorStack }
+                : { success: true }
         } catch (e) {
-            throw RethrowApiError(`Service error: Method - bulkDeletePersons`, e);
+            await transaction.rollback()
+            throw RethrowApiError(`Service error: Method - bulkDeleteRewards`, e);
         }
     }
 }

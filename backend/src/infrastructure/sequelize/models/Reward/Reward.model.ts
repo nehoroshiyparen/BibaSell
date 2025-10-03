@@ -8,7 +8,7 @@ export class Reward extends Model {
     declare count: number;
     declare addition?: string;
     declare description?: string;
-    declare image_url?: string
+    declare key?: string // S3 key
 
     static initialize(sequelize: Sequelize) {
         this.init({
@@ -19,7 +19,7 @@ export class Reward extends Model {
             count: { type: DataTypes.INTEGER, defaultValue: 0 },
             addition: { type: DataTypes.TEXT, allowNull: true },
             description: { type: DataTypes.TEXT, allowNull: true },
-            image_url : { type: DataTypes.STRING, allowNull: true, defaultValue: 'default.jpg' }
+            image_url : { type: DataTypes.STRING, allowNull: true }
         }, {
             sequelize,
             modelName: 'Reward',

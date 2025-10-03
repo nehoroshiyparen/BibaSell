@@ -1,7 +1,7 @@
 import { TYPES } from "#src/di/types.js";
 import { TypeofPdfArticlePatchSchema } from "../schemas/pdfArticle/PdfArticlePatch.schema.js";
 import { inject, injectable } from "inversify";
-import { Model, Sequelize, Transaction, where } from "sequelize";
+import { Model, Sequelize, Transaction, where, WhereOptions } from "sequelize";
 import { IDatabase } from "#src/types/contracts/index.js";
 import { PdfArticle } from "#src/infrastructure/sequelize/models/PdfArticle/PdfArticle.model.js";
 import { TypeofPdfArticleUpdateSchema } from "../schemas/pdfArticle/PdfArticleUpdate.schema.js";
@@ -51,10 +51,11 @@ export class PdfArticleSequelizeRepo {
         return articles
     }
 
-    async findAll(offset = 0, limit = 10): Promise<PdfArticle[]> {
+    async findAll(offset?: number, limit?: number, where?: WhereOptions<any>): Promise<PdfArticle[]> {
         const articles = await PdfArticle.findAll({ 
             offset, 
             limit, 
+            where,
             include: 
                 [ 
                     { 
@@ -98,16 +99,11 @@ export class PdfArticleSequelizeRepo {
         return await article.update({ ...data, updatedAt: new Date() }, { transaction })
     }
 
-    async destroy(id: number, transaction?: Transaction) {
+    async destroy(id: number | number[], transaction?: Transaction) {
         await PdfArticle.destroy({ where: { id }, transaction  })
     }
 
     async createTransaction(): Promise<Transaction> {
         return await this.sequelize.transaction()
-    }
-
-    private async isExists(id: number): Promise<boolean> {
-        const article = await PdfArticle.findByPk(id)
-        return !!article
     }
 }

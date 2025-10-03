@@ -16,13 +16,13 @@ export class RewardRouter {
         this.setup()
     }
 
-    async setup() {
-        this.router.get('/pagination', this.rewardController.getRewards.bind(this.rewardController))
+    setup() {
+        this.router.get('/', this.rewardController.getRewards.bind(this.rewardController))
         this.router.post('/filtered', this.rewardController.getFilteredRewards.bind(this.rewardController))
         this.router.get('/:id', this.rewardController.getRewardById.bind(this.rewardController))
         this.router.get('/slug/:slug', this.rewardController.getRewardBySlug.bind(this.rewardController))
 
-        this.router.patch('/bulk', prepareTempDir, upload.array('files'), this.rewardController.bulkCreateRewards.bind(this.rewardController))
+        this.router.post('/bulk', prepareTempDir, upload.array('files'), this.rewardController.bulkCreateRewards.bind(this.rewardController))
         
         this.router.delete('/bulk', this.rewardController.bulkDeleteRewards.bind(this.rewardController))
     }

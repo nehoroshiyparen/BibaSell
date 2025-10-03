@@ -5,6 +5,7 @@ import { TypeofPdfArticleFullSchema } from "#src/modules/pdfArticles/schemas/pdf
 import { TypeofPdfArticlePatchSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticlePatch.schema.js"
 import { TypeofPdfAcrticlePreviewSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticlePreview.schema.js"
 import { TypeofPdfArticleUpdateSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticleUpdate.schema.js"
+import { OperationResult } from "#src/types/interfaces/http/OperationResult.js"
 
 export interface IPdfArticleService {
     getArticleById(id: number): Promise<TypeofPdfArticleFullSchema>
@@ -25,6 +26,6 @@ export interface IPdfArticleService {
         options: TypeofPdfArticleUpdateSchema, 
         fileConfig: FileConfig | undefined
     ): Promise<TypeofPdfArticleFullSchema>
-    deleteArticle(id: number): Promise<Status>
-    bulkDeleteArticles(ids: number[]): Promise<Status>
+    deleteArticle(id: number): Promise<void>
+    bulkDeleteArticles(ids: number[]): Promise<OperationResult>
 }

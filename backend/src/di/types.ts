@@ -10,12 +10,14 @@ export const TYPES = {
     PersonRouter: Symbol.for('PersonRouter'),
     RewardRouter: Symbol.for('RewardRouter'),
     MDXArticleRouter: Symbol.for('MDXArticleRouter'),
+    PdfArticleRouter: Symbol.for('PdfArticleRouter'),
     IndexRouter: Symbol.for('IndexRouter'),
 
     // Controllers
     PersonController: Symbol.for('PersonController'),
     RewardController: Symbol.for('RewardController'),
     MDXArticleController: Symbol.for('MDXArticleController'),
+    PdfArticleController: Symbol.for('PdfArticleController'),
 
     // Services
     PersonService: Symbol.for('PersonService'),
@@ -24,9 +26,13 @@ export const TYPES = {
     PdfArticleService: Symbol.for('PdfArticleService'),
 
     // S3 services
-    S3PdfArticleService: Symbol.for('S3PdfArticleService'),
+    S3PersonService: Symbol.for('S3PersonServiceImpl'),
+    S3RewardService: Symbol.for('S3RewardServiceImpl'),
+    S3PdfArticleService: Symbol.for('S3PdfArticleServiceImpl'),
 
     // Sequelize repositories
+    PersonSequelizeRepo: Symbol.for('PersonSequelizeRepo'),
+    RewardSequelizeRepo: Symbol.for('RewardSequelizeRepo'),
     PdfArticleSequelizeRepo: Symbol.for('PdfArticleSequelizeRepo'),
 
     // Elastic repositories

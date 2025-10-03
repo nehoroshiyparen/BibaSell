@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { PersonArrayJsonSchema, PersonArraySchema } from '../types/schemas/person/PersonArraySchema.js'
+import { PersonArraySchema } from "../schemas/PersonArraySchema.js";
 import { SendError, SendResponse } from "#src/shared/http/index.js";
 import { status } from "#src/consts/status.js";
 import { IPersonService } from "#src/types/contracts/services/persons/person.service.interface.js";
@@ -116,7 +116,7 @@ export class PersonControllerImpl {
             req.tempUploadDir ? 
                 {
                     tempDirPath: req.tempUploadDir,
-                    files: req.files as Express.Multer.File[] | undefined,
+                    files: (req.files as Express.Multer.File[] | undefined) || []
                 } : undefined
 
             const { status } =  await this.personService.bulkCreatePersons(validatedData, fileConfig)

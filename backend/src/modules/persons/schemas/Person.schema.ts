@@ -7,5 +7,4 @@ export const PersonSchema = z.object({
     rank: z.string().optional(),
     comments: z.string().optional(),
 }).strict()
-
-export type Person = z.infer<typeof PersonSchema>
+export type TypeofPersonSchema = z.infer<typeof PersonSchema>
