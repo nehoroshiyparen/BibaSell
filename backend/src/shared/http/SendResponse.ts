@@ -1,16 +1,20 @@
 import { Response } from "express";
 import { ApiResponse } from "#src/types/interfaces/http/Response.interface.js";
+import { ResponsePayload } from "#src/types/contracts/http/ResponsePayload.interface.js";
+import { resolveCase } from "./resolveField.js";
 
-export function SendResponse<T>(
+export function SendResponse<T = any>(
     res: Response, 
-    status: number,
-    message: string,
-    data: T
+    options: ResponsePayload<T>
 ) {
-    const response: ApiResponse<T> = {
-        message,
-        data
-    }
+    const resolved = resolveCase(options.cases)
 
-    return res.status(status).json(response)
+    const status = resolved?.status ?? 500
+    const message = resolved?.message ?? 'Unknown error'
+
+    return res.status(status).json({
+        status,
+        message,
+        data: options.data
+    })
 }

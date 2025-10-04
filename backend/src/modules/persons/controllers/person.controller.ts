@@ -34,7 +34,16 @@ export class PersonControllerImpl {
 
             const person = await this.personService.getPersonById(id)
 
-            SendResponse(res, status.OK, `Person fetched`, person)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: status.OK,
+                        message: 'Person fetched'
+                    }
+                ],
+                data: person
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -46,7 +55,16 @@ export class PersonControllerImpl {
 
             const person = await this.personService.getPersonBySlug(slug)
 
-            SendResponse(res, status.OK, `Person fetched`, person)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: status.OK,
+                        message: 'Person fetched'
+                    }
+                ],
+                data: person
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -68,7 +86,16 @@ export class PersonControllerImpl {
 
             const persons = await this.personService.getPersons(offset, limit)
 
-            SendResponse(res, status.OK, persons?.length !== 0 ? `Persons fetched` : `No more data`, persons)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: status.OK,
+                        message: persons?.length !== 0 ? 'Persons fetched' : 'No more data found'
+                    }
+                ],
+                data: persons
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -93,7 +120,16 @@ export class PersonControllerImpl {
 
             const persons = await this.personService.getFilteredPersons(validatedFilters, offset, limit)
 
-            SendResponse(res, status.OK, persons?.length !== 0 ? `Persons fetched` : `No candidates found`, persons)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: status.OK,
+                        message: persons?.length !== 0 ? 'Persons fetched' : 'No cadidates found'
+                    }
+                ],
+                data: persons
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -118,14 +154,28 @@ export class PersonControllerImpl {
                     files: (req.files as Express.Multer.File[] | undefined) || []
                 } 
 
-            const result =  await this.personService.bulkCreatePersons(validatedData, fileConfig)
+            const bulkCreateResult =  await this.personService.bulkCreatePersons(validatedData, fileConfig)
 
-            SendResponse(
-                res, 
-                result.created === dataPack.length ? 200 : result.created > 0 ? 206 : 400, 
-                result.created === dataPack.length ? `Persons created` : result.created > 0 ? `Persons created partilly` : 'Persons were not created. Too much invalid data', 
-                result
-            )
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => bulkCreateResult.created === dataPack.length,
+                        status: status.OK,
+                        message: 'Persons created'
+                    },
+                    {
+                        condition: () => bulkCreateResult.created > 0,
+                        status: status.PARTIAL_CONTENT,
+                        message: 'Persons created partilly'
+                    },
+                    {
+                        condition: () => true,
+                        status: status.BAD_REQUEST,
+                        message: 'Persons were not created. Too much invalid data'
+                    }
+                ],
+                data: bulkCreateResult
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -139,7 +189,15 @@ export class PersonControllerImpl {
 
             await this.personService.deletePerson(id)
 
-            SendResponse(res, status.OK, 'Person deleted', null)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: status.OK,
+                        message: 'Person deleted'
+                    }
+                ]
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -159,13 +217,28 @@ export class PersonControllerImpl {
 
             ValidateIdArray(ids)
 
-            const result = await this.personService.bulkDeletePersons(ids)
+            const bulkDeleteResult = await this.personService.bulkDeletePersons(ids)
 
-            SendResponse(
-                res, 
-                !result.errors ? 200 : Object.keys(result.errors).length < ids.length ? 206 : 400,
-                !result.errors ? `Persons deleted` : Object.keys(result.errors).length ? `Persons deleted partilly` : 'Persons were not deleted. Too much invalid data',
-                result)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => !bulkDeleteResult.errors,
+                        status: status.OK,
+                        message: 'Persons deleted'
+                    },
+                    {
+                        condition: () => !!bulkDeleteResult.errors && Object.keys(bulkDeleteResult.errors).length < ids.length,
+                        status: status.PARTIAL_CONTENT,
+                        message: 'Persons deleted partilly'
+                    },
+                    {
+                        condition: () => true,
+                        status: status.BAD_REQUEST,
+                        message: 'Persons were not deleted. Too much invalid data'
+                    }
+                ],
+                data: bulkDeleteResult
+            })
         } catch (e) {
             SendError(res, e)
         }

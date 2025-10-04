@@ -10,6 +10,7 @@ import { ValidateIdArray } from "#src/shared/validations/ids/idArray.validate.js
 import { ValidatePaginationParams } from "#src/shared/validations/paginationParams.validate.js";
 import { RewardFiltersSchema } from "#src/modules/rewards/schemas/reward/RewardFilters.schema.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
+import { status } from "#src/consts/status.js";
 
 @injectable()
 export class RewardControllerImpl {
@@ -25,7 +26,16 @@ export class RewardControllerImpl {
 
             const reward = await this.rewardService.getRewardById(id)
 
-            SendResponse(res, 200, `Reward fetched`, reward)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: status.OK,
+                        message: 'Reward fetched'
+                    },
+                ],
+                data: reward
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -37,7 +47,16 @@ export class RewardControllerImpl {
 
             const reward = await this.rewardService.getRewardBySlug(slug)
 
-            SendResponse(res, 200, `Reward fetched`, reward)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: status.OK,
+                        message: 'Reward fetched'
+                    }
+                ],
+                data: reward
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -51,7 +70,16 @@ export class RewardControllerImpl {
 
             const rewards = await this.rewardService.getRewards(offset, limit)
 
-            SendResponse(res, 200, `Rewards fetched`, rewards)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: status.OK,
+                        message: rewards?.length !== 0 ? 'Rewards fetched' : 'No more data found'
+                    }
+                ],
+                data: rewards
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -74,7 +102,16 @@ export class RewardControllerImpl {
 
             const rewards = await this.rewardService.getFilteredRewards(validatedFilters, offset, limit)
 
-            SendResponse(res, 200, rewards ? `Rewards fetched` : `No candidates found`, rewards)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: status.OK,
+                        message: rewards?.length !== 0 ? 'Rewards fetched' : 'No cadidates found'
+                    }
+                ],
+                data: rewards
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -82,9 +119,9 @@ export class RewardControllerImpl {
 
     async bulkCreateRewards(req: Request, res: Response) {
         try {
-            const data = JSON.parse(req.body.data)
+            const dataPack = JSON.parse(req.body.data)
         
-            const validatedData = RewardArraySchema.parse(data)
+            const validatedData = RewardArraySchema.parse(dataPack)
 
             const fileConfig: FileConfig | undefined = 
                 req.tempUploadDir ? 
@@ -93,14 +130,28 @@ export class RewardControllerImpl {
                         files: (req.files as Express.Multer.File[] | undefined) || []
                     } : undefined
 
-            const result = await this.rewardService.bulkCreateRewards(validatedData, fileConfig)
+            const bulkCreateResult = await this.rewardService.bulkCreateRewards(validatedData, fileConfig)
 
-            SendResponse(
-                res, 
-                result.created === data.length ? 200 : result.created > 0 ? 206 : 400,
-                result.created === data.length ? `Rewards created` : result.created ? `Rewards created partilly` : 'Rewads were not created. Too much invalid data',
-                result
-            )
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => bulkCreateResult.created === dataPack.length,
+                        status: status.OK,
+                        message: 'Rewards created'
+                    },
+                    {
+                        condition: () => bulkCreateResult.created > 0,
+                        status: status.PARTIAL_CONTENT,
+                        message: 'Rewards created partilly'
+                    },
+                    {
+                        condition: () => true,
+                        status: status.BAD_REQUEST,
+                        message: 'Rewards were not created. Too much invalid data'
+                    }
+                ],
+                data: bulkCreateResult
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -114,12 +165,15 @@ export class RewardControllerImpl {
 
             await this.rewardService.deleteReward(id)
 
-            SendResponse(
-                res,
-                200,
-                'Reward deleted',
-                null
-            )
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: status.OK,
+                        message: 'Reward deleted'
+                    }
+                ]
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -131,14 +185,28 @@ export class RewardControllerImpl {
 
             ValidateIdArray(ids)
 
-            const result = await this.rewardService.bulkDeleteRewards(ids)
+            const bulkDeleteResult = await this.rewardService.bulkDeleteRewards(ids)
 
-            SendResponse(
-                res, 
-                !result.errors ? 200 : result.errors.length < ids.length ? 206 : 400, 
-                !result.errors ? `Rewards deleted` : result.errors.length < ids.length ?  `Rewards deleted partilly` : `Rewards were not deleted. Too much invalid data`, 
-                result
-            )
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => !bulkDeleteResult.errors,
+                        status: status.OK,
+                        message: 'Rewards deleted'
+                    },
+                    {
+                        condition: () => !!bulkDeleteResult.errors && Object.keys(bulkDeleteResult.errors).length < ids.length,
+                        status: status.PARTIAL_CONTENT,
+                        message: 'Rewards deleted partilly'
+                    },
+                    {
+                        condition: () => true,
+                        status: status.BAD_REQUEST,
+                        message: 'Rewards were not deleted. Too much invalid data'
+                    }
+                ],
+                data: bulkDeleteResult
+            })
         } catch (e) {
             SendError(res, e)
         }

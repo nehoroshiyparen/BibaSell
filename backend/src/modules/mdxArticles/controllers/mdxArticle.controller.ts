@@ -27,7 +27,16 @@ export class MDXArticleControllerImpl {
 
             const mdxArticle = await this.mdxArticleService.getMDXArticleById(id)
 
-            SendResponse(res, status.OK, `MDXArticle fetched`, mdxArticle)
+            SendResponse(res, {
+                cases: [
+                    { 
+                        condition: () => true,
+                        status: status.OK,
+                        message: 'MDX Article fetched'
+                    }
+                ],
+                data: mdxArticle
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -48,7 +57,16 @@ export class MDXArticleControllerImpl {
 
             const mdxArticles = await this.mdxArticleService.getFilteredMDXArticles(validatedFilters)
 
-            SendResponse(res, mdxArticles ? status.OK : status.NOT_FOUND , mdxArticles.length !== 0 ? `MDXArticle fetched` : `No candidates found`, mdxArticles)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: 200,
+                        message: mdxArticles.length !== 0 ? 'MDX Articles fetched' : 'No candidates found'
+                    }
+                ],
+                data: mdxArticles
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -62,7 +80,16 @@ export class MDXArticleControllerImpl {
                 
             const mdxArticle = await this.mdxArticleService.searchMDXArticleByContent(content)
     
-            SendResponse(res, status.OK, `MDXArticle fetched`, mdxArticle)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: status.OK,
+                        message: 'MDX Article fetched'
+                    }
+                ],
+                data: mdxArticle
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -76,7 +103,16 @@ export class MDXArticleControllerImpl {
 
             const mdxArticle = await this.mdxArticleService.getMDXArticleContent(id)
 
-            SendResponse(res, status.OK, `MDXArticle fetched`, mdxArticle)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: status.OK,
+                        message: 'MDX Article fetched'
+                    }
+                ],
+                data: mdxArticle
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -98,7 +134,17 @@ export class MDXArticleControllerImpl {
             
             const mdxArticle = await this.mdxArticleService.createMDXArticle(validatedOptions, fileConfig)
 
-            SendResponse(res, status.CREATED, `MDXArticle created`, mdxArticle)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: status.CREATED,
+                        message: 'MDX Article created'
+                    }
+                ],
+                data: mdxArticle
+            })
+
         } catch (e) {
             SendError(res, e)
         }
@@ -120,7 +166,18 @@ export class MDXArticleControllerImpl {
 
             const mdxArticle = await this.mdxArticleService.updateArcticle(id, validatedOptions, fileConfig)
 
-            SendResponse(res, status.OK, `MDXArticle updated`, mdxArticle)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: status.OK,
+                        message: 'MDX Article updated'
+                    }
+                ],
+                data: mdxArticle
+            })
+
+            //status.OK, `MDXArticle updated`, mdxArticle
         } catch (e) {
             SendError(res, e)
         }
@@ -134,7 +191,26 @@ export class MDXArticleControllerImpl {
 
             const { status } = await this.mdxArticleService.bulkDeleteMDXArticles(ids)
 
-            SendResponse(res, status, status === 200 ? `MDXArticles deleted` : status === 206 ? `MDXArticles deleted partilly` : `MDXArticles weren't deleted. To much invalid data`, null)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => status === 200,
+                        status: status,
+                        message: 'MDX Articles deleted'
+                    },
+                    {
+                        condition: () => status === 206,
+                        status: status,
+                        message: 'MDX Articles deleted partilly'
+                    },
+                    {
+                        condition: () => true,
+                        status: status,
+                        message: 'MDX Articles were not deleted. Too much invalid data'
+                    }
+                ]
+            })
+            //status, status === 200 ? `MDXArticles deleted` : status === 206 ? `MDXArticles deleted partilly` : `MDXArticles weren't deleted. To much invalid data`, null
         } catch (e) {
             SendError(res, e)
         }

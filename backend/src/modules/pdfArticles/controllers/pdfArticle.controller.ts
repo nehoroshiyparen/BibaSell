@@ -28,7 +28,16 @@ export class PdfArticleControllerImpl {
 
             const article = await this.pdfArticleService.getArticleById(id)
 
-            SendResponse(res, status.OK, 'Article fetched', article)
+            SendResponse(res, {
+                cases: [
+                    { 
+                        condition: () => true,
+                        status: status.OK,
+                        message: 'Article fetched'
+                    }
+                ],
+                data: article
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -42,7 +51,16 @@ export class PdfArticleControllerImpl {
 
             const articles = await this.pdfArticleService.getArticles(offset, limit)
 
-            SendResponse(res, status.OK, 'Articles fetched', articles)
+            SendResponse(res, {
+                cases: [
+                    { 
+                        condition: () => true,
+                        status: status.OK,
+                        message: articles.length > 0 ? 'Articles fetched' : 'No more articles found'
+                    }
+                ], 
+                data: articles
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -60,7 +78,16 @@ export class PdfArticleControllerImpl {
 
             const candidates = await this.pdfArticleService.getFilteredArticles(fileters)
 
-            SendResponse(res, status.OK, candidates ? 'Articles fetched' : 'Articles not found', candidates)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: status.OK,
+                        message: candidates.length > 0 ? 'Article fetched' : 'Articles not found'
+                    }
+                ],
+                data: candidates
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -87,7 +114,16 @@ export class PdfArticleControllerImpl {
 
             const article = await this.pdfArticleService.createArticle(validatedOptions, fileConfig)
 
-            SendResponse(res, status.CREATED, 'Article created', article)
+            SendResponse(res, {
+                cases: [
+                    { 
+                        condition: () => true,
+                        status: status.CREATED,
+                        message: 'Article created'
+                    }
+                ],
+                data: article
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -116,7 +152,16 @@ export class PdfArticleControllerImpl {
             
             const article = await this.pdfArticleService.updateArticle(validatedOptions, fileConfig)
 
-            SendResponse(res, status.CREATED, 'Article created', article)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: status.CREATED,
+                        message: 'Article created'
+                    }
+                ],
+                data: article
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -129,7 +174,15 @@ export class PdfArticleControllerImpl {
 
             await this.pdfArticleService.deleteArticle(id)
 
-            SendResponse(res, status.OK, 'Article deleted', null)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => true,
+                        status: status.OK,
+                        message: 'Article deleted'
+                    }
+                ],  
+            })
         } catch (e) {
             SendError(res, e)
         }
@@ -140,13 +193,28 @@ export class PdfArticleControllerImpl {
             const ids = req.params.ids.split(',').map(Number)
             ValidateIdArray(ids)
 
-            const result = await this.pdfArticleService.bulkDeleteArticles(ids)
+            const bulkDeleteResult = await this.pdfArticleService.bulkDeleteArticles(ids)
 
-            SendResponse(
-                res, 
-                !result.errors ? 200 : result.errors.length < ids.length ? 206 : 400, 
-                !result.errors ? `Articles deleted` : result.errors.length < ids.length ? `Articles deleted partilly` : `Articles weren't deleted. To much invalid data`,
-                result)
+            SendResponse(res, {
+                cases: [
+                    {
+                        condition: () => !bulkDeleteResult.errors,
+                        status: 200,
+                        message: 'Articles deleted'
+                    },
+                    {
+                        condition: () => !!bulkDeleteResult.errors && bulkDeleteResult.errors.length < ids.length,
+                        status: 206,
+                        message: 'Articles deleted partilly'
+                    },
+                    {
+                        condition: () => true,
+                        status: 400,
+                        message: 'Articles were not deleted. To much invalid data'
+                    }
+                ],
+                data: bulkDeleteResult
+            })
         } catch (e) {
             SendError(res, e)
         }
