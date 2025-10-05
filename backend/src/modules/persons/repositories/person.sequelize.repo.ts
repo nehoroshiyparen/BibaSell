@@ -1,22 +1,27 @@
 import { TYPES } from "#src/di/types.js";
 import { IDatabase } from "#src/types/contracts/index.js";
 import { inject, injectable } from "inversify";
-import { Sequelize, Transaction, WhereOptions } from "sequelize";
+import { FindOptions, Transaction, WhereOptions } from "sequelize";
 import { Person } from "#src/infrastructure/sequelize/models/Person/Person.model.js";
 import { Reward } from "#src/infrastructure/sequelize/models/Reward/Reward.model.js";
 import { TypeofPersonSchema } from "../schemas/Person.schema.js";
+import { BaseSequelizeRepo } from "#src/infrastructure/sequelize/base.sequelize-repo.js";
+import { StoreLogger } from "#src/lib/logger/instances/store.logger.js";
 
 @injectable()
-export class PersonSequelizeRepo {
-    private sequelize: Sequelize
-
+export class PersonSequelizeRepo extends BaseSequelizeRepo<Person> {
     constructor(
-        @inject(TYPES.Database) private database: IDatabase
+        @inject(TYPES.Database) private database: IDatabase,
+        @inject(TYPES.SequelizeLogger) protected logger: StoreLogger
     ) {
-        this.sequelize = this.database.getDatabase()
+        super(database.getDatabase(), Person, logger)
     }
 
-    async create(data: TypeofPersonSchema & { slug: string }, options?: { key?: string }, transaction?: Transaction): Promise<Person> {
+    async create(
+        data: TypeofPersonSchema & { slug: string }, 
+        options?: { key?: string }, 
+        transaction?: Transaction
+    ): Promise<Person> {
         const person = await Person.create({
             ...data,
             ...options,
@@ -24,8 +29,8 @@ export class PersonSequelizeRepo {
         return person
     }
 
-    async findById(id: number): Promise<Person | null> {
-        const person = await Person.findByPk(id, {
+    protected getFindByIdOptions(): FindOptions | undefined {
+        return {
             include: [
                 {
                     model: Reward,
@@ -33,13 +38,11 @@ export class PersonSequelizeRepo {
                     through: { attributes: [] }
                 }
             ]
-        })
-        return person
+        }
     }
 
-    async findBySlug(slug: string): Promise<Person | null> {
-        const person = await Person.findOne({
-            where: { slug },
+    protected getBySlugOptions(): FindOptions | undefined {
+        return {
             include: [
                 {
                     model: Reward,
@@ -47,25 +50,6 @@ export class PersonSequelizeRepo {
                     through: { attributes: [] }
                 }
             ]
-        })
-        return person
-    }
-
-    async findAll(offset?: number, limit?: number, where?: WhereOptions<any>): Promise<Person[]> {
-        const options: any = { where }
-
-        if (offset !== undefined) options.offset = offset
-        if (limit !== undefined) options.limit = limit
-
-        const candidates = await Person.findAll(options)
-        return candidates
-    }
-
-    async destroy(id: number | number[], transaction?: Transaction): Promise<void> {
-        await Person.destroy({ where: { id }, transaction })
-    }
-
-    async createTransaction(): Promise<Transaction> {
-        return await this.sequelize.transaction()
+        }
     }
 }

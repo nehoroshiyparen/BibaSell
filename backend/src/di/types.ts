@@ -37,4 +37,13 @@ export const TYPES = {
 
     // Elastic repositories
     PdfArticleElasticRepo: Symbol.for('PdfArticleElasticRepo'),
+
+    // Loggers
+    AppLogger: Symbol.for('Applogger'),
+    StoreLogger: Symbol.for('StoreLogger'),
+
+    SequelizeLogger: Symbol.for('SequelizeLogger'),
+    ElasticLogger: Symbol.for('ElasticLogger'),
+    RedisLogger: Symbol.for('RedisLogger'),
+    S3Logger: Symbol.for('S3Logger'),
 }

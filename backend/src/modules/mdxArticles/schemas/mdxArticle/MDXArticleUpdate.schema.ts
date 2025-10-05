@@ -1,6 +1,6 @@
 import z from "zod";
 import { HeadingArraySchema } from "../heading/HeadingArray.schema.js";
-import { MDXArticleFileUpdateSchema } from "../mdxArticleFiles/MDXArticleFileUpdate.schema.js";
+import { MDXArticleFileUpdateSchema } from "../articleFiles/ArticleFileUpdate.schema.js";
 
 export const MDXArticleUpdateSchema = z.object({
     title: z.string().optional(),

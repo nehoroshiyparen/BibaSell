@@ -15,6 +15,9 @@ import { MDXArticle } from './infrastructure/sequelize/models/MDXArticle/MDXArti
 import { MDXArticleFile } from './infrastructure/sequelize/models/MDXArticle/MDXArticleFiles.model.js'
 import { ElasticImpl } from './infrastructure/elastic/elastic.impl.js'
 import { mappings } from './infrastructure/elastic/mappings/index.js'
+import { PdfArticle } from './infrastructure/sequelize/models/PdfArticle/PdfArticle.model.js'
+import { Author } from './infrastructure/sequelize/models/Author/Author.model.js'
+import { AppLogger } from './lib/logger/instances/app.logger.js'
 
 @injectable()
 export class AppImpl implements IApp {
@@ -31,6 +34,7 @@ export class AppImpl implements IApp {
         @inject(TYPES.Database) private readonly database: DatabaseImpl,
         @inject(TYPES.Redis) private readonly redis: RedisImpl,
         @inject(TYPES.Elastic) private readonly elastic: ElasticImpl,
+        @inject(TYPES.AppLogger) private readonly logger: AppLogger,
     ) {
         this.#router = indexRouter.getRouter()
 
@@ -40,27 +44,52 @@ export class AppImpl implements IApp {
         this.#middlewares = []
     }
 
+    public async init() {
+        this.logger.info('App is initializing...')
+        
+        await this.setupStore('Sequelize', async () => {
+            this.database.registerModels([Person, Reward, PersonRewards, PdfArticle, Author])
+            await this.database.setup()
+        })
+
+        await this.setupStore('Elastic', async () => {
+            await this.elastic.createIndexes(mappings)
+        })
+
+        await this.setupStore('Redis', async () => {
+            await this.redis.setup()
+        })
+    }
+
+    public async start() {
+        this.#app.use(express.json())
+        this.#app.use(cors())
+        this.#app.use(this.#router)
+        this.setupMiddlewares(this.#middlewares)
+        this.redis.startRedisPing()
+
+        this.#app.listen(this.port, () => {
+            this.logger.started(this.name, this.port)
+        })
+    }
+
     public async setup() {
         try {
-            this.database.registerModels([Person, Reward, PersonRewards, MDXArticle, Heading, MDXArticleFile])
-            await this.database.setup()
-
-            await this.elastic.createIndexes(mappings)
-            await this.redis.setup()
-
-            this.#app.use(express.json())
-            this.#app.use(cors())
-            this.#app.use(this.#router)
-            this.setupMiddlewares(this.#middlewares)
-
-            this.redis.startRedisPing()
-
-            this.#app.listen(this.port, () => {
-                console.log(`App '${this.name}' started on port ${this.port}`)
-            })
+            await this.init()
+            await this.start()
         } catch (err) {
-            console.error('Error during app setup:', err)
+            this.logger.error(`Error while app setup: ${String(err)}`)
             process.exit(1)
+        }
+    }
+
+    private async setupStore(name: string, fn: () => Promise<void>) {
+        try {
+            await fn()
+            this.logger.storeInitialized(name)
+        } catch (e) {
+            this.logger.storeFailed(name, e)
+            throw e
         }
     }
 

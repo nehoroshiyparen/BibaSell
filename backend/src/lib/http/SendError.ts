@@ -1,9 +1,9 @@
 import { Response } from "express";
 import { ApiResponse } from "#src/types/interfaces/http/Response.interface.js";
-import { ApiError } from "../ApiError/ApiError.js";
+import { ApiError } from "../../shared/ApiError/ApiError.js";
 import { errorCodes } from "#src/consts/errorCodes.js";
 import { status } from "#src/consts/status.js";
-import { isError } from "../typeGuards/isError.js";
+import { isError } from "../../shared/typeGuards/isError.js";
 import { ZodError } from "zod";
 
 export function SendError(

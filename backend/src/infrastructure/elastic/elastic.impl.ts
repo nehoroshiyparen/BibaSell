@@ -4,17 +4,21 @@ import { CreateIndexResult } from "#src/types/interfaces/elastic/CreateIndexResu
 import { ElasticEntity } from "#src/types/interfaces/elastic/ElastucEntity.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
 import { Client, estypes } from "@elastic/elasticsearch";
-import { injectable } from "inversify";
-import { DeleteResponse, IndexResponse } from "node_modules/@elastic/elasticsearch/lib/api/types.js";
+import { inject, injectable } from "inversify";
+import { IndexResponse } from "node_modules/@elastic/elasticsearch/lib/api/types.js";
+import { TYPES } from "#src/di/types.js";
+import { StoreLogger } from "#src/lib/logger/instances/store.logger.js";
 
 @injectable()
 export class ElasticImpl implements IElastic {
     private client: Client
 
-    constructor(url?: string) {
+    constructor(
+        @inject(TYPES.ElasticLogger) private logger: StoreLogger
+    ) {
         this.client = new Client({ 
-            node: url ?? `${ENV.ELASTIC_HOST}:${String(ENV.ELASTIC_PORT)}`
-         })
+            node: `${ENV.ELASTIC_HOST}:${String(ENV.ELASTIC_PORT)}`
+        });
     }
 
     async createIndex(index: string, mappings?: estypes.MappingTypeMapping): Promise<CreateIndexResult> {
@@ -46,7 +50,7 @@ export class ElasticImpl implements IElastic {
             }
         }
 
-        console.log(`Elastic is connected on port: ${ENV.ELASTIC_PORT}}`)
+        this.logger.lifecycle.started(ENV.ELASTIC_PORT)
 
         return results
     }

@@ -6,8 +6,8 @@ import { TypeofPdfArticleFiltersSchema } from "../schemas/pdfArticle/PdfArticleF
 import { PdfArticlePatchSchema, TypeofPdfArticlePatchSchema } from "../schemas/pdfArticle/PdfArticlePatch.schema.js";
 import { PdfArticleUpdateSchema } from "../schemas/pdfArticle/PdfArticleUpdate.schema.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
-import { SendError } from "#src/shared/http/SendError.js";
-import { SendResponse } from "#src/shared/http/SendResponse.js";
+import { SendError } from "#src/lib/http/SendError.js";
+import { SendResponse } from "#src/lib/http/SendResponse.js";
 import { ValidateId } from "#src/shared/validations/ids/id.validate.js";
 import { ValidateIdArray } from "#src/shared/validations/ids/idArray.validate.js";
 import { ValidateObjectFieldsNotNull } from "#src/shared/validations/objectFieldsNotNull.validate.js";

@@ -1,25 +1,29 @@
 import { TYPES } from "#src/di/types.js";
 import { TypeofPdfArticlePatchSchema } from "../schemas/pdfArticle/PdfArticlePatch.schema.js";
 import { inject, injectable } from "inversify";
-import { Model, Sequelize, Transaction, where, WhereOptions } from "sequelize";
+import { FindOptions, Model, Sequelize, Transaction, where, WhereOptions } from "sequelize";
 import { IDatabase } from "#src/types/contracts/index.js";
 import { PdfArticle } from "#src/infrastructure/sequelize/models/PdfArticle/PdfArticle.model.js";
 import { TypeofPdfArticleUpdateSchema } from "../schemas/pdfArticle/PdfArticleUpdate.schema.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
 import { Author } from "#src/infrastructure/sequelize/models/Author/Author.model.js";
 import { PdfArticleUpdateDto } from "../types/dto/PdfArticleUpdate.dto.js";
+import { BaseSequelizeRepo } from "#src/infrastructure/sequelize/base.sequelize-repo.js";
+import { StoreLogger } from "#src/lib/logger/instances/store.logger.js";
 
 @injectable()
-export class PdfArticleSequelizeRepo {
-    private sequelize: Sequelize
-
+export class PdfArticleSequelizeRepo extends BaseSequelizeRepo<PdfArticle> {
     constructor(
-        @inject(TYPES.Database) private database: IDatabase
+        @inject(TYPES.Database) private database: IDatabase,
+        @inject(TYPES.SequelizeLogger) protected logger: StoreLogger
     ) {
-        this.sequelize = this.database.getDatabase()
+        super(database.getDatabase(), PdfArticle, logger)
     }
 
-    async create(data: TypeofPdfArticlePatchSchema & { extractedText: string, key: string }, transaction?: Transaction): Promise<PdfArticle> {
+    async create(
+        data: TypeofPdfArticlePatchSchema & { extractedText: string, key: string }, 
+        transaction?: Transaction
+    ): Promise<PdfArticle> {
         const article =  await PdfArticle.create({
             title: data.title,
             publishedAt: new Date(),
@@ -39,7 +43,7 @@ export class PdfArticleSequelizeRepo {
                     } 
                 ]
         })
-        return article as PdfArticle & { authors: Author[] } | null
+        return article
     }
 
     async findByIds(ids: number[], offset = 0, limit = 10): Promise<PdfArticle[]> {
@@ -47,22 +51,6 @@ export class PdfArticleSequelizeRepo {
             where: { id: ids },
             offset,
             limit
-        })
-        return articles
-    }
-
-    async findAll(offset?: number, limit?: number, where?: WhereOptions<any>): Promise<PdfArticle[]> {
-        const articles = await PdfArticle.findAll({ 
-            offset, 
-            limit, 
-            where,
-            include: 
-                [ 
-                    { 
-                        model: Author,
-                        as: 'authors',
-                    } 
-                ] 
         })
         return articles
     }
@@ -99,11 +87,39 @@ export class PdfArticleSequelizeRepo {
         return await article.update({ ...data, updatedAt: new Date() }, { transaction })
     }
 
-    async destroy(id: number | number[], transaction?: Transaction) {
-        await PdfArticle.destroy({ where: { id }, transaction  })
+    protected getFindByIdOptions(): FindOptions | undefined {
+        return {
+            include: 
+                [ 
+                    { 
+                        model: Author,
+                        as: 'authors',
+                    } 
+                ]
+        }
     }
 
-    async createTransaction(): Promise<Transaction> {
-        return await this.sequelize.transaction()
+    protected getFindBySlugOptions(): FindOptions | undefined {
+        return {
+            include: 
+                [ 
+                    { 
+                        model: Author,
+                        as: 'authors',
+                    } 
+                ]
+        }
+    }
+
+    protected getFindAllOptions(): FindOptions | undefined {
+        return {
+            include: 
+                [ 
+                    { 
+                        model: Author,
+                        as: 'authors',
+                    } 
+                ] 
+        }
     }
 }

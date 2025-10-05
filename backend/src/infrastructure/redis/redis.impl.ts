@@ -1,39 +1,43 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { Redis } from "ioredis";
 import { IRedis } from "#src/types/contracts/core/redis.interface.js";
 import { redisConfig } from "./config.js";
 import { ENV } from "#src/config/index.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
+import { StoreLogger } from "#src/lib/logger/instances/store.logger.js";
+import { TYPES } from "#src/di/types.js";
 
 @injectable()
 export class RedisImpl implements IRedis {
     private redis: Redis
 
-    constructor () {
+    constructor (
+        @inject(TYPES.RedisLogger) private logger: StoreLogger
+    ) {
         this.redis = redisConfig
 
         this.redis.on('connect', () => {
-            console.log(`Redis is working on port: ${ENV.REDIS_PORT}`)
+            this.logger.lifecycle.started(ENV.REDIS_PORT)
         })
 
         this.redis.on('error', (e) => {
-            console.log(`Redis error: ${e}`)
+            this.logger.exceptions.storeException(e)
         })
 
         this.redis.on("ready", () => {
-            console.log("Redis is ready to accept commands")
+            this.logger.info('Redis is ready to accept commands')
         })
     }
 
     async setup(): Promise<void> {
-        console.log('Redis connected')
+        this.logger.lifecycle.started(ENV.REDIS_PORT)
     }
 
     async startRedisPing(): Promise<NodeJS.Timeout> {
         return setInterval(async () => {
             const isAlive = this.redis.ping()
             if (!isAlive) {
-                console.log(`Redis ping failed !!!`)
+                this.logger.error('Redis ping failed !!!')
             }
         }, 120000)
     }

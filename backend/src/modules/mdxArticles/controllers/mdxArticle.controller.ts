@@ -5,7 +5,7 @@ import { TYPES } from "#src/di/types.js";
 import { IMDXArticleService } from "#src/types/contracts/services/mdxArticles/mdxArticle.service.interface.js";
 import { MDXArticleFiltersSchema } from "../schemas/mdxArticle/MDXArticleFilters.schema.js";
 import { MDXArticleCreateSchema } from "../schemas/mdxArticle/MDXArticlePatch.schema.js";
-import { SendError, SendResponse } from "#src/shared/http/index.js";
+import { SendError, SendResponse } from "#src/lib/http/index.js";
 import { ValidateObjectFieldsNotNull } from "#src/shared/validations/objectFieldsNotNull.validate.js";
 import { ValidateId } from "#src/shared/validations/ids/id.validate.js";
 import { ValidateIdArray } from "#src/shared/validations/ids/idArray.validate.js";

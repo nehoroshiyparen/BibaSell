@@ -4,6 +4,7 @@ WORKDIR /app
 
 # Копируем только манифесты
 COPY package*.json ./
+COPY patches ./patches
 
 # Чистая установка всех зависимостей под Linux
 RUN npm ci

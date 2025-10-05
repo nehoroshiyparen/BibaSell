@@ -33,6 +33,9 @@ import { S3RewardServiceImpl } from "#src/modules/rewards/services/S3Reward.serv
 import { S3PersonServiceImpl } from "#src/modules/persons/services/S3Person.service.impl.js";
 import { PersonSequelizeRepo } from "#src/modules/persons/repositories/person.sequelize.repo.js";
 import { RewardSequelizeRepo } from "#src/modules/rewards/repositories/reward.sequelize.repo.js";
+import { Logger } from "#src/lib/logger/base.logger.js";
+import { AppLogger } from "#src/lib/logger/instances/app.logger.js";
+import { elasticLogger, redisLogger, s3Logger, sequelizeLogger, StoreLogger } from "#src/lib/logger/instances/store.logger.js";
 
 const container = new Container()
 
@@ -72,7 +75,16 @@ container.bind<PersonSequelizeRepo>(TYPES.PersonSequelizeRepo).to(PersonSequeliz
 container.bind<RewardSequelizeRepo>(TYPES.RewardSequelizeRepo).to(RewardSequelizeRepo).inSingletonScope()
 container.bind<PdfArticleSequelizeRepo>(TYPES.PdfArticleSequelizeRepo).to(PdfArticleSequelizeRepo).inSingletonScope()
 
-//Elastic repositories
+// Elastic repositories
 container.bind<PdfArticleElasticRepo>(TYPES.PdfArticleElasticRepo).to(PdfArticleElasticRepo).inSingletonScope()
+
+// Loggers
+container.bind<Logger>(TYPES.AppLogger).to(AppLogger).inSingletonScope()
+
+
+container.bind<Logger>(TYPES.SequelizeLogger).toConstantValue(sequelizeLogger)
+container.bind<Logger>(TYPES.ElasticLogger).toConstantValue(elasticLogger)
+container.bind<Logger>(TYPES.S3Logger).toConstantValue(s3Logger)
+container.bind<Logger>(TYPES.RedisLogger).toConstantValue(redisLogger)
 
 export { container }

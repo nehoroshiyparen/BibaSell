@@ -16,20 +16,19 @@ import { TypeofMDXArticleFiltersSchema } from "../schemas/mdxArticle/MDXArticleF
 import { TypeofAdvancedMDXArticleSchema } from "../schemas/mdxArticle/MDXArticlePatch.schema.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
 import { RethrowApiError } from "#src/shared/ApiError/RethrowApiError.js";
-import { cleanup } from "#src/shared/helper/object.cleanup.js";
+import { cleanup } from "#src/shared/utils/object.cleanup.js";
 import { sanitizeMarkdownToText } from "#src/modules/mdxArticles/utils/sanitize/markdown.js";
 import { TypeofMDXArticleUpdateSchema } from "../schemas/mdxArticle/MDXArticleUpdate.schema.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
-import { createDir } from "#src/shared/fileUtils/create/createDir.js";
-import { moveFileToFinal } from "#src/shared/fileUtils/moveFileToFinal.js";
+import { createDir } from "#src/shared/files/create/createDir.js";
+import { moveFileToFinal } from "#src/shared/files/move/moveFileToFinal.js";
 import { MDXArticleFile } from "#src/infrastructure/sequelize/models/MDXArticle/MDXArticleFiles.model.js";
-import { removeFile } from "#src/shared/fileUtils/remove/removeFile.js";
-import { generateUuid } from "#src/shared/fileUtils/generateUuid.js";
+import { removeFile } from "#src/shared/files/remove/removeFile.js";
+import { generateUuid } from "#src/shared/crypto/generateUuid.js";
 import { MDXArticleFileInfo } from "#src/types/interfaces/files/MDXArticleFileInfo.interface.js";
 import { fileParser } from "../features/markdown/parsing/file.parser.js";
-import { removeDir } from "#src/shared/fileUtils/remove/removeDir.js";
-import { UPLOAD_BASE } from "#src/shared/fileUtils/config.js";
-import { getRelativePath } from "#src/shared/fileUtils/getRelativePath.js";
+import { removeDir } from "#src/shared/files/remove/removeDir.js";
+import { getRelativePath } from "#src/shared/files/utils/getRelativePath.js";
 
 @injectable()
 export class MDXArticleServiceImpl implements IMDXArticleService {
@@ -266,8 +265,6 @@ export class MDXArticleServiceImpl implements IMDXArticleService {
                     })
 
                     this._deleteRedisValue(id)
-
-                    removeDir(UPLOAD_BASE + `/final/mdxArticles/${id}`)
                 } catch (e) {
                     errorCounter++
                     console.log(`Error while deleting mdxArticle with id: ${id} \n Error: ${e}`)

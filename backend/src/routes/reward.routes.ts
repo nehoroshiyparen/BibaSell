@@ -19,13 +19,13 @@ export class RewardRouter {
     setup() {
         this.router.get('/', this.rewardController.getRewards.bind(this.rewardController))
         this.router.post('/filtered', this.rewardController.getFilteredRewards.bind(this.rewardController))
-        this.router.get('/:id', this.rewardController.getRewardById.bind(this.rewardController))
         this.router.get('/slug/:slug', this.rewardController.getRewardBySlug.bind(this.rewardController))
+        this.router.get('/:id', this.rewardController.getRewardById.bind(this.rewardController))
 
         this.router.post('/bulk', prepareTempDir, upload.array('files'), this.rewardController.bulkCreateRewards.bind(this.rewardController))
         
-        this.router.delete('/:id', this.rewardController.deleteReward.bind(this.rewardController))
         this.router.delete('/bulk', this.rewardController.bulkDeleteRewards.bind(this.rewardController))
+        this.router.delete('/:id', this.rewardController.deleteReward.bind(this.rewardController))
     }
 
     getRouter(): Router { return this.router }

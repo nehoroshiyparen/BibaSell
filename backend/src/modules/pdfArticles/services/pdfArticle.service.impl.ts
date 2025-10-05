@@ -15,10 +15,10 @@ import { RethrowApiError } from "#src/shared/ApiError/RethrowApiError.js";
 import { arrayToPdfArticlePreview } from "#src/modules/pdfArticles/utils/mappings/arrayToPreview.js";
 import { inject, injectable } from "inversify";
 import { getSlug } from "#src/shared/slugging/getSlug.js";
-import { pdfParse } from "#src/shared/fileUtils/pdf-parse.js";
-import { cleanup } from "#src/shared/helper/object.cleanup.js";
+import { pdfParse } from "#src/shared/files/pdf/pdf-parse.js";
+import { cleanup } from "#src/shared/utils/object.cleanup.js";
 import { PdfArticleUpdateDto } from "../types/dto/PdfArticleUpdate.dto.js";
-import { generateUuid } from "#src/shared/fileUtils/generateUuid.js";
+import { generateUuid } from "#src/shared/crypto/generateUuid.js";
 import { BaseS3Service } from "#src/infrastructure/S3/baseS3.service.js";
 import { S3PdfArticleServiceImpl } from "./S3PdfArticle.service.impl.js";
 import { OperationResult } from "#src/types/interfaces/http/OperationResult.js";
@@ -97,20 +97,20 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         try {
             const file = fileConfig.files[0] as Express.Multer.File
 
-            const extractedText = await pdfParse(file.buffer, fileConfig.tempDirPath)
+            const extractedText = await pdfParse(file.buffer)
 
             const article = await this.sequelize.create({ ...options, key: S3Key, extractedText: extractedText }, transaction)
             await this.elastic.indexArticle(article)
 
             await this.s3.upload(S3Key, file.buffer)
 
-            await transaction.commit()
+            await this.sequelize.commitTransaction(transaction)
             return { key: S3Key }
         } catch (e) {
             try {
                 await this.s3.delete(S3Key)
             } catch {}
-            await transaction.rollback()
+            await this.sequelize.rollbackTransaction(transaction)
             RethrowApiError('Service error: Method - createArticle', e)
         }
     }
@@ -144,10 +144,10 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
                 await this.s3.upload(updatedArticle.key, file.buffer)
             }
 
-            await transaction.commit()
+            await this.sequelize.commitTransaction(transaction)
             return updatedArticle
         } catch (e) {
-            await transaction.rollback()
+            await this.sequelize.rollbackTransaction(transaction)
             if (needToRollbackElastic) await this.rollbackElasticChanges(article)
             if (oldFileBuffer) await this.rollbackS3Changes(article, oldFileBuffer)
             RethrowApiError('Service error: Method - updateArticle', e)
@@ -169,9 +169,9 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
             await this.elastic.destroyArticle(id)
             await this.s3.delete(article.key)
 
-            await transaction.commit()
+            await this.sequelize.commitTransaction(transaction)
         } catch (e) {
-            await transaction.rollback()
+            await this.sequelize.rollbackTransaction(transaction)
             if (needToRollbackElastic) await this.rollbackElasticChanges(article)
             if (oldFileBuffer) await this.rollbackS3Changes(article, oldFileBuffer)
             RethrowApiError('Service error: Method - deleteArticle', e)
@@ -201,13 +201,13 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
                 }
             }
 
-            await transaction.commit()
+            await this.sequelize.commitTransaction(transaction)
 
             return Object.keys(errorStack).length > 0
                 ? { success: false, errors: errorStack }
                 : { success: true }
         } catch (e) {
-            await transaction.rollback()
+            await this.sequelize.rollbackTransaction(transaction)
             RethrowApiError('Service error: Method - bulkDeleteArticles', e)
         }
     }

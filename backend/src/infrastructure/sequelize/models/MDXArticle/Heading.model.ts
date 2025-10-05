@@ -1,5 +1,5 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
-import { MDXArticle } from "../MDXArticle.model.js";
+import { MDXArticle } from "./MDXArticle.model.js";
 
 export class Heading extends Model {
     declare id: number

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { PersonArraySchema } from "../schemas/PersonArraySchema.js";
-import { SendError, SendResponse } from "#src/shared/http/index.js";
+import { SendError, SendResponse } from "#src/lib/http/index.js";
 import { status } from "#src/consts/status.js";
 import { IPersonService } from "#src/types/contracts/services/persons/person.service.interface.js";
 import { injectable, inject } from "inversify";

@@ -24,8 +24,8 @@ export class PdfArticleRouter {
 
         this.router.put('/:id', prepareTempDir, upload.array('files'), this.pdfArticleController.updateArticle.bind(this.pdfArticleController))
 
-        this.router.delete('/:id', this.pdfArticleController.deleteArticle.bind(this.pdfArticleController))
         this.router.delete('/bulk', this.pdfArticleController.bulkDeleteArticles.bind(this.pdfArticleController))
+        this.router.delete('/:id', this.pdfArticleController.deleteArticle.bind(this.pdfArticleController))
     }
 
     getRouter(): Router { return this.router }

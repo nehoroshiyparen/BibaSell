@@ -1,5 +1,6 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 import { fa } from "zod/locales";
+import { Author } from "../Author/Author.model.js";
 
 export class PdfArticle extends Model {
     declare id: number
@@ -10,6 +11,8 @@ export class PdfArticle extends Model {
     declare pusblishedAt: Date
     declare updatedAt: Date
 
+    declare authors?: Author[]
+
     static initialize(sequelize: Sequelize) {
         this.init({
             id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -17,8 +20,8 @@ export class PdfArticle extends Model {
             slug: { type: DataTypes.STRING, unique: true, allowNull: false },
             key: { type: DataTypes.TEXT, allowNull: false },
             extractedText: { type: DataTypes.TEXT, allowNull: false },
-            publishedAt: { type: DataTypes.DATE, allowNull: false, defaultValue: Date.now().toLocaleString() },
-            updatedAt: { type: DataTypes.DATE, allowNull: false, defaultValue: Date.now().toLocaleString() },
+            publishedAt: { type: DataTypes.DATE, allowNull: false, defaultValue: new Date() },
+            updatedAt: { type: DataTypes.DATE, allowNull: false, defaultValue: new Date()},
         }, {
             sequelize,
             modelName: 'PdfArticle',

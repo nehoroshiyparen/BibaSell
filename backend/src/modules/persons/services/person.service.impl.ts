@@ -7,14 +7,14 @@ import { RethrowApiError } from "#src/shared/ApiError/RethrowApiError.js";
 import { IPersonService } from "../../../types/contracts/services/persons/person.service.interface.js";
 import { TYPES } from "#src/di/types.js";
 import { TypeofPersonFiltersSchema } from "#src/modules/persons/schemas/PersonFilters.schema.js";
-import { removeDir } from "#src/shared/fileUtils/remove/removeDir.js";
+import { removeDir } from "#src/shared/files/remove/removeDir.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
 import { getSlug } from "#src/shared/slugging/getSlug.js";
 import { OperationResult } from "#src/types/interfaces/http/OperationResult.js";
 import { PersonSequelizeRepo } from "../repositories/person.sequelize.repo.js";
 import { ErrorStack } from "#src/types/interfaces/http/ErrorStack.interface.js";
 import { S3PersonServiceImpl } from "./S3Person.service.impl.js";
-import { generateUuid } from "#src/shared/fileUtils/generateUuid.js";
+import { generateUuid } from "#src/shared/crypto/generateUuid.js";
 import { isError } from "#src/shared/typeGuards/isError.js";
 
 @injectable()
@@ -96,10 +96,10 @@ export class PersonServiceImpl implements IPersonService {
                         transaction
                     )
 
-                    await transaction.commit()
+                    await this.sequelize.commitTransaction(transaction)
                     created++
                 } catch (e) {
-                    await transaction.rollback()
+                    await this.sequelize.rollbackTransaction(transaction)
                     if (S3Key) await this.s3.delete(S3Key)
                     errorStack[index] = {
                         message: isError(e) ? e.message : 'Internal error',
@@ -127,9 +127,9 @@ export class PersonServiceImpl implements IPersonService {
 
             await this.sequelize.destroy(id, transaction)
             if (person.key) await this.s3.delete(person.key)
-            await transaction.commit()
+            await this.sequelize.commitTransaction(transaction)
         } catch (e) {
-            await transaction.rollback()
+            await this.sequelize.rollbackTransaction(transaction)
             RethrowApiError(`Service error: Method - deletePerson`, e)
         }
     }
@@ -159,13 +159,13 @@ export class PersonServiceImpl implements IPersonService {
                 }
             }
     
-            await transaction.commit()
+            await this.sequelize.commitTransaction(transaction)
 
             return Object.keys(errorStack).length > 0
                 ? { success: false, errors: errorStack }
                 : { success: true }
         } catch (e) {
-            await transaction.rollback()
+            await this.sequelize.rollbackTransaction(transaction)
             throw RethrowApiError(`Service error: Method - bulkDeletePersons`, e);
         }
     }

@@ -8,9 +8,9 @@ import { ApiError } from "#src/shared/ApiError/ApiError.js";
 import { Op, Sequelize } from "sequelize";
 import { TYPES } from "#src/di/types.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
-import { removeDir } from "#src/shared/fileUtils/remove/removeDir.js";
+import { removeDir } from "#src/shared/files/remove/removeDir.js";
 import { getSlug } from "#src/shared/slugging/getSlug.js";
-import { generateUuid } from "#src/shared/fileUtils/generateUuid.js";
+import { generateUuid } from "#src/shared/crypto/generateUuid.js";
 import { S3RewardServiceImpl } from "./S3Reward.service.impl.js";
 import { RewardSequelizeRepo } from "../repositories/reward.sequelize.repo.js";
 import { OperationResult } from "#src/types/interfaces/http/OperationResult.js";
@@ -89,16 +89,16 @@ export class RewardServiceImpl implements IRewardService {
                     }
 
                     const slug = getSlug(reward.label)!
-                    await this.sequelize.createReward(
+                    await this.sequelize.create(
                         { ...reward, slug }, 
                         S3Key ? { key: S3Key } : {}, 
                         transaction
                     )
 
-                    await transaction.commit()
+                    await this.sequelize.commitTransaction(transaction)
                     created++
                 } catch (e) {
-                    await transaction.rollback()
+                    await this.sequelize.rollbackTransaction(transaction)
 
                     errorStack[index] = {
                         message: isError(e) ? e.message : 'Internal error',
@@ -126,9 +126,9 @@ export class RewardServiceImpl implements IRewardService {
 
             await this.sequelize.destroy(id, transaction)
             if (reward.key) await this.s3.delete(reward.key)
-            await transaction.commit()     
+            await this.sequelize.commitTransaction(transaction)    
         } catch (e) {
-            await transaction.rollback()
+            await this.sequelize.rollbackTransaction(transaction)
             throw RethrowApiError(`Service error: Method - deleteReward`, e);
         }
     }
@@ -158,13 +158,13 @@ export class RewardServiceImpl implements IRewardService {
                 }
             }
 
-            await transaction.commit()
+            await this.sequelize.commitTransaction(transaction)
 
             return Object.keys(errorStack).length > 0
                 ? { success: false, errors: errorStack }
                 : { success: true }
         } catch (e) {
-            await transaction.rollback()
+            await this.sequelize.rollbackTransaction(transaction)
             throw RethrowApiError(`Service error: Method - bulkDeleteRewards`, e);
         }
     }
