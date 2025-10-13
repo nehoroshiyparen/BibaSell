@@ -23,8 +23,8 @@ import { PdfArticleSequelizeRepo } from "#src/modules/pdfArticles/repositories/p
 import { PdfArticleElasticRepo } from "#src/modules/pdfArticles/repositories/pdfArticle.elastic-repo.js";
 import { IElastic } from "#src/types/contracts/core/elastic.interface.js";
 import { ElasticImpl } from "#src/infrastructure/elastic/elastic.impl.js";
-import { IS3 } from "#src/types/contracts/core/s3.interface.js";
-import { S3Impl } from "#src/infrastructure/S3/s3.impl.js";
+import { IBaseS3Repo } from "#src/types/contracts/core/base.s3-repo.interface.js";
+import { BaseS3Repo } from "#src/infrastructure/S3/base.s3-repo.js";
 import { PdfArticleRouter } from "#src/routes/pdfArticle.routes.js";
 import { PdfArticleControllerImpl } from "#src/modules/pdfArticles/controllers/pdfArticle.controller.js";
 import { IPdfArticleService } from "#src/types/contracts/services/pdfArticles/pdfArticle.service.interface.js";
@@ -44,7 +44,7 @@ container.bind<IApp>(TYPES.App).to(AppImpl).inSingletonScope()
 container.bind<IDatabase>(TYPES.Database).to(DatabaseImpl).inSingletonScope()
 container.bind<IRedis>(TYPES.Redis).to(RedisImpl).inSingletonScope()
 container.bind<IElastic>(TYPES.Elastic).to(ElasticImpl).inSingletonScope()
-container.bind<IS3>(TYPES.S3).to(S3Impl).inSingletonScope()
+container.bind<IBaseS3Repo>(TYPES.S3).to(BaseS3Repo).inSingletonScope()
 
 // Routers
 container.bind<PersonRouter>(TYPES.PersonRouter).to(PersonRouter).inSingletonScope()

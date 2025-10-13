@@ -1,9 +1,9 @@
-import { IS3 } from "#src/types/contracts/core/s3.interface.js"
+import { IBaseS3Repo } from "#src/types/contracts/core/base.s3-repo.interface.js"
 
 export abstract class BaseS3Service {
     protected abstract prefix: string
 
-    constructor(protected readonly s3: IS3) {}
+    constructor(protected readonly s3: IBaseS3Repo) {}
 
     private buildKey(key: string): string {
         return `${this.prefix}${key}`

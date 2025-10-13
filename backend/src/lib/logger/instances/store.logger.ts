@@ -46,8 +46,8 @@ export class StoreLogger extends Logger {
     }
 
     exceptions = {
-        storeException: (e: unknown) =>
-        this.error(`Error occured in store ${this.storeName} ${String(e)}`)
+        storeException: (e: unknown, comment?: string) =>
+        this.error(`Error occured in store ${this.storeName}. ${comment} ${String(e)}`)
     }
 }
 

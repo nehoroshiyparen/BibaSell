@@ -8,6 +8,7 @@ import { inject, injectable } from "inversify";
 import { IndexResponse } from "node_modules/@elastic/elasticsearch/lib/api/types.js";
 import { TYPES } from "#src/di/types.js";
 import { StoreLogger } from "#src/lib/logger/instances/store.logger.js";
+import { stringifyObject } from "#src/shared/utils/stringifyObject.js";
 
 @injectable()
 export class ElasticImpl implements IElastic {
@@ -24,13 +25,14 @@ export class ElasticImpl implements IElastic {
     async createIndex(index: string, mappings?: estypes.MappingTypeMapping): Promise<CreateIndexResult> {
         const exists = await this.client.indices.exists({ index })
         if (exists) throw ApiError.Conflict(`Index ${index} already exists`, 'INDEX_ALREADY_EXISTS')
-        
+            
         const params = await this.client.indices.create({
             index,
             body: mappings
                 ? mappings
                 : {}
         })
+        this.logger.info(`Index created: ${index}`)
         return {
             index: params.index,
             acknowledged: params.acknowledged,
@@ -61,6 +63,7 @@ export class ElasticImpl implements IElastic {
             id: entity.id?.toString(),
             document: entity
         })
+        this.logger.operations.created(stringifyObject(entity), entity.id)
         return res
     }
 
@@ -85,6 +88,7 @@ export class ElasticImpl implements IElastic {
                 }
             }
         })
+        this.logger.operations.fetched(stringifyObject(res.hits.hits.map(hit => hit._source)))
         return res.hits.hits.map(hit => hit._source as T)
     }
 
@@ -93,6 +97,7 @@ export class ElasticImpl implements IElastic {
             index,
             id: String(id)
         })
+        this.logger.operations.deleted(id)
         return res
     }
 

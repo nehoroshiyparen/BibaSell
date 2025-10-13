@@ -16,6 +16,8 @@ import { ErrorStack } from "#src/types/interfaces/http/ErrorStack.interface.js";
 import { S3PersonServiceImpl } from "./S3Person.service.impl.js";
 import { generateUuid } from "#src/shared/crypto/generateUuid.js";
 import { isError } from "#src/shared/typeGuards/isError.js";
+import path from "path";
+import { readFile } from "#src/shared/files/utils/readFIle.js";
 
 @injectable()
 export class PersonServiceImpl implements IPersonService {
@@ -75,7 +77,9 @@ export class PersonServiceImpl implements IPersonService {
         let created = 0
     
         try {
-            const fileMap = new Map(fileConfig.files.map(file => [file.originalname, file]))
+            const fileMap = new Map(
+                fileConfig.files.map(file => [path.parse(file.originalname).name, file])
+            )
 
             for (const [index, person] of persons.entries()) {
                 const transaction = await this.sequelize.createTransaction()
@@ -86,7 +90,11 @@ export class PersonServiceImpl implements IPersonService {
 
                     if (file) {
                         S3Key = generateUuid()
-                        await this.s3.upload(S3Key, file.buffer)
+                        const buffer = await readFile(file.path)
+                        await this.s3.upload(S3Key, buffer, { 
+                            contentType: file.mimetype,
+                            ACL: 'public-read'
+                        })
                     }
 
                     const slug = getSlug(person.name)!
@@ -100,7 +108,6 @@ export class PersonServiceImpl implements IPersonService {
                     created++
                 } catch (e) {
                     await this.sequelize.rollbackTransaction(transaction)
-                    if (S3Key) await this.s3.delete(S3Key)
                     errorStack[index] = {
                         message: isError(e) ? e.message : 'Internal error',
                         code: 'PERSON_CREATE_ERROR'

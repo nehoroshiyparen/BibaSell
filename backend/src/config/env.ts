@@ -22,6 +22,8 @@ export const ENV = {
     MULTER_UPLOAD_PATH: process.env.MULTER_UPLOAD_PATH ?? 'ENV process error',
     MULTER_GAP_DIR_PATH: process.env.MULTER_GAP_DIR_PATH ?? 'ENV process error',
 
-    YC_ACCESS_KEY: process.env.YC_ACCESS_KEY || 'ENV process error',
-    YC_SECRET_KEY: process.env.YC_SECRET_KEY || 'ENV process error'
+    YC_ACCESS_KEY: process.env.YC_ACCESS_KEY?.trim() || 'ENV process error',
+    YC_SECRET_KEY: process.env.YC_SECRET_KEY?.trim() || 'ENV process error'
 }
+
+console.log(JSON.stringify(ENV.YC_ACCESS_KEY), JSON.stringify(ENV.YC_SECRET_KEY))
