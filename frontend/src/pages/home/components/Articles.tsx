@@ -2,7 +2,7 @@ import ArrowIcon from "src/assets/svg/ArrowIcon/ArrowIcon"
 import BookIcon from "src/assets/svg/BookIcon/BookIcon"
 import SearchIcon from "src/assets/svg/SearchIcon/SearchIcon"
 
-const MDXArticle = () => {
+const Article = () => {
     return (
         <div className="w-full h-full flex flex-col justify-center gap-35">
             <div className="_big-p text-textw-full text-center">
@@ -57,4 +57,4 @@ const MDXArticle = () => {
     )
 }
 
-export default MDXArticle
+export default Article

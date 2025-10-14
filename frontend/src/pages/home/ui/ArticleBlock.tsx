@@ -1,6 +1,6 @@
-import MDXArticle from "../components/MDXArticles"
+import MDXArticle from "../components/Articles"
 
-const MDXArticleBlock = () => {
+const ArticleBlock = () => {
     return (
         <div className="flex justify-center h-[90vh] overflow-hidden">
             <div className="w-full sm:max-w-[1280px] md:max-w-[1920px] lg:max-w-[2560px] box-border pl-30 pr-30">
@@ -10,4 +10,4 @@ const MDXArticleBlock = () => {
     )
 }
 
-export default MDXArticleBlock
+export default ArticleBlock

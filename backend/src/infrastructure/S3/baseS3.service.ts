@@ -24,4 +24,8 @@ export abstract class BaseS3Service {
     async list(): Promise<string[]> {
         return this.s3.list(this.prefix)
     }
+
+    async getSignedUrls(keys: string[]): Promise<Record<string, string>> {
+        return this.s3.generateSignedUrls(keys.map(key => this.buildKey(key)))
+    }
 }

@@ -5,7 +5,7 @@ import { request } from "src/shared/api";
 
 export const getRewardsApi = async (offset: number, limit: number): Promise<RewardPreview[]> => {
     const req: ApiRequest<undefined, RewardPreview[]> = {
-        url: RewardApiUrl + `/pagination?offset=${offset}&limit=${limit}`,
+        url: RewardApiUrl + `/?offset=${offset}&limit=${limit}`,
         method: 'GET',
     }
 

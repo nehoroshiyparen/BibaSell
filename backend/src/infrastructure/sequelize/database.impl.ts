@@ -29,9 +29,9 @@ export class DatabaseImpl implements IDatabase {
         }
     }
 
-    public registerModels(model: ISequelizeModel[]): void {
-        model.forEach(model => model.initialize(this.sequelize))
-        model.forEach(model => {
+    public registerModels(models: ISequelizeModel[]): void {
+        models.forEach(model => model.initialize(this.sequelize))
+        models.forEach(model => {
               if (typeof model.setupAssociations === 'function') {
                 model.setupAssociations()
               }

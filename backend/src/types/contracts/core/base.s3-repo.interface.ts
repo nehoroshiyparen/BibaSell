@@ -3,4 +3,5 @@ export interface IBaseS3Repo {
     get(key: string): Promise<Buffer>
     delete(key: string): Promise<void>
     list(prefix?: string): Promise<string[]>
+    generateSignedUrls(keys: string[]): Promise<Record<string, string>>
 } 

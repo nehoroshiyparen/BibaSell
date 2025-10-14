@@ -2,7 +2,7 @@ import './Home.css'
 import GreetingBlock from "./ui/GreetingBlock"
 import CardsBlock from "./ui/CardsBlock"
 import MapsBlock from "./ui/MapsBlock"
-import MDXArticleBlock from "./ui/MDXArticleBlock"
+import MDXArticleBlock from "./ui/ArticleBlock"
 
 const Home = () => {
     return (

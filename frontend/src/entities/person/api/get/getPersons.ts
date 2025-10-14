@@ -5,7 +5,7 @@ import { PersonApiUrl } from ".."
 
 export const getPersonsApi = async (offset: number, limit: number): Promise<PersonPreview[]> => {
     const req: ApiRequest<undefined, PersonPreview[]> = {
-        url: PersonApiUrl + `/pagination?offset=${offset}&limit=${limit}`,
+        url: PersonApiUrl + `?offset=${offset}&limit=${limit}`,
         method: 'GET',
     }
 

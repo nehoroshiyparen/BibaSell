@@ -70,7 +70,7 @@ export class PdfArticleControllerImpl {
         try {
             const fileters: TypeofPdfArticleFiltersSchema = {
                 title: req.query.title?.toString() || '',
-                extractedText: req.query.text?.toString() || '',
+                extractedText: req.query.extractedText?.toString() || '',
                 author: req.query.authors?.toString() || '',
             }
 
@@ -95,6 +95,10 @@ export class PdfArticleControllerImpl {
     
     async createArticle(req: Request, res: Response) {
         try {
+            if (!req.body.data) {
+                throw ApiError.BadRequest('Missing data field in body')
+            }
+            
             const options = JSON.parse(req.body.data)
 
             ValidateObjectFieldsNotNull(options)
@@ -131,6 +135,10 @@ export class PdfArticleControllerImpl {
     
     async updateArticle(req: Request, res: Response) {
         try {
+            if (!req.body.data) {
+                throw ApiError.BadRequest('Missing data field in body')
+            }
+
             const options = JSON.parse(req.body.data)
 
             ValidateObjectFieldsNotNull(options)
@@ -190,7 +198,7 @@ export class PdfArticleControllerImpl {
 
     async bulkDeleteArticles(req: Request, res: Response) {
         try {
-            const ids = req.params.ids.split(',').map(Number)
+            const ids = String(req.query.ids).split(',').map(Number)
             ValidateIdArray(ids)
 
             const bulkDeleteResult = await this.pdfArticleService.bulkDeleteArticles(ids)

@@ -11,12 +11,9 @@ const PersonAdvanced:React.FC<PersonAdvancedProps> = ({ person }) => {
             <div className="w-full h-full flex gap-40">
                 <div className="h-300 aspect-[194/261]">
                     <img 
-                        src={person.image_url ? 
-                            `http://localhost:8080/files/${person.image_url}` 
-                            :
-                            '/images/persons/unknown.png'
-                        } 
-                        className="h-full aspect-[194/261] rounded-3xl"
+                        src={person.key || "/images/persons/unknown.png"}
+                        onLoad={(e) => (e.currentTarget.style.opacity = "1")}
+                        className="h-full aspect-[194/261] rounded-3xl object-cover opacity-0 transition-opacity duration-200"
                         style={{boxShadow: "0 0 20px rgba(0,0,0,0.4)"}}
                     />
                 </div>

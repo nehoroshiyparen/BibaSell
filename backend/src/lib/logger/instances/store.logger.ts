@@ -36,7 +36,7 @@ export class StoreLogger extends Logger {
 
     transactions = {
         started: (name: string) =>
-        this.debug(`Transaction-${name} is started`),
+        this.info(`Transaction-${name} is started`),
 
         commited: (name: string) =>
         this.info(`Transaction-${name} is commited`),

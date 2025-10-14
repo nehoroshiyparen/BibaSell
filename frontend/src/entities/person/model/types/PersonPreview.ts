@@ -3,5 +3,5 @@ export interface PersonPreview {
     slug: string,
     name: string,
     description: string,
-    image_url: string,
+    key: string,
 }

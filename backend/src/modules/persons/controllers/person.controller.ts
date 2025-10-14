@@ -11,6 +11,7 @@ import { ValidateObjectFieldsNotNull } from "#src/shared/validations/objectField
 import { ValidateIdArray } from "#src/shared/validations/ids/idArray.validate.js";
 import { PersonFiltersSchema } from "#src/modules/persons/schemas/PersonFilters.schema.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
+import { ApiError } from "#src/shared/ApiError/ApiError.js";
 
 @injectable()
 export class PersonControllerImpl {
@@ -144,6 +145,10 @@ export class PersonControllerImpl {
      */
     async bulkCreatePersons(req: Request, res: Response) {
         try {
+            if (!req.body.data) {
+                throw ApiError.BadRequest('Missing data field in body')
+            }
+
             const dataPack = JSON.parse(req.body.data)
 
             const validatedData = PersonArraySchema.parse(dataPack)

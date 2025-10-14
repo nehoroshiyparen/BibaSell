@@ -10,12 +10,13 @@ const RewardAdvanced:React.FC<RewardAdvancedProps> = ({ reward }) => {
             <div className="w-full h-full flex gap-40">
                 <div className="w-150 flex flex-shrink-0 justify-center items-start">
                     <img 
-                        src={reward.image_url ? 
-                            `http://localhost:8080/files/${reward.image_url}` 
+                        src={reward.key ? 
+                            reward.key
                             :
                             '/images/persons/unknown.png'
                         } 
-                        className="w-full max-h-[70vh] object-contain"
+                        onLoad={(e) => (e.currentTarget.style.opacity = "1")}
+                        className="w-full max-h-[70vh] object-cover opacity-0 transition-opacity duration-200"
                     />
                 </div>
                 <div className="flex flex-col gap-18">

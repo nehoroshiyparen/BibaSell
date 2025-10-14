@@ -6,6 +6,8 @@ import { Readable } from "stream";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
 import { StoreLogger } from "#src/lib/logger/instances/store.logger.js";
 import { TYPES } from "#src/di/types.js";
+import { Upload } from "@aws-sdk/lib-storage";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 @injectable()
 export class BaseS3Repo implements IBaseS3Repo {
@@ -21,15 +23,17 @@ export class BaseS3Repo implements IBaseS3Repo {
     
     async upload(key: string, body: Buffer, options?: { contentType?: string, ACL: 'public-read' }): Promise<void> {
         try {
-            const command = new PutObjectCommand({
-                Bucket: this.bucketName,
-                Key: key,
-                Body: body,
-                ContentType: options?.contentType,
-                ACL: options?.ACL
+            const command = new Upload({
+                client: this.client,
+                params: {
+                    Bucket: this.bucketName,
+                    Key: key,
+                    Body: body,
+                    ContentType: options?.contentType,
+                    ACL: 'private'
+                }
             })
-            console.log(command)
-            await this.client.send(command)
+            await command.done()
             this.logger.info(`Key: ${key} is uploaded`)
         } catch (e) {
             this.logger.exceptions.storeException(e, `Key: ${key}. Upload error`)
@@ -85,5 +89,17 @@ export class BaseS3Repo implements IBaseS3Repo {
             this.logger.exceptions.storeException(e, `Prefix: ${prefix}. List error`)
             throw ApiError.S3(`S3 list failed (prefix: ${prefix})`, undefined, e)
         }
+    }
+    
+    async generateSignedUrls(keys: string[]): Promise<Record<string, string>> {
+        const entries = await Promise.all(
+            keys.map(async (key) => {
+                const shortKey = key.includes('/') ? key.split('/').slice(1).join('/') : key
+                const command = new GetObjectCommand({ Bucket: this.bucketName, Key: key })
+                const url = await getSignedUrl(s3, command, { expiresIn: 300 })
+                return [shortKey, url] as const
+            })
+        )
+        return Object.fromEntries(entries)
     }
 }

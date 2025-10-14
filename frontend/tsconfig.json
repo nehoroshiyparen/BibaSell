@@ -1,8 +1,12 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowJs": true,
     "paths": {
-      "src/*": ["src/*"],
+      "src/*": ["./src/*"],
     }
   },
   "files": [],

@@ -7,6 +7,7 @@ import { Reward } from "#src/infrastructure/sequelize/models/Reward/Reward.model
 import { TypeofPersonSchema } from "../schemas/Person.schema.js";
 import { BaseSequelizeRepo } from "#src/infrastructure/sequelize/base.sequelize-repo.js";
 import { StoreLogger } from "#src/lib/logger/instances/store.logger.js";
+import { stringifyObject } from "#src/shared/utils/stringifyObject.js";
 
 @injectable()
 export class PersonSequelizeRepo extends BaseSequelizeRepo<Person> {
@@ -26,6 +27,7 @@ export class PersonSequelizeRepo extends BaseSequelizeRepo<Person> {
             ...data,
             ...options,
         }, { transaction })
+        this.logger.operations.created(stringifyObject(person), person.id)
         return person
     }
 

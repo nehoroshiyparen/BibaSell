@@ -19,7 +19,7 @@ export class Reward extends Model {
             count: { type: DataTypes.INTEGER, defaultValue: 0 },
             addition: { type: DataTypes.TEXT, allowNull: true },
             description: { type: DataTypes.TEXT, allowNull: true },
-            image_url : { type: DataTypes.STRING, allowNull: true }
+            key : { type: DataTypes.STRING, allowNull: true }
         }, {
             sequelize,
             modelName: 'Reward',

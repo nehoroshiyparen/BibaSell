@@ -5,5 +5,5 @@ export interface PersonAdvanced {
     description: string,
     rank: string,
     comments: string,
-    image_url: string
+    key: string
 }

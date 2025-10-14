@@ -23,6 +23,8 @@ import { BaseS3Service } from "#src/infrastructure/S3/baseS3.service.js";
 import { S3PdfArticleServiceImpl } from "./S3PdfArticle.service.impl.js";
 import { OperationResult } from "#src/types/interfaces/http/OperationResult.js";
 import { ErrorStack } from "#src/types/interfaces/http/ErrorStack.interface.js";
+import { readFile } from "#src/shared/files/utils/readFile.js";
+import { removeDir } from "#src/shared/files/remove/removeDir.js";
 
 @injectable()
 export class PdfArticleServiceImpl implements IPdfArticleService {
@@ -36,7 +38,8 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         try {
             const article = await this.sequelize.findById(id)
             if (!article) throw ApiError.NotFound(`Article with id: ${id} was not found`)
-            return article
+            const urls = await this.s3.getSignedUrls([article.key])
+            return { ...article.toJSON(), key: urls[article.key] }
         } catch (e) {
             RethrowApiError('Service error: Method - getArticleById', e)
         }
@@ -96,15 +99,20 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
 
         try {
             const file = fileConfig.files[0] as Express.Multer.File
+            const buffer = await readFile(file.path)
 
-            const extractedText = await pdfParse(file.buffer)
+            const extractedText = await pdfParse(buffer)
+            if (!options.title) throw ApiError.BadRequest('Article must have a title')
+            const slug = getSlug(options.title)
 
-            const article = await this.sequelize.create({ ...options, key: S3Key, extractedText: extractedText }, transaction)
+            const article = await this.sequelize.create({ ...options, slug: slug!, key: S3Key, extractedText: extractedText }, transaction)
             await this.elastic.indexArticle(article)
 
-            await this.s3.upload(S3Key, file.buffer)
+            await this.s3.upload(S3Key, buffer)
 
             await this.sequelize.commitTransaction(transaction)
+            fileConfig && await removeDir(fileConfig.tempDirPath)
+            
             return { key: S3Key }
         } catch (e) {
             try {
@@ -145,6 +153,8 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
             }
 
             await this.sequelize.commitTransaction(transaction)
+            fileConfig && await removeDir(fileConfig.tempDirPath)
+
             return updatedArticle
         } catch (e) {
             await this.sequelize.rollbackTransaction(transaction)

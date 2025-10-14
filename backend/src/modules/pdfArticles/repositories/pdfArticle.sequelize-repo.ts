@@ -21,12 +21,13 @@ export class PdfArticleSequelizeRepo extends BaseSequelizeRepo<PdfArticle> {
     }
 
     async create(
-        data: TypeofPdfArticlePatchSchema & { extractedText: string, key: string }, 
+        data: TypeofPdfArticlePatchSchema & { extractedText: string, key: string, slug: string }, 
         transaction?: Transaction
     ): Promise<PdfArticle> {
         const article =  await PdfArticle.create({
             title: data.title,
             publishedAt: new Date(),
+            slug: data.slug,
             key: data.key,
             extractedText: data.extractedText
         }, { transaction })
@@ -50,7 +51,14 @@ export class PdfArticleSequelizeRepo extends BaseSequelizeRepo<PdfArticle> {
         const articles = await PdfArticle.findAll({
             where: { id: ids },
             offset,
-            limit
+            limit,
+            include: 
+                [ 
+                    { 
+                        model: Author,
+                        as: 'authors',
+                    } 
+                ]            
         })
         return articles
     }

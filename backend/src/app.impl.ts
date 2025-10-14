@@ -18,6 +18,7 @@ import { mappings } from './infrastructure/elastic/mappings/index.js'
 import { PdfArticle } from './infrastructure/sequelize/models/PdfArticle/PdfArticle.model.js'
 import { Author } from './infrastructure/sequelize/models/Author/Author.model.js'
 import { AppLogger } from './lib/logger/instances/app.logger.js'
+import { PdfArticleAuthors } from './infrastructure/sequelize/models/Associations/PdfArticleAuthors.model.js'
 
 @injectable()
 export class AppImpl implements IApp {
@@ -48,7 +49,7 @@ export class AppImpl implements IApp {
         this.logger.info('App is initializing...')
         
         await this.setupStore('Sequelize', async () => {
-            this.database.registerModels([Person, Reward, PersonRewards, PdfArticle, Author])
+            this.database.registerModels([Person, Reward, PersonRewards, PdfArticle, Author, PdfArticleAuthors])
             await this.database.setup()
         })
 

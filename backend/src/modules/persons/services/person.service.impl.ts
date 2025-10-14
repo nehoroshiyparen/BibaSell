@@ -17,7 +17,7 @@ import { S3PersonServiceImpl } from "./S3Person.service.impl.js";
 import { generateUuid } from "#src/shared/crypto/generateUuid.js";
 import { isError } from "#src/shared/typeGuards/isError.js";
 import path from "path";
-import { readFile } from "#src/shared/files/utils/readFIle.js";
+import { readFile } from "#src/shared/files/utils/readFile.js";
 
 @injectable()
 export class PersonServiceImpl implements IPersonService {
@@ -30,7 +30,7 @@ export class PersonServiceImpl implements IPersonService {
         try {
             const person = await this.sequelize.findById(id)
             if (!person) throw ApiError.NotFound('Person not found')
-            return person
+            return await this.modifyObject(person, person.key) 
         } catch (e) {
             RethrowApiError(`Service error: Method - getPersonById`, e)
         }
@@ -40,7 +40,7 @@ export class PersonServiceImpl implements IPersonService {
         try {
             const person = await this.sequelize.findBySlug(slug)
             if (!person) throw ApiError.NotFound('Person not found')
-            return person 
+            return await this.modifyObject(person, person.key) 
         } catch (e) {
             RethrowApiError(`Service error: Method - getPersonBySlug`, e)
         }
@@ -49,7 +49,12 @@ export class PersonServiceImpl implements IPersonService {
     async getPersons(offset = 0, limit = 10) {
         try {
             const persons = await this.sequelize.findAll(offset, limit)
-            return persons
+            
+            const modifiedPersons = await Promise.all(
+                persons.map((person) => this.modifyObject(person, person.key))
+            )
+
+            return modifiedPersons
         } catch (e) {
             RethrowApiError(`Service error: Method - getPersons`, e)
         }
@@ -66,6 +71,12 @@ export class PersonServiceImpl implements IPersonService {
             }
             if (Object.keys(where).length === 0) throw ApiError.BadRequest('Invalid filter params')
             const candidates = await this.sequelize.findAll(offset, limit, where)
+
+            const modifiedCandidates = await Promise.all(
+                candidates.map((candidate) => this.modifyObject(candidate, candidate.key))
+            )
+
+            return modifiedCandidates
             return candidates
         } catch (e) {
             RethrowApiError(`Service error: Method - getFilteredPersons`, e)
@@ -84,17 +95,14 @@ export class PersonServiceImpl implements IPersonService {
             for (const [index, person] of persons.entries()) {
                 const transaction = await this.sequelize.createTransaction()
                 let S3Key: string | null = null
+                let buffer: Buffer | null = null
 
                 try {
                     const file = fileMap.get(person.name)
 
                     if (file) {
                         S3Key = generateUuid()
-                        const buffer = await readFile(file.path)
-                        await this.s3.upload(S3Key, buffer, { 
-                            contentType: file.mimetype,
-                            ACL: 'public-read'
-                        })
+                        buffer = await readFile(file.path)
                     }
 
                     const slug = getSlug(person.name)!
@@ -103,6 +111,13 @@ export class PersonServiceImpl implements IPersonService {
                         S3Key ? { key: S3Key } : {},
                         transaction
                     )
+
+                    if (S3Key && buffer && file)  {
+                        await this.s3.upload(S3Key, buffer, { 
+                            contentType: file.mimetype,
+                            ACL: 'public-read'
+                        })
+                    }
 
                     await this.sequelize.commitTransaction(transaction)
                     created++
@@ -114,14 +129,13 @@ export class PersonServiceImpl implements IPersonService {
                     }
                 }
             }
+            fileConfig && removeDir(fileConfig.tempDirPath)
     
             return Object.keys(errorStack).length > 0
                 ? { success: false, created, errors: errorStack }
                 : { success: true, created }
         } catch (e) {
             throw RethrowApiError(`Service error: Method - bulkCreatePersons`, e);
-        } finally {
-            fileConfig && removeDir(fileConfig.tempDirPath)
         }
     }
 
@@ -175,5 +189,11 @@ export class PersonServiceImpl implements IPersonService {
             await this.sequelize.rollbackTransaction(transaction)
             throw RethrowApiError(`Service error: Method - bulkDeletePersons`, e);
         }
+    }
+
+    private async modifyObject(model: Person, key?: string) {
+        if (!key) return model
+        const urls = await this.s3.getSignedUrls([key])
+        return { ...model.toJSON(), key: urls[key] }
     }
 }

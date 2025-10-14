@@ -4,7 +4,8 @@ import { TypeofPdfAcrticlePreviewSchema } from "../../schemas/pdfArticle/PdfArti
 import { toPdfArticlePreview } from "./toPreview.js";
 
 export function arrayToPdfArticlePreview(articles: (PdfArticle | null)[]): TypeofPdfAcrticlePreviewSchema[] {
-    if (!articles) return []
+    if (!Array.isArray(articles)) return []
+
     const results = articles.filter(
         (a): a is PdfArticle & { authors: Author[] } => a !== null
     )
