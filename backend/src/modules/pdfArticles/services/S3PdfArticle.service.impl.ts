@@ -5,7 +5,7 @@ import { inject, injectable } from "inversify";
 
 @injectable()
 export class S3PdfArticleServiceImpl extends BaseS3Service {
-    protected prefix = "articles/"
+    protected prefix = ["articles/", "article_previews/"]
 
     constructor(@inject(TYPES.S3) s3: IBaseS3Repo) {
         super(s3)

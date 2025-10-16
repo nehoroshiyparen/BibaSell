@@ -25,6 +25,7 @@ import { OperationResult } from "#src/types/interfaces/http/OperationResult.js";
 import { ErrorStack } from "#src/types/interfaces/http/ErrorStack.interface.js";
 import { readFile } from "#src/shared/files/utils/readFile.js";
 import { removeDir } from "#src/shared/files/remove/removeDir.js";
+import { pdf2pic } from "#src/shared/files/pdf/pdf2pic.js";
 
 @injectable()
 export class PdfArticleServiceImpl implements IPdfArticleService {
@@ -38,8 +39,11 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         try {
             const article = await this.sequelize.findById(id)
             if (!article) throw ApiError.NotFound(`Article with id: ${id} was not found`)
-            const urls = await this.s3.getSignedUrls([article.key])
-            return { ...article.toJSON(), key: urls[article.key] }
+            const [pdfUrls, previewUrls] = await Promise.all([
+                this.s3.getSignedUrls([article.key]),
+                this.s3.getSignedUrls([article.firstpage_key], 'article_previews/')
+            ])
+            return { ...article.toJSON(), key: pdfUrls[article.key], firstpage_key: previewUrls[article.firstpage_key] }
         } catch (e) {
             RethrowApiError('Service error: Method - getArticleById', e)
         }
@@ -48,7 +52,15 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
     async getArticles(offset: number = 0, limit: number = 10): Promise<TypeofPdfAcrticlePreviewSchema[]> {
         try {
             const articles = await this.sequelize.findAll(offset, limit)
-            return arrayToPdfArticlePreview(articles)
+            const jsonArticles = articles.map(article => article.toJSON())
+            const articlesWithUrls = await Promise.all(jsonArticles.map(async article => {
+                const preview_urls = await this.s3.getSignedUrls([article.firstpage_key], 'article_previews/')
+                return {
+                    ...article,
+                    firstpage_key: preview_urls[article.firstpage_key]
+                }
+            }))
+            return arrayToPdfArticlePreview(articlesWithUrls)
         } catch (e) {
             RethrowApiError('Service error: Method - getArticles', e)
         }
@@ -84,42 +96,65 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
                 articles = await this.sequelize.findAll(offset, limit)
             }
 
-            return arrayToPdfArticlePreview(articles)
+            const jsonArticles = articles.map(article => article.toJSON())
+
+            const articlesWithUrls = await Promise.all(jsonArticles.map(async article => {
+                const preview_urls = await this.s3.getSignedUrls([article.firstpage_key], 'article_previews/')
+                return {
+                    ...article,
+                    firstpage_key: preview_urls[article.firstpage_key]
+                }
+            }))
+
+            return arrayToPdfArticlePreview(articlesWithUrls)
         } catch (e) {
             RethrowApiError('Service error: Method - getFilteredArticles', e)
         }
     }
 
     async createArticle(
-        options: TypeofPdfArticlePatchSchema, 
+        options: TypeofPdfArticlePatchSchema,
         fileConfig: FileConfig
     ): Promise<TypeofPdfArticleFullSchema> {
         const transaction = await this.sequelize.createTransaction()
-        const S3Key = generateUuid()
+        const pdfKey = generateUuid()
+        const previewKey = generateUuid()
 
         try {
-            const file = fileConfig.files[0] as Express.Multer.File
-            const buffer = await readFile(file.path)
+            const uploadedFile = fileConfig.files[0] as Express.Multer.File
+            const pdfBuffer = await readFile(uploadedFile.path)
 
-            const extractedText = await pdfParse(buffer)
-            if (!options.title) throw ApiError.BadRequest('Article must have a title')
+            const previewPath = await pdf2pic(uploadedFile.path, fileConfig.tempDirPath, previewKey)
+            const previewBuffer = await readFile(previewPath)
+
+            const extractedText = await pdfParse(pdfBuffer)
+
+            if (!options.title) throw ApiError.BadRequest("Article must have a title")
             const slug = getSlug(options.title)
 
-            const article = await this.sequelize.create({ ...options, slug: slug!, key: S3Key, extractedText: extractedText }, transaction)
-            await this.elastic.indexArticle(article)
+            const article = await this.sequelize.create({
+                ...options,
+                slug: slug!,
+                key: pdfKey,
+                extractedText,
+                firstpage_key: previewKey
+            }, transaction)
 
-            await this.s3.upload(S3Key, buffer)
+            await this.elastic.indexArticle(article)
+            await this.s3.upload(previewKey, previewBuffer, { prefix: "article_previews/" })
+            await this.s3.upload(pdfKey, pdfBuffer)
 
             await this.sequelize.commitTransaction(transaction)
-            fileConfig && await removeDir(fileConfig.tempDirPath)
-            
-            return { key: S3Key }
-        } catch (e) {
+            removeDir(fileConfig.tempDirPath)
+
+            return { key: pdfKey, firstpage_key: previewKey }
+        } catch (err) {
             try {
-                await this.s3.delete(S3Key)
+                await this.s3.delete(pdfKey)
+                await this.s3.delete(previewKey, "article_previews/")
             } catch {}
             await this.sequelize.rollbackTransaction(transaction)
-            RethrowApiError('Service error: Method - createArticle', e)
+            RethrowApiError("Service error: Method - createArticle", err)
         }
     }
 
@@ -147,9 +182,23 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
             await this.elastic.indexArticle(updatedArticle)
 
             if (fileConfig && fileConfig?.files.length !== 0) {
-                oldFileBuffer = await this.s3.get(article.key)
                 const file = fileConfig.files[0]
+                const pdfKey = generateUuid()
+
+                const previewKey = generateUuid()
+                const previewPath = await pdf2pic(file.path, fileConfig.tempDirPath, previewKey)
+                const previewBuffer = await readFile(previewPath)
+
+                await this.s3.upload(previewKey, previewBuffer, { prefix: 'article_previews/' })
                 await this.s3.upload(updatedArticle.key, file.buffer)
+                await this.s3.delete(`article_previews/${article.key}`)
+                await this.s3.delete(article.firstpage_key, 'article_previews/')
+
+                await this.sequelize.update(
+                    updatedArticle.id,
+                    { key: pdfKey, firstpage_key: previewKey },
+                    transaction
+                )
             }
 
             await this.sequelize.commitTransaction(transaction)
@@ -166,24 +215,22 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
 
     async deleteArticle(id: number): Promise<void> {
         const transaction = await this.sequelize.createTransaction()
-        let oldFileBuffer: Buffer | null = null
         let needToRollbackElastic = false
 
         const article = await this.sequelize.findById(id)
         if (!article) throw ApiError.NotFound(`Article with id: ${id} is not found`)
 
         try {
-            oldFileBuffer = await this.s3.get(article.key)
 
             await this.sequelize.destroy(id, transaction)
             await this.elastic.destroyArticle(id)
             await this.s3.delete(article.key)
+            await this.s3.delete(article.firstpage_key, 'article_previews/')
 
             await this.sequelize.commitTransaction(transaction)
         } catch (e) {
             await this.sequelize.rollbackTransaction(transaction)
             if (needToRollbackElastic) await this.rollbackElasticChanges(article)
-            if (oldFileBuffer) await this.rollbackS3Changes(article, oldFileBuffer)
             RethrowApiError('Service error: Method - deleteArticle', e)
         }
     }
@@ -206,6 +253,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
             for (const article of articles) {
                 try {
                     await this.s3.delete(article.key)
+                    await this.s3.delete(article.firstpage_key, "article_previews/")
                 } catch (e) {
                     errorStack[article.id] = { message: 'S3 delete failed', code: 'S3_ERROR' }
                 }

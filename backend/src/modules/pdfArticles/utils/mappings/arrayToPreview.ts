@@ -3,11 +3,24 @@ import { PdfArticle } from "#src/infrastructure/sequelize/models/PdfArticle/PdfA
 import { TypeofPdfAcrticlePreviewSchema } from "../../schemas/pdfArticle/PdfArticlePreview.schema.js";
 import { toPdfArticlePreview } from "./toPreview.js";
 
-export function arrayToPdfArticlePreview(articles: (PdfArticle | null)[]): TypeofPdfAcrticlePreviewSchema[] {
+export interface PdfArticleJson {
+    id: number
+    title: string
+    slug: string
+    key: string
+    firstpage_key: string
+    extractedText?: string
+    pusblishedAt: Date
+    updatedAt: Date
+    authors: { id: number; name: string }[]
+}
+
+export function arrayToPdfArticlePreview(articles: (PdfArticleJson | null)[]): TypeofPdfAcrticlePreviewSchema[] {
     if (!Array.isArray(articles)) return []
 
     const results = articles.filter(
-        (a): a is PdfArticle & { authors: Author[] } => a !== null
+        (a): a is PdfArticleJson => a !== null
     )
+    
     return results.map(toPdfArticlePreview)
 }
