@@ -1,11 +1,7 @@
 import { inject, injectable } from "inversify";
-import { IRewardService } from "#src/types/contracts/services/rewards/reward.service.interface.js";
-import { Reward } from "#src/infrastructure/sequelize/models/Reward/Reward.model.js";
-import { TypeofRewardSchema } from "#src/modules/rewards/schemas/reward/Reward.schema.js";
-import { RewardArray } from "#src/modules/rewards/schemas/reward/RewardArray.schema.js";
 import { RethrowApiError } from "#src/shared/ApiError/RethrowApiError.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
-import { Op, Sequelize } from "sequelize";
+import { Op } from "sequelize";
 import { TYPES } from "#src/di/types.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
 import { removeDir } from "#src/shared/files/remove/removeDir.js";
@@ -21,6 +17,9 @@ import path from "path";
 import { RewardMapper } from "../mappers/reward.mapper.js";
 import { TypeofRewardFullSchema } from "../schemas/reward/RewardFull.schema.js";
 import { TypeofRewardPreviewSchema } from "../schemas/reward/RewardPreview.schema.js";
+import { IRewardService } from "#src/types/contracts/services/rewards/reward.service.interface.js";
+import { TypeofRewardFiltersSchema } from "../schemas/reward/RewardFilters.schema.js";
+import { TypeofRewardSchema } from "../schemas/reward/Reward.schema.js";
 
 @injectable()
 export class RewardServiceImpl implements IRewardService {
@@ -30,7 +29,7 @@ export class RewardServiceImpl implements IRewardService {
         @inject(TYPES.RewardMapper) private mapper: RewardMapper
     ) {}
 
-    async getRewardById(id: number): Promise<TypeofRewardFullSchema> {
+    async getById(id: number): Promise<TypeofRewardFullSchema> {
         try {
             const reward = await this.sequelize.findById(id)
             if (!reward) throw ApiError.NotFound(`Reward not found`)
@@ -40,7 +39,7 @@ export class RewardServiceImpl implements IRewardService {
         }
     }
 
-    async getRewardBySlug(slug: string): Promise<TypeofRewardFullSchema> {
+    async getBySlug(slug: string): Promise<TypeofRewardFullSchema> {
         try {
             const reward = await this.sequelize.findBySlug(slug)
             if (!reward) throw ApiError.NotFound(`Reward not found`)
@@ -50,7 +49,7 @@ export class RewardServiceImpl implements IRewardService {
         }
     }
 
-    async getRewards(offset = 0, limit = 10): Promise<TypeofRewardPreviewSchema[] | null> {
+    async getList(offset = 0, limit = 10): Promise<TypeofRewardPreviewSchema[]> {
         try {
             const rewards = await this.sequelize.findAll(offset, limit)
             return await this.mapper.toPreview(rewards)
@@ -59,7 +58,7 @@ export class RewardServiceImpl implements IRewardService {
         }
     }
 
-    async getFilteredRewards(filters: TypeofRewardSchema, offset = 0, limit = 10): Promise<TypeofRewardPreviewSchema[] | null> {
+    async getFiltered(filters: TypeofRewardFiltersSchema, offset = 0, limit = 10): Promise<TypeofRewardPreviewSchema[]> {
         try {
             const where: any = {}
 
@@ -74,7 +73,7 @@ export class RewardServiceImpl implements IRewardService {
         }
     }
 
-    async bulkCreateRewards(rewards: RewardArray, fileConfig: FileConfig): Promise<OperationResult> {
+    async bulkCreate(rewards: TypeofRewardSchema[], fileConfig: FileConfig): Promise<OperationResult> {
         const errorStack: ErrorStack = {}
         let created = 0
     
@@ -132,7 +131,7 @@ export class RewardServiceImpl implements IRewardService {
         }
     }
 
-    async deleteReward(id: number): Promise<void> {
+    async delete(id: number): Promise<void> {
         const transaction = await this.sequelize.createTransaction()
 
         try {
@@ -148,7 +147,7 @@ export class RewardServiceImpl implements IRewardService {
         }
     }
 
-    async bulkDeleteRewards(ids: number[]): Promise<OperationResult> {
+    async bulkDelete(ids: number[]): Promise<OperationResult> {
         const transaction = await this.sequelize.createTransaction()
         const errorStack: ErrorStack = {}
     

@@ -2,7 +2,6 @@ import { PdfArticle } from "#src/infrastructure/sequelize/models/PdfArticle/PdfA
 import { PdfArticleSequelizeRepo } from "#src/modules/pdfArticles/repositories/pdfArticle.sequelize-repo.js";
 import { TYPES } from "#src/di/types.js";
 import { PdfArticleElasticRepo } from "#src/modules/pdfArticles/repositories/pdfArticle.elastic-repo.js";
-import { IPdfArticleService } from "#src/types/contracts/services/pdfArticles/pdfArticle.service.interface.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
 import { TypeofPdfArticleFiltersSchema } from "../schemas/pdfArticle/PdfArticleFilters.schema.js"; 
 import { TypeofPdfArticleFullSchema } from "../schemas/pdfArticle/PdfArticleFull.schema.js";
@@ -11,7 +10,6 @@ import { TypeofPdfAcrticlePreviewSchema } from "../schemas/pdfArticle/PdfArticle
 import { TypeofPdfArticleUpdateSchema } from "../schemas/pdfArticle/PdfArticleUpdate.schema.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
 import { RethrowApiError } from "#src/shared/ApiError/RethrowApiError.js";
-import { arrayToPdfArticlePreview } from "#src/modules/pdfArticles/utils/mappings/arrayToPreview.js";
 import { inject, injectable } from "inversify";
 import { getSlug } from "#src/shared/slugging/getSlug.js";
 import { pdfParse } from "#src/shared/files/pdf/pdf-parse.js";
@@ -25,6 +23,7 @@ import { readFile } from "#src/shared/files/utils/readFile.js";
 import { removeDir } from "#src/shared/files/remove/removeDir.js";
 import { pdf2pic } from "#src/shared/files/pdf/pdf2pic.js";
 import { PdfArticleMapper } from "../mappers/pdfArticle.mapper.js";
+import { IPdfArticleService } from "#src/types/contracts/services/pdfArticles/pdfArticle.service.interface.js";
 
 @injectable()
 export class PdfArticleServiceImpl implements IPdfArticleService {
@@ -35,7 +34,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
        @inject(TYPES.PdfArticleMapper) private mapper: PdfArticleMapper,
     ) {}
 
-    async getArticleById(id: number): Promise<TypeofPdfArticleFullSchema> {
+    async getById(id: number): Promise<TypeofPdfArticleFullSchema> {
         try {
             const article = await this.sequelize.findById(id)
             if (!article) throw ApiError.NotFound(`Article with id: ${id} was not found`)
@@ -45,7 +44,17 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         }
     }
 
-    async getArticles(offset: number = 0, limit: number = 10): Promise<TypeofPdfAcrticlePreviewSchema[]> {
+    async getBySlug(slug: string): Promise<TypeofPdfArticleFullSchema> {
+        try {
+            const article = await this.sequelize.findBySlug(slug)
+            if (!article) throw ApiError.NotFound(`Article with slug: ${slug} was not found`)
+            return await this.mapper.toFull(article)
+        } catch (e) {
+            RethrowApiError('Service error: ', e)
+        }
+    }
+
+    async getList(offset: number = 0, limit: number = 10): Promise<TypeofPdfAcrticlePreviewSchema[]> {
         try {
             const articles = await this.sequelize.findAll(offset, limit)
             return await this.mapper.toPreview(articles)
@@ -54,7 +63,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         }
     }
 
-    async getFilteredArticles(
+    async getFiltered(
         filters: TypeofPdfArticleFiltersSchema,
         offset = 0,
         limit = 10,
@@ -90,7 +99,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         }
     }
 
-    async createArticle(
+    async create(
         options: TypeofPdfArticlePatchSchema,
         fileConfig: FileConfig
     ): Promise<TypeofPdfArticleFullSchema> {
@@ -136,9 +145,9 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         }
     }
 
-    async updateArticle(
+    async update(
         options: TypeofPdfArticleUpdateSchema, 
-        fileConfig: FileConfig | undefined
+        fileConfig: FileConfig
     ): Promise<TypeofPdfArticleFullSchema> {
         const transaction = await this.sequelize.createTransaction()
         let oldFileBuffer: Buffer | null = null
@@ -156,8 +165,8 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
 
             const updatedArticle = await this.sequelize.update(options.id, optionsToUpdate, transaction)
 
-            needToRollbackElastic = true
             await this.elastic.indexArticle(updatedArticle)
+            needToRollbackElastic = true
 
             if (fileConfig && fileConfig?.files.length !== 0) {
                 const file = fileConfig.files[0]
@@ -191,7 +200,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         }
     }
 
-    async deleteArticle(id: number): Promise<void> {
+    async delete(id: number): Promise<void> {
         const transaction = await this.sequelize.createTransaction()
         let needToRollbackElastic = false
 
@@ -213,7 +222,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         }
     }
 
-    async bulkDeleteArticles(ids: number[]): Promise<OperationResult> {
+    async bulkDelete(ids: number[]): Promise<OperationResult> {
         const transaction = await this.sequelize.createTransaction()
         const errorStack: ErrorStack = {}
 

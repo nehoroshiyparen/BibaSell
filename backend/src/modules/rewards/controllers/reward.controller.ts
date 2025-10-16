@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
 import { TYPES } from "#src/di/types.js";
-import { IRewardService } from "#src/types/contracts/services/rewards/reward.service.interface.js";
+import { IRewardService } from "#src/types/contracts/services/rewards/reward.service.interface.js"; 
 import { RewardArraySchema } from "#src/modules/rewards/schemas/reward/RewardArray.schema.js";
 import { SendError, SendResponse } from "#src/lib/http/index.js";
 import { ValidateObjectFieldsNotNull } from "#src/shared/validations/objectFieldsNotNull.validate.js";
@@ -25,7 +25,7 @@ export class RewardControllerImpl {
 
             ValidateId(id)
 
-            const reward = await this.rewardService.getRewardById(id)
+            const reward = await this.rewardService.getById(id)
 
             SendResponse(res, {
                 cases: [
@@ -46,7 +46,7 @@ export class RewardControllerImpl {
         try {
             const slug = String(req.params.slug)
 
-            const reward = await this.rewardService.getRewardBySlug(slug)
+            const reward = await this.rewardService.getBySlug(slug)
 
             SendResponse(res, {
                 cases: [
@@ -69,7 +69,7 @@ export class RewardControllerImpl {
 
             ValidatePaginationParams(offset, limit)
 
-            const rewards = await this.rewardService.getRewards(offset, limit)
+            const rewards = await this.rewardService.getList(offset, limit)
 
             SendResponse(res, {
                 cases: [
@@ -101,7 +101,7 @@ export class RewardControllerImpl {
             ValidateObjectFieldsNotNull(filters)
             const validatedFilters = RewardFiltersSchema.parse(filters)
 
-            const rewards = await this.rewardService.getFilteredRewards(validatedFilters, offset, limit)
+            const rewards = await this.rewardService.getFiltered(validatedFilters, offset, limit)
 
             SendResponse(res, {
                 cases: [
@@ -128,14 +128,13 @@ export class RewardControllerImpl {
         
             const validatedData = RewardArraySchema.parse(dataPack)
 
-            const fileConfig: FileConfig | undefined = 
-                req.tempUploadDir ? 
-                    {
-                        tempDirPath: req.tempUploadDir,
-                        files: (req.files as Express.Multer.File[] | undefined) || []
-                    } : undefined
+            const fileConfig: FileConfig =
+                {
+                    tempDirPath: req.tempUploadDir!,
+                    files: (req.files as Express.Multer.File[]) || []
+                } 
 
-            const bulkCreateResult = await this.rewardService.bulkCreateRewards(validatedData, fileConfig)
+            const bulkCreateResult = await this.rewardService.bulkCreate(validatedData, fileConfig)
 
             SendResponse(res, {
                 cases: [
@@ -168,7 +167,7 @@ export class RewardControllerImpl {
 
             ValidateId(id)
 
-            await this.rewardService.deleteReward(id)
+            await this.rewardService.delete(id)
 
             SendResponse(res, {
                 cases: [
@@ -190,7 +189,7 @@ export class RewardControllerImpl {
 
             ValidateIdArray(ids)
 
-            const bulkDeleteResult = await this.rewardService.bulkDeleteRewards(ids)
+            const bulkDeleteResult = await this.rewardService.bulkDelete(ids)
 
             SendResponse(res, {
                 cases: [

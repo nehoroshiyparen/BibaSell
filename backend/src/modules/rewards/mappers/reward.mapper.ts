@@ -23,8 +23,8 @@ export class RewardMapper {
             return {
                 id: reward.id,
                 slug: reward.slug,
-                key: urls[reward.key],
                 label: reward.label,
+                key: urls[reward.key]
             }
         }))
         return modifiedPersons

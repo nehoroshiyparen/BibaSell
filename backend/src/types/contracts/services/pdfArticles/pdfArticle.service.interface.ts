@@ -1,31 +1,19 @@
-import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js"
-import { Status } from "#src/types/interfaces/http/Status.interface.js"
-import { TypeofPdfArticleFiltersSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticleFilters.schema.js"
-import { TypeofPdfArticleFullSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticleFull.schema.js"
-import { TypeofPdfArticlePatchSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticlePatch.schema.js"
-import { TypeofPdfAcrticlePreviewSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticlePreview.schema.js"
-import { TypeofPdfArticleUpdateSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticleUpdate.schema.js"
-import { OperationResult } from "#src/types/interfaces/http/OperationResult.js"
+import { TypeofPdfArticleFiltersSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticleFilters.schema.js";
+import { TypeofPdfArticleFullSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticleFull.schema.js";
+import { TypeofPdfArticlePatchSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticlePatch.schema.js";
+import { TypeofPdfAcrticlePreviewSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticlePreview.schema.js";
+import { TypeofPdfArticleUpdateSchema } from "#src/modules/pdfArticles/schemas/pdfArticle/PdfArticleUpdate.schema.js";
+import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
+import { IBaseService } from "../module.service.interface.js";
 
-export interface IPdfArticleService {
-    getArticleById(id: number): Promise<TypeofPdfArticleFullSchema>
-    getArticles(
-        offset: number, 
-        limit: number
-    ): Promise<TypeofPdfAcrticlePreviewSchema[]>
-    getFilteredArticles(
-        filters: TypeofPdfArticleFiltersSchema,
-        offset?: number,
-        limit?: number,
-    ): Promise<TypeofPdfAcrticlePreviewSchema[]>
-    createArticle(
-        options: TypeofPdfArticlePatchSchema, 
-        fileConfig: FileConfig | undefined
-    ): Promise<TypeofPdfArticleFullSchema>
-    updateArticle(
-        options: TypeofPdfArticleUpdateSchema, 
-        fileConfig: FileConfig | undefined
-    ): Promise<TypeofPdfArticleFullSchema>
-    deleteArticle(id: number): Promise<void>
-    bulkDeleteArticles(ids: number[]): Promise<OperationResult>
-}
+export interface IPdfArticleService
+    extends IBaseService<
+        TypeofPdfArticleFullSchema,
+        TypeofPdfAcrticlePreviewSchema,
+        TypeofPdfArticleFiltersSchema,
+        TypeofPdfArticlePatchSchema,
+        TypeofPdfArticleUpdateSchema
+    > {
+        create(options: TypeofPdfArticlePatchSchema, fileConfig: FileConfig): Promise<TypeofPdfArticleFullSchema>
+        update(options: TypeofPdfArticleUpdateSchema, fileConfig: FileConfig | undefined): Promise<TypeofPdfArticleFullSchema>
+    }

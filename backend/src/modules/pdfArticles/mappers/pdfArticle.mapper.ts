@@ -24,7 +24,11 @@ export class PdfArticleMapper {
         const modifiedArticles: TypeofPdfAcrticlePreviewSchema[] = await Promise.all(json.map(async article => {
             const preview_urls = await this.s3.getSignedUrls([article.firstpage_key], 'article_previews/')
             return {
-                ...article,
+                id: article.id,
+                slug: article.slug,
+                title: article.title,
+                publishedAt: article.publishedAt,
+                authors: article.authors,
                 firstpage_key: preview_urls[article.firstpage_key]
             }
         }))

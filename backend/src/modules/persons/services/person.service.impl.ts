@@ -4,7 +4,6 @@ import { Person } from "#src/infrastructure/sequelize/models/Person/Person.model
 import { TypeofPersonArraySchema } from "#src/modules/persons/schemas/PersonArraySchema.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
 import { RethrowApiError } from "#src/shared/ApiError/RethrowApiError.js";
-import { IPersonService } from "../../../types/contracts/services/persons/person.service.interface.js";
 import { TYPES } from "#src/di/types.js";
 import { TypeofPersonFiltersSchema } from "#src/modules/persons/schemas/PersonFilters.schema.js";
 import { removeDir } from "#src/shared/files/remove/removeDir.js";
@@ -21,6 +20,9 @@ import { readFile } from "#src/shared/files/utils/readFile.js";
 import { PersonMapper } from "../mappers/person.mapper.js";
 import { TypeofPersonPreviewSchema } from "../schemas/PersonPreview.schema.js";
 import { TypeofPersonFullSchema } from "../schemas/PersonFull.schema.js";
+import { IBaseService } from "#src/types/contracts/services/module.service.interface.js";
+import { IPersonService } from "#src/types/contracts/services/persons/person.service.interface.js";
+import { TypeofPersonSchema } from "../schemas/Person.schema.js";
 
 @injectable()
 export class PersonServiceImpl implements IPersonService {
@@ -30,7 +32,7 @@ export class PersonServiceImpl implements IPersonService {
         @inject(TYPES.PersonMapper) private mapper: PersonMapper,
     ) {}
 
-    async getPersonById(id: number): Promise<TypeofPersonFullSchema> {
+    async getById(id: number): Promise<TypeofPersonFullSchema> {
         try {
             const person = await this.sequelize.findById(id)
             if (!person) throw ApiError.NotFound('Person not found')
@@ -40,7 +42,7 @@ export class PersonServiceImpl implements IPersonService {
         }
     }
 
-    async getPersonBySlug(slug: string): Promise<TypeofPersonFullSchema> {
+    async getBySlug(slug: string): Promise<TypeofPersonFullSchema> {
         try {
             const person = await this.sequelize.findBySlug(slug)
             if (!person) throw ApiError.NotFound('Person not found')
@@ -50,7 +52,7 @@ export class PersonServiceImpl implements IPersonService {
         }
     }
 
-    async getPersons(offset = 0, limit = 10): Promise<TypeofPersonPreviewSchema[]> {
+    async getList(offset = 0, limit = 10): Promise<TypeofPersonPreviewSchema[]> {
         try {
             const persons = await this.sequelize.findAll(offset, limit)
             
@@ -60,7 +62,7 @@ export class PersonServiceImpl implements IPersonService {
         }
     }
 
-    async getFilteredPersons(filters: TypeofPersonFiltersSchema, offset = 0, limit = 10): Promise<TypeofPersonPreviewSchema[] | null> {
+    async getFiltered(filters: TypeofPersonFiltersSchema, offset = 0, limit = 10): Promise<TypeofPersonPreviewSchema[]> {
         try {
             const where: any = {}
             if (filters.name) {
@@ -78,7 +80,7 @@ export class PersonServiceImpl implements IPersonService {
         }
     }
 
-    async bulkCreatePersons(persons: TypeofPersonArraySchema, fileConfig: FileConfig): Promise<OperationResult> {
+    async bulkCreate(persons: TypeofPersonSchema[], fileConfig: FileConfig): Promise<OperationResult> {
         const errorStack: ErrorStack = {}
         let created = 0
     
@@ -133,7 +135,7 @@ export class PersonServiceImpl implements IPersonService {
         }
     }
 
-    async deletePerson(id: number): Promise<void> {
+    async delete(id: number): Promise<void> {
         const transaction = await this.sequelize.createTransaction()
 
         try {
@@ -149,7 +151,7 @@ export class PersonServiceImpl implements IPersonService {
         }
     }
 
-    async bulkDeletePersons(ids: number[]): Promise<OperationResult> {
+    async bulkDelete(ids: number[]): Promise<OperationResult> {
         const transaction = await this.sequelize.createTransaction()
         const errorStack: ErrorStack = {}
     

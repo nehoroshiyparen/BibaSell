@@ -5,4 +5,4 @@ export const RewardArrayJsonSchema = z.object({
     data: z.array(RewardSchema)
 })
 export const RewardArraySchema = z.array(RewardSchema)
-export type RewardArray = z.infer<typeof RewardArraySchema>
+export type TypeofRewardArraySchema = z.infer<typeof RewardArraySchema>

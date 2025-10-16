@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { PersonArraySchema } from "../schemas/PersonArraySchema.js";
 import { SendError, SendResponse } from "#src/lib/http/index.js";
 import { status } from "#src/consts/status.js";
-import { IPersonService } from "#src/types/contracts/services/persons/person.service.interface.js";
+
 import { injectable, inject } from "inversify";
 import { TYPES } from "#src/di/types.js";
 import { ValidateId } from "#src/shared/validations/ids/id.validate.js";
@@ -12,6 +12,8 @@ import { ValidateIdArray } from "#src/shared/validations/ids/idArray.validate.js
 import { PersonFiltersSchema } from "#src/modules/persons/schemas/PersonFilters.schema.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
+import { IBaseService } from "#src/types/contracts/services/module.service.interface.js";
+import { IPersonService } from "#src/types/contracts/services/persons/person.service.interface.js";
 
 @injectable()
 export class PersonControllerImpl {
@@ -33,7 +35,7 @@ export class PersonControllerImpl {
 
             ValidateId(id)
 
-            const person = await this.personService.getPersonById(id)
+            const person = await this.personService.getById(id)
 
             SendResponse(res, {
                 cases: [
@@ -54,7 +56,7 @@ export class PersonControllerImpl {
         try {
             const slug = String(req.params.slug)
 
-            const person = await this.personService.getPersonBySlug(slug)
+            const person = await this.personService.getBySlug(slug)
 
             SendResponse(res, {
                 cases: [
@@ -85,7 +87,7 @@ export class PersonControllerImpl {
 
             ValidatePaginationParams(offset, limit)
 
-            const persons = await this.personService.getPersons(offset, limit)
+            const persons = await this.personService.getList(offset, limit)
 
             SendResponse(res, {
                 cases: [
@@ -119,7 +121,7 @@ export class PersonControllerImpl {
             ValidateObjectFieldsNotNull(filters)
             const validatedFilters = PersonFiltersSchema.parse(filters)
 
-            const persons = await this.personService.getFilteredPersons(validatedFilters, offset, limit)
+            const persons = await this.personService.getFiltered(validatedFilters, offset, limit)
 
             SendResponse(res, {
                 cases: [
@@ -156,10 +158,10 @@ export class PersonControllerImpl {
             const fileConfig: FileConfig =
                 {
                     tempDirPath: req.tempUploadDir!,
-                    files: (req.files as Express.Multer.File[] | undefined) || []
+                    files: (req.files as Express.Multer.File[]) || []
                 } 
 
-            const bulkCreateResult =  await this.personService.bulkCreatePersons(validatedData, fileConfig)
+            const bulkCreateResult =  await this.personService.bulkCreate(validatedData, fileConfig)
 
             SendResponse(res, {
                 cases: [
@@ -192,7 +194,7 @@ export class PersonControllerImpl {
 
             ValidateId(id)
 
-            await this.personService.deletePerson(id)
+            await this.personService.delete(id)
 
             SendResponse(res, {
                 cases: [
@@ -222,7 +224,7 @@ export class PersonControllerImpl {
 
             ValidateIdArray(ids)
 
-            const bulkDeleteResult = await this.personService.bulkDeletePersons(ids)
+            const bulkDeleteResult = await this.personService.bulkDelete(ids)
 
             SendResponse(res, {
                 cases: [

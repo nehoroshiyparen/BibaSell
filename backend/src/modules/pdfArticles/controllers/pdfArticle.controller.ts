@@ -1,6 +1,6 @@
 import { status } from "#src/consts/status.js";
 import { TYPES } from "#src/di/types.js";
-import { IPdfArticleService } from "#src/types/contracts/services/pdfArticles/pdfArticle.service.interface.js";
+import { IPdfArticleService } from "#src/types/contracts/services/pdfArticles/pdfArticle.service.interface.js"; 
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
 import { TypeofPdfArticleFiltersSchema } from "../schemas/pdfArticle/PdfArticleFilters.schema.js";
 import { PdfArticlePatchSchema, TypeofPdfArticlePatchSchema } from "../schemas/pdfArticle/PdfArticlePatch.schema.js";
@@ -26,7 +26,7 @@ export class PdfArticleControllerImpl {
             const id = Number(req.params.id)
             ValidateId(id)
 
-            const article = await this.pdfArticleService.getArticleById(id)
+            const article = await this.pdfArticleService.getById(id)
 
             SendResponse(res, {
                 cases: [
@@ -49,7 +49,7 @@ export class PdfArticleControllerImpl {
 
             ValidatePaginationParams(offset, limit)
 
-            const articles = await this.pdfArticleService.getArticles(offset, limit)
+            const articles = await this.pdfArticleService.getList(offset, limit)
 
             SendResponse(res, {
                 cases: [
@@ -76,7 +76,7 @@ export class PdfArticleControllerImpl {
 
             ValidateObjectFieldsNotNull(fileters)
 
-            const candidates = await this.pdfArticleService.getFilteredArticles(fileters)
+            const candidates = await this.pdfArticleService.getFiltered(fileters)
 
             SendResponse(res, {
                 cases: [
@@ -116,7 +116,7 @@ export class PdfArticleControllerImpl {
                     throw new ApiError(status.BAD_REQUEST, 'Article cant be created without file. File is not attached')
                 }
 
-            const article = await this.pdfArticleService.createArticle(validatedOptions, fileConfig)
+            const article = await this.pdfArticleService.create(validatedOptions, fileConfig)
 
             SendResponse(res, {
                 cases: [
@@ -158,7 +158,7 @@ export class PdfArticleControllerImpl {
                 throw new ApiError(status.BAD_REQUEST, 'At least one option param has to be specified or file needs to be attached');
             }
             
-            const article = await this.pdfArticleService.updateArticle(validatedOptions, fileConfig)
+            const article = await this.pdfArticleService.update(validatedOptions, fileConfig)
 
             SendResponse(res, {
                 cases: [
@@ -180,7 +180,7 @@ export class PdfArticleControllerImpl {
             const id = Number(req.params.id)
             ValidateId(id)
 
-            await this.pdfArticleService.deleteArticle(id)
+            await this.pdfArticleService.delete(id)
 
             SendResponse(res, {
                 cases: [
@@ -201,7 +201,7 @@ export class PdfArticleControllerImpl {
             const ids = String(req.query.ids).split(',').map(Number)
             ValidateIdArray(ids)
 
-            const bulkDeleteResult = await this.pdfArticleService.bulkDeleteArticles(ids)
+            const bulkDeleteResult = await this.pdfArticleService.bulkDelete(ids)
 
             SendResponse(res, {
                 cases: [
