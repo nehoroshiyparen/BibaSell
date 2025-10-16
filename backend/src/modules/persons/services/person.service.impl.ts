@@ -18,49 +18,49 @@ import { generateUuid } from "#src/shared/crypto/generateUuid.js";
 import { isError } from "#src/shared/typeGuards/isError.js";
 import path from "path";
 import { readFile } from "#src/shared/files/utils/readFile.js";
+import { PersonMapper } from "../mappers/person.mapper.js";
+import { TypeofPersonPreviewSchema } from "../schemas/PersonPreview.schema.js";
+import { TypeofPersonFullSchema } from "../schemas/PersonFull.schema.js";
 
 @injectable()
 export class PersonServiceImpl implements IPersonService {
     constructor(
         @inject(TYPES.PersonSequelizeRepo) private sequelize: PersonSequelizeRepo,
-        @inject(TYPES.S3PersonService) private s3: S3PersonServiceImpl
+        @inject(TYPES.S3PersonService) private s3: S3PersonServiceImpl,
+        @inject(TYPES.PersonMapper) private mapper: PersonMapper,
     ) {}
 
-    async getPersonById(id: number) {
+    async getPersonById(id: number): Promise<TypeofPersonFullSchema> {
         try {
             const person = await this.sequelize.findById(id)
             if (!person) throw ApiError.NotFound('Person not found')
-            return await this.modifyObject(person, person.key) 
+            return await this.mapper.toFull(person)
         } catch (e) {
             RethrowApiError(`Service error: Method - getPersonById`, e)
         }
     }
 
-    async getPersonBySlug(slug: string) {
+    async getPersonBySlug(slug: string): Promise<TypeofPersonFullSchema> {
         try {
             const person = await this.sequelize.findBySlug(slug)
             if (!person) throw ApiError.NotFound('Person not found')
-            return await this.modifyObject(person, person.key) 
+            return await this.mapper.toFull(person)
         } catch (e) {
             RethrowApiError(`Service error: Method - getPersonBySlug`, e)
         }
     }
 
-    async getPersons(offset = 0, limit = 10) {
+    async getPersons(offset = 0, limit = 10): Promise<TypeofPersonPreviewSchema[]> {
         try {
             const persons = await this.sequelize.findAll(offset, limit)
             
-            const modifiedPersons = await Promise.all(
-                persons.map((person) => this.modifyObject(person, person.key))
-            )
-
-            return modifiedPersons
+            return await this.mapper.toPreview(persons)
         } catch (e) {
             RethrowApiError(`Service error: Method - getPersons`, e)
         }
     }
 
-    async getFilteredPersons(filters: TypeofPersonFiltersSchema, offset = 0, limit = 10): Promise<Person[] | null> {
+    async getFilteredPersons(filters: TypeofPersonFiltersSchema, offset = 0, limit = 10): Promise<TypeofPersonPreviewSchema[] | null> {
         try {
             const where: any = {}
             if (filters.name) {
@@ -72,12 +72,7 @@ export class PersonServiceImpl implements IPersonService {
             if (Object.keys(where).length === 0) throw ApiError.BadRequest('Invalid filter params')
             const candidates = await this.sequelize.findAll(offset, limit, where)
 
-            const modifiedCandidates = await Promise.all(
-                candidates.map((candidate) => this.modifyObject(candidate, candidate.key))
-            )
-
-            return modifiedCandidates
-            return candidates
+            return await this.mapper.toPreview(candidates)
         } catch (e) {
             RethrowApiError(`Service error: Method - getFilteredPersons`, e)
         }
@@ -115,7 +110,6 @@ export class PersonServiceImpl implements IPersonService {
                     if (S3Key && buffer && file)  {
                         await this.s3.upload(S3Key, buffer, { 
                             contentType: file.mimetype,
-                            ACL: 'public-read'
                         })
                     }
 

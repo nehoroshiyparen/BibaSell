@@ -21,7 +21,7 @@ export class BaseS3Repo implements IBaseS3Repo {
         this.bucketName = 'history-project-storage'
     }
     
-    async upload(key: string, body: Buffer, options?: { contentType?: string, ACL: 'public-read' }): Promise<void> {
+    async upload(key: string, body: Buffer, options?: { contentType?: string }): Promise<void> {
         try {
             const command = new Upload({
                 client: this.client,

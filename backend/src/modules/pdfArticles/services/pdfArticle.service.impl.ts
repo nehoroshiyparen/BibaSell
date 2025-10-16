@@ -4,7 +4,6 @@ import { TYPES } from "#src/di/types.js";
 import { PdfArticleElasticRepo } from "#src/modules/pdfArticles/repositories/pdfArticle.elastic-repo.js";
 import { IPdfArticleService } from "#src/types/contracts/services/pdfArticles/pdfArticle.service.interface.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
-import { Status } from "#src/types/interfaces/http/Status.interface.js";
 import { TypeofPdfArticleFiltersSchema } from "../schemas/pdfArticle/PdfArticleFilters.schema.js"; 
 import { TypeofPdfArticleFullSchema } from "../schemas/pdfArticle/PdfArticleFull.schema.js";
 import { TypeofPdfArticlePatchSchema } from "../schemas/pdfArticle/PdfArticlePatch.schema.js";
@@ -19,13 +18,13 @@ import { pdfParse } from "#src/shared/files/pdf/pdf-parse.js";
 import { cleanup } from "#src/shared/utils/object.cleanup.js";
 import { PdfArticleUpdateDto } from "../types/dto/PdfArticleUpdate.dto.js";
 import { generateUuid } from "#src/shared/crypto/generateUuid.js";
-import { BaseS3Service } from "#src/infrastructure/S3/baseS3.service.js";
 import { S3PdfArticleServiceImpl } from "./S3PdfArticle.service.impl.js";
 import { OperationResult } from "#src/types/interfaces/http/OperationResult.js";
 import { ErrorStack } from "#src/types/interfaces/http/ErrorStack.interface.js";
 import { readFile } from "#src/shared/files/utils/readFile.js";
 import { removeDir } from "#src/shared/files/remove/removeDir.js";
 import { pdf2pic } from "#src/shared/files/pdf/pdf2pic.js";
+import { PdfArticleMapper } from "../mappers/pdfArticle.mapper.js";
 
 @injectable()
 export class PdfArticleServiceImpl implements IPdfArticleService {
@@ -33,17 +32,14 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
        @inject(TYPES.PdfArticleSequelizeRepo) private sequelize: PdfArticleSequelizeRepo,
        @inject(TYPES.PdfArticleElasticRepo) private elastic: PdfArticleElasticRepo,
        @inject(TYPES.S3PdfArticleService) private s3: S3PdfArticleServiceImpl,
+       @inject(TYPES.PdfArticleMapper) private mapper: PdfArticleMapper,
     ) {}
 
     async getArticleById(id: number): Promise<TypeofPdfArticleFullSchema> {
         try {
             const article = await this.sequelize.findById(id)
             if (!article) throw ApiError.NotFound(`Article with id: ${id} was not found`)
-            const [pdfUrls, previewUrls] = await Promise.all([
-                this.s3.getSignedUrls([article.key]),
-                this.s3.getSignedUrls([article.firstpage_key], 'article_previews/')
-            ])
-            return { ...article.toJSON(), key: pdfUrls[article.key], firstpage_key: previewUrls[article.firstpage_key] }
+            return await this.mapper.toFull(article)
         } catch (e) {
             RethrowApiError('Service error: Method - getArticleById', e)
         }
@@ -52,15 +48,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
     async getArticles(offset: number = 0, limit: number = 10): Promise<TypeofPdfAcrticlePreviewSchema[]> {
         try {
             const articles = await this.sequelize.findAll(offset, limit)
-            const jsonArticles = articles.map(article => article.toJSON())
-            const articlesWithUrls = await Promise.all(jsonArticles.map(async article => {
-                const preview_urls = await this.s3.getSignedUrls([article.firstpage_key], 'article_previews/')
-                return {
-                    ...article,
-                    firstpage_key: preview_urls[article.firstpage_key]
-                }
-            }))
-            return arrayToPdfArticlePreview(articlesWithUrls)
+            return await this.mapper.toPreview(articles)
         } catch (e) {
             RethrowApiError('Service error: Method - getArticles', e)
         }
@@ -96,17 +84,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
                 articles = await this.sequelize.findAll(offset, limit)
             }
 
-            const jsonArticles = articles.map(article => article.toJSON())
-
-            const articlesWithUrls = await Promise.all(jsonArticles.map(async article => {
-                const preview_urls = await this.s3.getSignedUrls([article.firstpage_key], 'article_previews/')
-                return {
-                    ...article,
-                    firstpage_key: preview_urls[article.firstpage_key]
-                }
-            }))
-
-            return arrayToPdfArticlePreview(articlesWithUrls)
+            return await this.mapper.toPreview(articles)
         } catch (e) {
             RethrowApiError('Service error: Method - getFilteredArticles', e)
         }

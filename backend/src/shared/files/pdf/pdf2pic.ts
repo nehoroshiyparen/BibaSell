@@ -1,4 +1,3 @@
-import { generateUuid } from "#src/shared/crypto/generateUuid.js";
 import { fromPath } from "pdf2pic";
 import path from "path";
 

@@ -10,7 +10,7 @@ export abstract class BaseS3Service {
         return `${usedPrefix}${key}`
     }
 
-    async upload(key: string, body: Buffer, options?: { prefix?: string; contentType?: string; ACL?: string }): Promise<void> {
+    async upload(key: string, body: Buffer, options?: { prefix?: string; contentType?: string }): Promise<void> {
         return this.s3.upload(this.buildKey(key, options?.prefix), body, options)
     }
 

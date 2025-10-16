@@ -18,49 +18,48 @@ import { ErrorStack } from "#src/types/interfaces/http/ErrorStack.interface.js";
 import { isError } from "#src/shared/typeGuards/isError.js";
 import { readFile } from "#src/shared/files/utils/readFile.js";
 import path from "path";
+import { RewardMapper } from "../mappers/reward.mapper.js";
+import { TypeofRewardFullSchema } from "../schemas/reward/RewardFull.schema.js";
+import { TypeofRewardPreviewSchema } from "../schemas/reward/RewardPreview.schema.js";
 
 @injectable()
 export class RewardServiceImpl implements IRewardService {
     constructor(
         @inject(TYPES.RewardSequelizeRepo) private sequelize: RewardSequelizeRepo,
-        @inject(TYPES.S3RewardService) private s3: S3RewardServiceImpl
+        @inject(TYPES.S3RewardService) private s3: S3RewardServiceImpl,
+        @inject(TYPES.RewardMapper) private mapper: RewardMapper
     ) {}
 
-    async getRewardById(id: number): Promise<Reward> {
+    async getRewardById(id: number): Promise<TypeofRewardFullSchema> {
         try {
             const reward = await this.sequelize.findById(id)
             if (!reward) throw ApiError.NotFound(`Reward not found`)
-            return await this.modifyObject(reward, reward.key)
+            return await this.mapper.toFull(reward)
         } catch (e) {
             RethrowApiError(`Service error: Method - getRewardById`, e)
         }
     }
 
-    async getRewardBySlug(slug: string): Promise<Reward> {
+    async getRewardBySlug(slug: string): Promise<TypeofRewardFullSchema> {
         try {
             const reward = await this.sequelize.findBySlug(slug)
             if (!reward) throw ApiError.NotFound(`Reward not found`)
-            return await this.modifyObject(reward, reward.key) 
+            return await this.mapper.toFull(reward)
         } catch (e) {
             RethrowApiError(`Service error: Method - getRewards`, e)
         }
     }
 
-    async getRewards(offset = 0, limit = 10): Promise<Reward[] | null> {
+    async getRewards(offset = 0, limit = 10): Promise<TypeofRewardPreviewSchema[] | null> {
         try {
             const rewards = await this.sequelize.findAll(offset, limit)
-
-            const modifiedPersons = await Promise.all(
-                rewards.map((reward) => this.modifyObject(reward, reward.key))
-            )
-
-            return modifiedPersons
+            return await this.mapper.toPreview(rewards)
         } catch (e) {
             RethrowApiError(`Service error: Method - getRewards`, e)
         }
     }
 
-    async getFilteredRewards(filters: TypeofRewardSchema, offset = 0, limit = 10): Promise<Reward[] | null> {
+    async getFilteredRewards(filters: TypeofRewardSchema, offset = 0, limit = 10): Promise<TypeofRewardPreviewSchema[] | null> {
         try {
             const where: any = {}
 
@@ -69,12 +68,7 @@ export class RewardServiceImpl implements IRewardService {
             }
             
             const candidates = await this.sequelize.findAll(offset, limit, where)
-
-            const modifiedCandidates = await Promise.all(
-                candidates.map((candidate) => this.modifyObject(candidate, candidate.key))
-            )
-
-            return modifiedCandidates
+            return await this.mapper.toPreview(candidates)
         } catch (e) {
             RethrowApiError(`Service error: Method - getFilteredRewards`, e)
         }
@@ -112,7 +106,6 @@ export class RewardServiceImpl implements IRewardService {
                     if (S3Key && buffer && file) {
                         await this.s3.upload(S3Key, buffer, { 
                             contentType: file.mimetype,
-                            ACL: 'public-read'
                         })
                     }
 
@@ -189,11 +182,5 @@ export class RewardServiceImpl implements IRewardService {
             await this.sequelize.rollbackTransaction(transaction)
             throw RethrowApiError(`Service error: Method - bulkDeleteRewards`, e);
         }
-    }
-
-    private async modifyObject(model: Reward, key?: string) {
-        if (!key) return model
-        const urls = await this.s3.getSignedUrls([key])
-        return { ...model.toJSON(), key: urls[key] }
     }
 }

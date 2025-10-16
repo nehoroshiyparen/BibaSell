@@ -3,12 +3,12 @@ import { DataTypes, Model, Sequelize } from "sequelize";
 export class Reward extends Model {
     declare id: number;
     declare slug: string;
+    declare key: string // S3 key
     declare label: string;
     declare realeseDate: string;
     declare count: number;
     declare addition?: string;
     declare description?: string;
-    declare key?: string // S3 key
 
     static initialize(sequelize: Sequelize) {
         this.init({

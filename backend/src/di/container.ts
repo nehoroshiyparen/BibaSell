@@ -36,6 +36,9 @@ import { RewardSequelizeRepo } from "#src/modules/rewards/repositories/reward.se
 import { Logger } from "#src/lib/logger/base.logger.js";
 import { AppLogger } from "#src/lib/logger/instances/app.logger.js";
 import { elasticLogger, redisLogger, s3Logger, sequelizeLogger, StoreLogger } from "#src/lib/logger/instances/store.logger.js";
+import { PdfArticleMapper } from "#src/modules/pdfArticles/mappers/pdfArticle.mapper.js";
+import { PersonMapper } from "#src/modules/persons/mappers/person.mapper.js";
+import { RewardMapper } from "#src/modules/rewards/mappers/reward.mapper.js";
 
 const container = new Container()
 
@@ -78,9 +81,13 @@ container.bind<PdfArticleSequelizeRepo>(TYPES.PdfArticleSequelizeRepo).to(PdfArt
 // Elastic repositories
 container.bind<PdfArticleElasticRepo>(TYPES.PdfArticleElasticRepo).to(PdfArticleElasticRepo).inSingletonScope()
 
+// Helpers 
+container.bind<PersonMapper>(TYPES.PersonMapper).to(PersonMapper).inSingletonScope()
+container.bind<RewardMapper>(TYPES.RewardMapper).to(RewardMapper).inSingletonScope()
+container.bind<PdfArticleMapper>(TYPES.PdfArticleMapper).to(PdfArticleMapper).inSingletonScope()
+
 // Loggers
 container.bind<Logger>(TYPES.AppLogger).to(AppLogger).inSingletonScope()
-
 
 container.bind<Logger>(TYPES.SequelizeLogger).toConstantValue(sequelizeLogger)
 container.bind<Logger>(TYPES.ElasticLogger).toConstantValue(elasticLogger)

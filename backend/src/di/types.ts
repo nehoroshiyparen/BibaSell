@@ -38,6 +38,11 @@ export const TYPES = {
     // Elastic repositories
     PdfArticleElasticRepo: Symbol.for('PdfArticleElasticRepo'),
 
+    // Mappers
+    PersonMapper: Symbol.for('PersonMapper'),
+    RewardMapper: Symbol.for('RewardMapper'),
+    PdfArticleMapper: Symbol.for('PdfArticleMapper'),
+
     // Loggers
     AppLogger: Symbol.for('Applogger'),
     StoreLogger: Symbol.for('StoreLogger'),
