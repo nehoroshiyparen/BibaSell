@@ -10,7 +10,7 @@ export interface PdfArticleJson {
     key: string
     firstpage_key: string
     extractedText?: string
-    pusblishedAt: Date
+    publishedAt: Date
     updatedAt: Date
     authors: { id: number; name: string }[]
 }

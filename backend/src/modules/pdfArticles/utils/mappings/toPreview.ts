@@ -8,7 +8,7 @@ export function toPdfArticlePreview(a: PdfArticleJson): TypeofPdfAcrticlePreview
         id: a.id,
         title: a.title,
         firstpage_key: a.firstpage_key,
-        publishedAt: a.pusblishedAt,
+        publishedAt: a.publishedAt,
         authors: a.authors.map(author => ({
             id: author.id,
             name: author.name

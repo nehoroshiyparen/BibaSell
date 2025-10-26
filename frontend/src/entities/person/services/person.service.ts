@@ -12,11 +12,11 @@ export const getPersonById = async (id: number, dispatch: AppDispatch) => {
 
 export const getPersons = async (offset: number, limit: number) => {
     const state = store.getState()
-    const persons = state.person
+    const personState = state.person
 
     const fetchedPersons = await getPersonsApi(offset, limit)
 
-    if (!persons || persons.length === 0) {
+    if (!personState || personState.persons.length === 0) {
         store.dispatch(setPersons(fetchedPersons))
     } else {
         store.dispatch(pushPersons(fetchedPersons))

@@ -9,7 +9,7 @@ export class PdfArticle extends Model {
     declare key: string
     declare firstpage_key: string
     declare extractedText: string
-    declare pusblishedAt: Date
+    declare publishedAt: Date
     declare updatedAt: Date
 
     declare authors?: Author[]

@@ -3,13 +3,15 @@ import loaderReducer from "./slices/loader.slice";
 import errorReducer from './slices/error.slice'
 import { personReducer } from 'src/entities/person/model'
 import { rewardReducer } from "src/entities/reward/model";
+import { articleReducer } from "src/entities/article/model";
 
 export const store = configureStore({
     reducer: {
         loader: loaderReducer,
         error: errorReducer,
         person: personReducer,
-        reward: rewardReducer
+        reward: rewardReducer,
+        article: articleReducer
     }
 })
 

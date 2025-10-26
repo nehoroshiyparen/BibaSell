@@ -1,24 +1,17 @@
 import { useEffect, useRef } from "react"
-import { usePersons } from "src/entities/person/hooks/usePersons"
+import { usePerson } from "src/entities/person/hooks/usePerson"
 import SearchPeople from "src/features/SearchPeople/ui/SearchPeople"
 import PersonFeed from "src/widgets/PersonFeed/PersonFeed"
-import EmptyFeed from "../../shared/ui/Feed/EmptyFeed"
-import { useAppDispatch, useAppSelector } from "src/app/store/hooks"
-import type { RootState } from "src/app/store"
-import FeedLoad from "../../shared/ui/Feed/FeedLoad"
+import EmptyFeed from "../../../shared/ui/Feed/EmptyFeed"
+import { useAppDispatch } from "src/app/store/hooks"
+import FeedLoad from "../../../shared/ui/Feed/FeedLoad"
 import { setLoading } from "src/entities/person/model"
 
 const PersonFeedPage = () => {
     const dispatch = useAppDispatch()
-    const { load, loadWithFilters } = usePersons()
-
-    const persons = useAppSelector((state: RootState) => state.person.persons)
-    const filteredPersons = useAppSelector((state: RootState) => state.person.filteredPersons)
-    const page = useAppSelector((state: RootState) => state.person.page)
-    const hasMore = useAppSelector((state: RootState) => state.person.hasMore) 
-    const searchQuery = useAppSelector((state: RootState) => state.person.searchQuery)
-    const isLoading = useAppSelector((state: RootState) => state.person.isLoading)
+    const { useLoad, useLoadWithFilters, usePersonState } = usePerson()
     
+    const { persons, filteredPersons, hasMore, isLoading, searchQuery, page } = usePersonState()
     const bottomRef = useRef<HTMLDivElement | null>(null)
 
     let debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -27,9 +20,9 @@ const PersonFeedPage = () => {
         if (!hasMore || isLoading) return
 
         if (searchQuery.trim() === '') {
-            await load(page)
+            await useLoad(page)
         } else {
-            await loadWithFilters({ name: searchQuery }, page)
+            await useLoadWithFilters({ name: searchQuery }, page)
         }
     }
 
@@ -41,7 +34,7 @@ const PersonFeedPage = () => {
         dispatch(setLoading(true))
 
         debounceTimer.current = setTimeout(async() => {
-            loadWithFilters({name: searchQuery}, page)
+            useLoadWithFilters({name: searchQuery}, page)
         }, 1000)
     }
 

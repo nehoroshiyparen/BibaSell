@@ -134,7 +134,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
             await this.sequelize.commitTransaction(transaction)
             removeDir(fileConfig.tempDirPath)
 
-            return { key: pdfKey, firstpage_key: previewKey }
+            return await this.mapper.toFull(article)
         } catch (err) {
             try {
                 await this.s3.delete(pdfKey)
@@ -191,7 +191,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
             await this.sequelize.commitTransaction(transaction)
             fileConfig && await removeDir(fileConfig.tempDirPath)
 
-            return updatedArticle
+            return await this.mapper.toFull(updatedArticle)
         } catch (e) {
             await this.sequelize.rollbackTransaction(transaction)
             if (needToRollbackElastic) await this.rollbackElasticChanges(article)

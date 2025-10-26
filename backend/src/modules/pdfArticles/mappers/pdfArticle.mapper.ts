@@ -16,7 +16,14 @@ export class PdfArticleMapper {
             this.s3.getSignedUrls([article.key]),
             this.s3.getSignedUrls([article.firstpage_key], 'article_previews/')
         ])
-        return { ...article.toJSON(), key: pdfUrls[article.key], firstpage_key: previewUrls[article.firstpage_key] }
+        return { 
+            id: article.id,
+            title: article.title,
+            key: pdfUrls[article.key], 
+            firstpage_key: previewUrls[article.firstpage_key],
+            publishedAt: article.publishedAt,
+            authors: article.authors || [],
+        }
     }
 
     async toPreview(articles: PdfArticle[]): Promise<TypeofPdfAcrticlePreviewSchema[]> {
