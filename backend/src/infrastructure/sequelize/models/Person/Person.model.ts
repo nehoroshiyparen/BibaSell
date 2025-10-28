@@ -14,7 +14,7 @@ export class Person extends Model {
         this.init({
             id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
             slug: { type: DataTypes.STRING, unique: true, allowNull: true },
-             key: { type: DataTypes.STRING, allowNull: false },
+            key: { type: DataTypes.STRING, allowNull: true },
             name: { type: DataTypes.STRING, allowNull: false },
             addition: { type: DataTypes.TEXT, allowNull: true },
             description: { type: DataTypes.TEXT, allowNull: true },

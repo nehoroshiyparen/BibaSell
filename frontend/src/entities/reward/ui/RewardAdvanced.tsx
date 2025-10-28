@@ -16,7 +16,7 @@ const RewardAdvanced:React.FC<RewardAdvancedProps> = ({ reward }) => {
                             '/images/persons/unknown.png'
                         } 
                         onLoad={(e) => (e.currentTarget.style.opacity = "1")}
-                        className="w-full max-h-[70vh] object-cover opacity-0 transition-opacity duration-200"
+                        className="w-full object-cover opacity-0 transition-opacity duration-200"
                     />
                 </div>
                 <div className="flex flex-col gap-18">

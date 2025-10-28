@@ -13,7 +13,7 @@ const PersonFeedPreview:React.FC<PersonFeedPreviewProps> = ({ person }) => {
             <div className="flex gap-15 h-full w-full">
                 <div className="h-full">
                     <img 
-                        src={person.key || "/images/persons/unknown.png"} 
+                        src={person.key ? person.key : "/images/persons/unknown.png"} 
                         onLoad={(e) => (e.currentTarget.style.opacity = "1")}
                         className="h-full aspect-[194/261] rounded-4xl object-cover opacity-0 transition-opacity duration-500"
                         style={{boxShadow: "0 0 20px rgba(0,0,0,0.4)"}}
