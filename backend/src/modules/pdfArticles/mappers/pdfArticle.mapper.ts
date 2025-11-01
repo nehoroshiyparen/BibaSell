@@ -12,15 +12,13 @@ export class PdfArticleMapper {
     ) {}
 
     async toFull(article: PdfArticle): Promise<TypeofPdfArticleFullSchema> {
-        const [pdfUrls, previewUrls] = await Promise.all([
-            this.s3.getSignedUrls([article.key]),
-            this.s3.getSignedUrls([article.firstpage_key], 'article_previews/')
-        ])
+        const pdfUrls = await this.s3.getSignedUrls([article.key])
+        const previewUrls = article.preview_key ? await this.s3.getSignedUrls([article.preview_key], 'article_previews/') : null
         return { 
             id: article.id,
             title: article.title,
             key: pdfUrls[article.key], 
-            firstpage_key: previewUrls[article.firstpage_key],
+            preview: previewUrls ? previewUrls[article.preview_key] : article.defaultPreview,
             publishedAt: article.publishedAt,
             authors: article.authors || [],
         }
@@ -29,14 +27,14 @@ export class PdfArticleMapper {
     async toPreview(articles: PdfArticle[]): Promise<TypeofPdfAcrticlePreviewSchema[]> {
         const json = articles.map(article => article.toJSON())
         const modifiedArticles: TypeofPdfAcrticlePreviewSchema[] = await Promise.all(json.map(async article => {
-            const preview_urls = await this.s3.getSignedUrls([article.firstpage_key], 'article_previews/')
+            const preview_urls = article.preview_key ? await this.s3.getSignedUrls([article.preview_key], 'article_previews/') : null
             return {
                 id: article.id,
                 slug: article.slug,
                 title: article.title,
                 publishedAt: article.publishedAt,
                 authors: article.authors,
-                firstpage_key: preview_urls[article.firstpage_key]
+                preview: preview_urls ? preview_urls[article.preview_key] : article.defaultPreview
             }
         }))
         return modifiedArticles

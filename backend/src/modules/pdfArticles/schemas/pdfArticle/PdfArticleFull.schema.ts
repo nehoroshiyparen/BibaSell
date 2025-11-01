@@ -5,7 +5,7 @@ export const PdfArticleFull = z.object({
     id: z.number(),
     title: z.string(),
     key: z.string(),
-    firstpage_key: z.string(),
+    preview: z.string(),
     publishedAt: z.date(),
     authors: z.array(AuthorSchema)
 })

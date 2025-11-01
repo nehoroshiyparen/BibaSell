@@ -24,6 +24,9 @@ import { removeDir } from "#src/shared/files/remove/removeDir.js";
 import { pdf2pic } from "#src/shared/files/pdf/pdf2pic.js";
 import { PdfArticleMapper } from "../mappers/pdfArticle.mapper.js";
 import { IPdfArticleService } from "#src/types/contracts/services/pdfArticles/pdfArticle.service.interface.js";
+import { getRelativePath } from "#src/shared/files/utils/getRelativePath.js";
+import { getRandomCover } from "../utils/files/getRandomCover.js";
+import { TypeofUpdateOptionsSchema } from "../schemas/options/UpdateOptionsSchema.js";
 
 @injectable()
 export class PdfArticleServiceImpl implements IPdfArticleService {
@@ -108,11 +111,11 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         const previewKey = generateUuid()
 
         try {
-            const uploadedFile = fileConfig.files[0] as Express.Multer.File
-            const pdfBuffer = await readFile(uploadedFile.path)
+            const pdfFile = fileConfig.files.pdf as Express.Multer.File
+            const pdfBuffer = await readFile(pdfFile.path)
 
-            const previewPath = await pdf2pic(uploadedFile.path, fileConfig.tempDirPath, previewKey)
-            const previewBuffer = await readFile(previewPath)
+            const previewFile = fileConfig.files.preview as Express.Multer.File
+            const previewBuffer = previewFile ? await readFile(previewFile.path) : undefined
 
             const extractedText = await pdfParse(pdfBuffer)
 
@@ -123,12 +126,13 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
                 ...options,
                 slug: slug!,
                 key: pdfKey,
+                preview_key: previewFile ? previewKey : null,
+                defaultPreview: getRandomCover(),
                 extractedText,
-                firstpage_key: previewKey
             }, transaction)
 
             await this.elastic.indexArticle(article)
-            await this.s3.upload(previewKey, previewBuffer, { prefix: "article_previews/" })
+            previewBuffer && await this.s3.upload(previewKey, previewBuffer, { prefix: "article_previews/" })
             await this.s3.upload(pdfKey, pdfBuffer)
 
             await this.sequelize.commitTransaction(transaction)
@@ -146,6 +150,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
     }
 
     async update(
+        id: number,
         options: TypeofPdfArticleUpdateSchema, 
         fileConfig: FileConfig
     ): Promise<TypeofPdfArticleFullSchema> {
@@ -153,45 +158,65 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         let oldFileBuffer: Buffer | null = null
         let needToRollbackElastic: boolean = false
 
-        const article = await this.sequelize.findById(options.id)
-        if (!article) throw ApiError.NotFound(`Article with id: ${options.id} is not found`)
+        const article = await this.sequelize.findById(id)
+        if (!article) throw ApiError.NotFound(`Article with id: ${id} is not found`)
 
-        try {           
-            const slug = getSlug(options.title)
+        try {         
+            const pdfFile = fileConfig.files.pdf as Express.Multer.File
+            const previewFile = fileConfig.files.preview as Express.Multer.File
+            
+            const slug = options.title ? getSlug(options.title as string) : undefined
             const optionsToUpdate: Partial<PdfArticleUpdateDto> = cleanup({
                 title: options.title,
                 slug
             }) as Partial<PdfArticleUpdateDto>
 
-            const updatedArticle = await this.sequelize.update(options.id, optionsToUpdate, transaction)
+            const updatedArticle = await this.sequelize.update(id, optionsToUpdate, transaction)
 
             await this.elastic.indexArticle(updatedArticle)
             needToRollbackElastic = true
 
-            if (fileConfig && fileConfig?.files.length !== 0) {
-                const file = fileConfig.files[0]
+            if (pdfFile) {
                 const pdfKey = generateUuid()
-
-                const previewKey = generateUuid()
-                const previewPath = await pdf2pic(file.path, fileConfig.tempDirPath, previewKey)
-                const previewBuffer = await readFile(previewPath)
-
-                await this.s3.upload(previewKey, previewBuffer, { prefix: 'article_previews/' })
-                await this.s3.upload(updatedArticle.key, file.buffer)
-                await this.s3.delete(`article_previews/${article.key}`)
-                await this.s3.delete(article.firstpage_key, 'article_previews/')
+                const pdfBuffer = await readFile(pdfFile.path) 
+                await this.s3.upload(updatedArticle.key, pdfBuffer)
+                await this.s3.delete(article.key, 'articles/')
 
                 await this.sequelize.update(
                     updatedArticle.id,
-                    { key: pdfKey, firstpage_key: previewKey },
+                    { key: pdfKey },
                     transaction
                 )
+            }
+
+            if (previewFile) {
+                const previewKey = generateUuid()
+                const previewBuffer = await readFile(previewFile.path)
+                await this.s3.upload(previewKey, previewBuffer, { prefix: 'article_previews/' })
+                article.preview_key && await this.s3.delete(article.preview_key, 'article_previews/')
+                await this.sequelize.update(
+                    updatedArticle.id,
+                    { preview_key: previewKey },
+                    transaction
+                )
+            }  
+            if (options.functions?.removePreview) {
+                if (article.preview_key) {
+                    await this.s3.delete(article.preview_key, 'article_previews/')
+                    await this.sequelize.update(
+                        updatedArticle.id,
+                        { preview_key: null },
+                        transaction
+                    )
+                }
             }
 
             await this.sequelize.commitTransaction(transaction)
             fileConfig && await removeDir(fileConfig.tempDirPath)
 
-            return await this.mapper.toFull(updatedArticle)
+            const finalArticle = await this.sequelize.findById(id)
+
+            return await this.mapper.toFull(finalArticle!)
         } catch (e) {
             await this.sequelize.rollbackTransaction(transaction)
             if (needToRollbackElastic) await this.rollbackElasticChanges(article)
@@ -212,7 +237,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
             await this.sequelize.destroy(id, transaction)
             await this.elastic.destroyArticle(id)
             await this.s3.delete(article.key)
-            await this.s3.delete(article.firstpage_key, 'article_previews/')
+            await this.s3.delete(article.preview_key, 'article_previews/')
 
             await this.sequelize.commitTransaction(transaction)
         } catch (e) {
@@ -240,7 +265,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
             for (const article of articles) {
                 try {
                     await this.s3.delete(article.key)
-                    await this.s3.delete(article.firstpage_key, "article_previews/")
+                    await this.s3.delete(article.preview_key, "article_previews/")
                 } catch (e) {
                     errorStack[article.id] = { message: 'S3 delete failed', code: 'S3_ERROR' }
                 }

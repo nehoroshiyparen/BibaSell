@@ -21,7 +21,7 @@ export interface IBaseService<
     ): Promise<TPreview[]>
     create?(options: TCreate, fileConfig: FileConfig): Promise<TFull>
     bulkCreate?(data: TCreate[], fileConfig: FileConfig): Promise<OperationResult>
-    update?(options: TUpdate, fileConfig: FileConfig | undefined): Promise<TFull>
+    update?(id: number, options: TUpdate, fileConfig: FileConfig | undefined): Promise<TFull>
     delete(id: number): Promise<void>
     bulkDelete(ids: number[]): Promise<OperationResult>
 }

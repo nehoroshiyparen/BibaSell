@@ -23,16 +23,10 @@ export function SendError(
         errorCode = e.code ? e.code : ''
         errorMessage = e.message
         responseMessage = 'Request processing error'
-    } else if (e instanceof ZodError) {
-        errorStatus = status.BAD_REQUEST
-        errorCode = 'ZOD_VALIDATION_ERROR'
-        errorMessage = e.issues[0].message
-        responseMessage = 'Validation error'
-        
-        console.log(errorMessage)
     } else {
         if (isError(e)) {
             console.log('Unknown error', e)
+            console.log(e.stack);
         }
     }
 

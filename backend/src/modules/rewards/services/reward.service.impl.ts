@@ -78,8 +78,9 @@ export class RewardServiceImpl implements IRewardService {
         let created = 0
     
         try {
+            const images = fileConfig.files.images as Express.Multer.File[]
             const fileMap = new Map(
-                fileConfig.files.map(file => [path.parse(file.originalname).name, file])
+                images.map(file => [path.parse(file.originalname).name, file])
             )
 
             for (const [index, reward] of rewards.entries()) {

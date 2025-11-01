@@ -7,7 +7,8 @@ export class PdfArticle extends Model {
     declare title: string
     declare slug: string
     declare key: string
-    declare firstpage_key: string
+    declare preview_key: string
+    declare defaultPreview: string
     declare extractedText: string
     declare publishedAt: Date
     declare updatedAt: Date
@@ -20,7 +21,8 @@ export class PdfArticle extends Model {
             title: { type: DataTypes.STRING, unique: false, allowNull: false },
             slug: { type: DataTypes.STRING, unique: true, allowNull: false },
             key: { type: DataTypes.STRING, allowNull: false, unique: true },
-            firstpage_key: { type: DataTypes.TEXT, allowNull: false , unique: true },
+            preview_key: { type: DataTypes.TEXT, allowNull: true , unique: true },
+            defaultPreview: {type: DataTypes.TEXT, allowNull: false, unique: false }, // path for deafult cover
             extractedText: { type: DataTypes.TEXT, allowNull: false },
             publishedAt: { type: DataTypes.DATE, allowNull: false, defaultValue: new Date() },
             updatedAt: { type: DataTypes.DATE, allowNull: false, defaultValue: new Date()},

@@ -21,7 +21,7 @@ export class PdfArticleSequelizeRepo extends BaseSequelizeRepo<PdfArticle> {
     }
 
     async create(
-        data: TypeofPdfArticlePatchSchema & { extractedText: string, key: string, slug: string, firstpage_key: string }, 
+        data: TypeofPdfArticlePatchSchema & { extractedText: string, key: string, slug: string, preview_key: string | null, defaultPreview: string }, 
         transaction?: Transaction
     ): Promise<PdfArticle> {
         const article =  await PdfArticle.create({
@@ -29,7 +29,8 @@ export class PdfArticleSequelizeRepo extends BaseSequelizeRepo<PdfArticle> {
             publishedAt: new Date(),
             slug: data.slug,
             key: data.key,
-            firstpage_key: data.firstpage_key,
+            preview_key: data.preview_key,
+            defaultPreview: data.defaultPreview,
             extractedText: data.extractedText
         }, { transaction })
         return article

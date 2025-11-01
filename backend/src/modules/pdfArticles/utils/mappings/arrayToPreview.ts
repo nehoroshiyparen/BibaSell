@@ -8,7 +8,7 @@ export interface PdfArticleJson {
     title: string
     slug: string
     key: string
-    firstpage_key: string
+    preview_key: string
     extractedText?: string
     publishedAt: Date
     updatedAt: Date

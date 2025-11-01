@@ -15,5 +15,5 @@ export interface IPdfArticleService
         TypeofPdfArticleUpdateSchema
     > {
         create(options: TypeofPdfArticlePatchSchema, fileConfig: FileConfig): Promise<TypeofPdfArticleFullSchema>
-        update(options: TypeofPdfArticleUpdateSchema, fileConfig: FileConfig | undefined): Promise<TypeofPdfArticleFullSchema>
+        update(id: number, options: TypeofPdfArticleUpdateSchema, fileConfig: FileConfig | undefined): Promise<TypeofPdfArticleFullSchema>
     }

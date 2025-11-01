@@ -98,23 +98,32 @@ export class PdfArticleControllerImpl {
             if (!req.body.data) {
                 throw ApiError.BadRequest('Missing data field in body')
             }
+            if (!req.tempUploadDir) {
+                throw ApiError.Internal('Server has not prepared necessary dirs')
+            }
             
             const options = JSON.parse(req.body.data)
 
             ValidateObjectFieldsNotNull(options)
             const validatedOptions = PdfArticlePatchSchema.parse(options)
 
-            const fileConfig: FileConfig | undefined = 
-                req.tempUploadDir ?
-                    {
-                        tempDirPath: req.tempUploadDir,
-                        files: (req.files as Express.Multer.File[] | undefined) || []
-                    } : undefined
+            const files = req.files as Record<string, Express.Multer.File[]>
+
+            const pdfFile: Express.Multer.File = files.pdf?.[0] 
+            const previewFile: Express.Multer.File = files.preview?.[0] 
             
-            const hasFiles = fileConfig?.files && fileConfig.files.length > 0;
+            const hasFiles = !!pdfFile;
                 if (!hasFiles) {
                     throw new ApiError(status.BAD_REQUEST, 'Article cant be created without file. File is not attached')
                 }
+            
+            const fileConfig: FileConfig | undefined = {
+                tempDirPath: req.tempUploadDir,
+                files: {
+                    preview: previewFile,
+                    pdf: pdfFile
+                }
+            }
 
             const article = await this.pdfArticleService.create(validatedOptions, fileConfig)
 
@@ -135,37 +144,43 @@ export class PdfArticleControllerImpl {
     
     async updateArticle(req: Request, res: Response) {
         try {
-            if (!req.body.data) {
-                throw ApiError.BadRequest('Missing data field in body')
+            if (!req.tempUploadDir) {
+                throw ApiError.Internal('Server has not prepared necessary dirs')
             }
 
             const options = JSON.parse(req.body.data)
+            const id = Number(req.params.id)
 
-            ValidateObjectFieldsNotNull(options)
             const validatedOptions = PdfArticleUpdateSchema.parse(options)
 
-            const fileConfig: FileConfig | undefined = 
-                req.tempUploadDir ?
-                    {
-                        tempDirPath: req.tempUploadDir,
-                        files: (req.files as Express.Multer.File[] | undefined) || []
-                    } : undefined
+            const files = req.files as Record<string, Express.Multer.File[]>
+
+            const pdfFile: Express.Multer.File = files.pdf?.[0]
+            const previewFile: Express.Multer.File = files.preview?.[0]
+            
+            const hasFiles = !!pdfFile || !!previewFile;
+            
+            const fileConfig: FileConfig | undefined = {
+                tempDirPath: req.tempUploadDir,
+                files: {
+                    preview: previewFile,
+                    pdf: pdfFile
+                }
+            }
 
             const hasOptions = validatedOptions && Object.keys(validatedOptions).length > 0;
-            const hasFiles = fileConfig?.files && fileConfig.files.length > 0;
 
             if (!hasOptions && !hasFiles) {
                 throw new ApiError(status.BAD_REQUEST, 'At least one option param has to be specified or file needs to be attached');
             }
-            
-            const article = await this.pdfArticleService.update(validatedOptions, fileConfig)
+            const article = await this.pdfArticleService.update(id, validatedOptions, fileConfig)
 
             SendResponse(res, {
                 cases: [
                     {
                         condition: () => true,
                         status: status.CREATED,
-                        message: 'Article created'
+                        message: 'Article updated'
                     }
                 ],
                 data: article

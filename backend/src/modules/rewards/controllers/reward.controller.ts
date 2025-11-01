@@ -123,16 +123,23 @@ export class RewardControllerImpl {
             if (!req.body.data) {
                 throw ApiError.BadRequest('Missing data field in body')
             }
+            if (!req.tempUploadDir) {
+                throw ApiError.Internal('Server has not prepared necessary dirs')
+            }
 
             const dataPack = JSON.parse(req.body.data)
         
             const validatedData = RewardArraySchema.parse(dataPack)
 
-            const fileConfig: FileConfig =
-                {
-                    tempDirPath: req.tempUploadDir!,
-                    files: (req.files as Express.Multer.File[]) || []
-                } 
+            const files = req.files as Record<string, Express.Multer.File[]>
+            const imageFiles: Express.Multer.File[] = files.images
+
+            const fileConfig: FileConfig | undefined = {
+                tempDirPath: req.tempUploadDir,
+                files: {
+                    images: imageFiles,
+                }
+            }
 
             const bulkCreateResult = await this.rewardService.bulkCreate(validatedData, fileConfig)
 

@@ -1,4 +1,4 @@
 export interface FileConfig {
     tempDirPath: string,
-    files: Express.Multer.File[]
+    files: Record<string, Express.Multer.File[] | Express.Multer.File>
 } 
