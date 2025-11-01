@@ -144,6 +144,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
                 await this.s3.delete(pdfKey)
                 await this.s3.delete(previewKey, "article_previews/")
             } catch {}
+            fileConfig && removeDir(fileConfig.tempDirPath)
             await this.sequelize.rollbackTransaction(transaction)
             RethrowApiError("Service error: Method - createArticle", err)
         }
@@ -221,8 +222,9 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
             await this.sequelize.rollbackTransaction(transaction)
             if (needToRollbackElastic) await this.rollbackElasticChanges(article)
             if (oldFileBuffer) await this.rollbackS3Changes(article, oldFileBuffer)
+            fileConfig && removeDir(fileConfig.tempDirPath)
             RethrowApiError('Service error: Method - updateArticle', e)
-        }
+        } 
     }
 
     async delete(id: number): Promise<void> {

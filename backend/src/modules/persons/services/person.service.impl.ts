@@ -132,6 +132,7 @@ export class PersonServiceImpl implements IPersonService {
                 ? { success: false, created, errors: errorStack }
                 : { success: true, created }
         } catch (e) {
+            fileConfig && removeDir(fileConfig.tempDirPath)
             throw RethrowApiError(`Service error: Method - bulkCreatePersons`, e);
         }
     }
