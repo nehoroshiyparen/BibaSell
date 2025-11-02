@@ -10,4 +10,6 @@ export class S3PdfArticleServiceImpl extends BaseS3Service {
     constructor(@inject(TYPES.S3) s3: IBaseS3Repo) {
         super(s3)
     }
+
+    
 }
