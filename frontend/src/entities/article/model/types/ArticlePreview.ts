@@ -6,5 +6,5 @@ export interface ArticlePreview {
     title: string
     publishedAt: Date
     authors: Author[]
-    firspage_key: string
+    preview: string
 }

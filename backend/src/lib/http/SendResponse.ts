@@ -12,6 +12,9 @@ export function SendResponse<T = any>(
     const status = resolved?.status ?? 500
     const message = resolved?.message ?? 'Unknown error'
 
+    res.setHeader('Content-Type', 'application/json')
+    res.setHeader('Cache-Control', 'no-store')
+
     return res.status(status).json({
         status,
         message,

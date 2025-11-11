@@ -1,25 +1,22 @@
 import { useEffect, useRef } from "react"
-import { useAppDispatch } from "src/app/store/hooks"
 import { useArticle } from "src/entities/article/hooks/useArticle"
 import ArticleFeed from "src/widgets/ArticleFeed/ArticleFeed"
 import SideMenu from "./ui/SideMenu"
 import SearchArticles from "src/features/SearchArticles/ui/SearchArticles"
+import FeedLoad from "src/shared/ui/Feed/FeedLoad"
+import EmptyFeed from "src/shared/ui/Feed/EmptyFeed"
 
 const ArticleFeedPage = () => {
-    const dispatch = useAppDispatch()
     const { useLoad, useArticleState } = useArticle()
     
-    const { articles, page, hasMore, isLoading, searchQuery } = useArticleState()
+    const { articles, page, hasMore, isLoading, isFilterActive } = useArticleState()
     const bottomRef = useRef<HTMLDivElement | null>(null)
-    const hasFilter = searchQuery.trim() !== ''
-    const isEmpty = hasFilter && articles.length === 0
+
+    const isEmpty = isFilterActive && articles.length === 0
 
     const loadData = async() => {
         if (!hasMore || isLoading) return
-
-        if (searchQuery.trim() === '') {
-            await useLoad(page)
-        }
+        await useLoad(page)
     }
 
     useEffect(() => {
@@ -37,7 +34,7 @@ const ArticleFeedPage = () => {
         observer.observe(bottomRef.current)
 
         return () => observer.disconnect()
-    }, [bottomRef.current, page, hasMore, searchQuery])
+    }, [bottomRef.current, page, hasMore, isFilterActive])
 
     return (
         <div className="w-screen flex justify-center">
@@ -50,14 +47,14 @@ const ArticleFeedPage = () => {
                     </div>
                     {
                         isLoading ? (
-                            null
+                            <FeedLoad/>
                         ) : (
                             isEmpty ? (
-                                'жопа'
+                                 <EmptyFeed />
                             ) : (
                                 <>
                                     <ArticleFeed articles={articles}/>
-                                    {articles && <div ref={bottomRef}/>}
+                                    {articles && <div ref={bottomRef} className="ref"/>}
                                 </>
                             )
                         )

@@ -50,7 +50,7 @@ const PersonFeedPage = () => {
         const observer = new IntersectionObserver(
             entries => {
                 if (entries[0].isIntersecting) {
-                    loadData()
+                    setTimeout(() => loadData(), 20)
                 }
             },
             { root: null, rootMargin: '200px', threshold: 0 }

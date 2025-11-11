@@ -64,7 +64,7 @@ export class AppImpl implements IApp {
 
     public async start() {
         this.#app.use(express.json())
-        this.#app.use(cors())
+        this.#app.use(cors({ origin: 'http://localhost:9973', credentials: true }))
         this.#app.use(this.#router)
         this.setupMiddlewares(this.#middlewares)
         this.redis.startRedisPing()

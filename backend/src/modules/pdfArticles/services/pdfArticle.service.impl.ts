@@ -25,7 +25,7 @@ import { PdfArticleMapper } from "../mappers/pdfArticle.mapper.js";
 import { IPdfArticleService } from "#src/types/contracts/services/pdfArticles/pdfArticle.service.interface.js";
 import { getRandomCover } from "../utils/files/getRandomCover.js";
 import { ExtendedTransaction } from "#src/infrastructure/sequelize/extentions/Transaction.js";
-import { readFileFromConfig } from 'src/shared/files/utils/readFileFromConfig.js'
+import { readFileFromConfig } from '#src/shared/files/utils/readFileFromConfig.js'
 
 @injectable()
 export class PdfArticleServiceImpl implements IPdfArticleService {

@@ -1,8 +1,9 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
 import type { ArticlePreview } from "./types/ArticlePreview"
 import { fetchArticles } from "./article.thunks"
+import { SortTypes } from "src/features/SearchArticles/types/SortTypes"
 
-type ArticleState = {
+export type ArticleState = {
     articles: ArticlePreview[],
     filteredArticles: ArticlePreview[],
 
@@ -13,6 +14,16 @@ type ArticleState = {
 
     isLoading: boolean,
     error: string | null
+
+    sortType: SortTypes
+    authorFilter: string
+    titleFilter: string
+    contentFilter: string
+    isAuthorFilterEnabled: boolean
+    isTitleFilterEnabled: boolean
+    isContentFilterEnabled: boolean
+
+    isFilterActive: boolean
 }
 
 const initialState: ArticleState = {
@@ -25,7 +36,17 @@ const initialState: ArticleState = {
     searchQuery: '',
 
     isLoading: false,
-    error: null
+    error: null,
+    
+    sortType: SortTypes.none,
+    authorFilter: '',
+    titleFilter: '',
+    contentFilter: '',
+    isAuthorFilterEnabled: false,
+    isTitleFilterEnabled: false,
+    isContentFilterEnabled: false,
+
+    isFilterActive: false, 
 }
 
 const articleSlice = createSlice({
@@ -44,12 +65,44 @@ const articleSlice = createSlice({
             state.hasMore = true
         },
 
-        setSearchQuery: (state, action: PayloadAction<string>) => {
-            state.searchQuery = action.payload
-            state.filteredArticles = []
-            state.page = 0
-            state.hasMore = true
+        setSortType: (state, action: PayloadAction<SortTypes>) => {
+            state.sortType = action.payload
         },
+        setAuthorFilter: (state, action: PayloadAction<string>) => {
+            state.authorFilter = action.payload
+        },
+        setTitleFilter: (state, action: PayloadAction<string>) => {
+            state.titleFilter = action.payload
+        },
+        setContentFilter: (state, action: PayloadAction<string>) => {
+            state.contentFilter = action.payload
+        },
+
+        setIsAuthorFilterEnabled: (state, action: PayloadAction<boolean>) => {
+            state.isAuthorFilterEnabled = action.payload
+        },
+        setIsTitleFilterEnabled: (state, action: PayloadAction<boolean>) => {
+            state.isTitleFilterEnabled = action.payload
+        },
+        setIsContentFilterEnabled: (state, action: PayloadAction<boolean>) => {
+            state.isContentFilterEnabled = action.payload
+        },
+        setIsFilterActive: (state) => {
+            state.isFilterActive = Boolean(
+                state.sortType !== SortTypes.none ||
+                state.authorFilter ||
+                state.titleFilter ||
+                state.contentFilter ||
+                state.isAuthorFilterEnabled ||
+                state.isTitleFilterEnabled ||
+                state.isContentFilterEnabled
+            )
+            if (state.isFilterActive) {
+                state.page = 0
+                state.hasMore = true
+            }
+        },
+        
 
         setLoading: (state, action: PayloadAction<boolean>) => {
             state.isLoading = action.payload
@@ -82,7 +135,14 @@ const articleSlice = createSlice({
 
 export const {
     setArticles, pushArticles, resetArticles,
-    setSearchQuery,
+    setSortType,
+    setAuthorFilter,
+    setTitleFilter,
+    setContentFilter,
+    setIsAuthorFilterEnabled,
+    setIsTitleFilterEnabled,
+    setIsContentFilterEnabled,
+    setIsFilterActive,
     setLoading, setError
 } = articleSlice.actions
 export default articleSlice.reducer

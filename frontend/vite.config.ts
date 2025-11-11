@@ -16,7 +16,19 @@ export default defineConfig({
     watch: {
       usePolling: true,      // включаем polling
       interval: 500          // интервал проверки в мс
-    }
+    },
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+      Pragma: 'no-cache',
+      Expires: '0',
+    },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:7812',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   resolve: {
     alias: {

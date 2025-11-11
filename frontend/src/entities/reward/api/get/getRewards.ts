@@ -10,7 +10,5 @@ export const getRewardsApi = async (offset: number, limit: number): Promise<Rewa
     }
 
     const data = await request<undefined, RewardPreview[]>(req)
-
-    console.log(data)
     return data
 }

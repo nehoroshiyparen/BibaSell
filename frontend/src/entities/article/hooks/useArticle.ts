@@ -1,10 +1,27 @@
 import { useAppDispatch, useAppSelector } from "src/app/store/hooks";
 import { fetchArticles } from "../model/article.thunks";
 import type { RootState } from "src/app/store";
+import { 
+    setArticles,
+    pushArticles,
+    resetArticles,
+    setSortType,
+    setAuthorFilter,
+    setTitleFilter,
+    setContentFilter,
+    setIsAuthorFilterEnabled,
+    setIsTitleFilterEnabled,
+    setIsContentFilterEnabled,
+    setIsFilterActive,
+    setLoading,
+    setError,
+} from "../model";
+import type { ArticlePreview } from "../model/types/ArticlePreview";
 
 export function useArticle() {
     const dispatch = useAppDispatch()
 
+    // Default limit = 10
     const useLoad = async(page: number, limit?: number) => {
         try {
             await dispatch(fetchArticles({ page, limit }))
@@ -17,15 +34,49 @@ export function useArticle() {
         const articles = useAppSelector((state: RootState) => state.article.articles)
         const page = useAppSelector((state: RootState) => state.article.page)
         const hasMore = useAppSelector((state: RootState) => state.article.hasMore)
-        const searchQuery = useAppSelector((state: RootState) => state.article.searchQuery)
         const isLoading = useAppSelector((state: RootState) => state.article.isLoading)
+
+        const sortType = useAppSelector((state: RootState) => state.article.sortType)
+        const authorFilter = useAppSelector((state: RootState) => state.article.authorFilter)
+        const titleFilter = useAppSelector((state: RootState) => state.article.titleFilter)
+        const contentFilter = useAppSelector((state: RootState) => state.article.contentFilter)
+        const isAuthorFilterEnabled = useAppSelector((state: RootState) => state.article.isAuthorFilterEnabled)
+        const isTitleFilterEnabled = useAppSelector((state: RootState) => state.article.isTitleFilterEnabled)
+        const isContentFilterEnabled = useAppSelector((state: RootState) => state.article.isContentFilterEnabled)
+
+        const isFilterActive = useAppSelector((state: RootState) => state.article.isFilterActive)
+
+        const actions = {
+            setArticles: (data: ArticlePreview[]) => dispatch(setArticles(data)),
+            pushArticles: (data: ArticlePreview[]) => dispatch(pushArticles(data)),
+            resetArticles: () => dispatch(resetArticles()),
+            setSortType: (type: any) => dispatch(setSortType(type)),
+            setAuthorFilter: (value: string) => dispatch(setAuthorFilter(value)),
+            setTitleFilter: (value: string) => dispatch(setTitleFilter(value)),
+            setContentFilter: (value: string) => dispatch(setContentFilter(value)),
+            setIsAuthorFilterEnabled: (val: boolean) => dispatch(setIsAuthorFilterEnabled(val)),
+            setIsTitleFilterEnabled: (val: boolean) => dispatch(setIsTitleFilterEnabled(val)),
+            setIsContentFilterEnabled: (val: boolean) => dispatch(setIsContentFilterEnabled(val)),
+            setIsFilterActive: () => dispatch(setIsFilterActive()),
+            setLoading: (val: boolean) => dispatch(setLoading(val)),
+            setError: (val: string | null) => dispatch(setError(val)),
+        }
 
         return {
             articles,
             page,
             hasMore,
-            searchQuery,
-            isLoading
+            isLoading,
+            sortType,
+            authorFilter,
+            titleFilter,
+            contentFilter,
+            isAuthorFilterEnabled,
+            isTitleFilterEnabled,
+            isContentFilterEnabled,
+            isFilterActive,
+
+            ...actions
         }
     }
 

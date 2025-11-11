@@ -9,3 +9,15 @@ export const api = axios.create({
     },
     timeout: 10000
 })
+
+api.interceptors.request.use(cfg => {
+  console.log('[axios] request ->', cfg.method, cfg.url)
+  return cfg
+})
+api.interceptors.response.use(res => {
+  console.log('[axios] response <-', res.status, res.config?.url)
+  return res
+}, err => {
+  console.error('[axios] response err', err?.message, err?.code, err?.response?.status)
+  return Promise.reject(err)
+})
