@@ -1,16 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import type { ArticlePreview } from "./types/ArticlePreview"
 import { getArticlesApi } from "../api/get/getArticles"
+import type { ArticleFilters } from "./types/ArticleFilters"
 
 type FetchArticleArgs = {
     page: number,
     limit?: number,
-}
-
-type FetchArticlesWithFiltersArg = {
-    filters: any,
-    page: number,
-    limit?: number,
+    filters?: ArticleFilters,
 }
 
 export const fetchArticles = createAsyncThunk<ArticlePreview[], FetchArticleArgs>(

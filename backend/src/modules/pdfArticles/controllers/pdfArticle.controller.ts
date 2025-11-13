@@ -2,7 +2,7 @@ import { status } from "#src/consts/status.js";
 import { TYPES } from "#src/di/types.js";
 import { IPdfArticleService } from "#src/types/contracts/services/pdfArticles/pdfArticle.service.interface.js"; 
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
-import { TypeofPdfArticleFiltersSchema } from "../schemas/pdfArticle/PdfArticleFilters.schema.js";
+import { PdfArticleFiltersSchema, TypeofPdfArticleFiltersSchema } from "../schemas/pdfArticle/PdfArticleFilters.schema.js";
 import { PdfArticlePatchSchema, TypeofPdfArticlePatchSchema } from "../schemas/pdfArticle/PdfArticlePatch.schema.js";
 import { PdfArticleUpdateSchema } from "../schemas/pdfArticle/PdfArticleUpdate.schema.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
@@ -44,54 +44,34 @@ export class PdfArticleControllerImpl {
     }
 
     async getArticles(req: Request, res: Response) {
-        try {
-            const [offset, limit] = ['offset', 'limit'].map(k => Number(req.query[k]))
+    try {
+        const offset = Number(req.query.offset) || 0
+        const limit = Number(req.query.limit) || 10
 
-            ValidatePaginationParams(offset, limit)
+        ValidatePaginationParams(offset, limit)
 
-            const articles = await this.pdfArticleService.getList(offset, limit)
-
-            SendResponse(res, {
-                cases: [
-                    { 
-                        condition: () => true,
-                        status: status.OK,
-                        message: articles.length > 0 ? 'Articles fetched' : 'No more articles found'
-                    }
-                ], 
-                data: articles
-            })
-        } catch (e) {
-            SendError(res, e)
+        const filters: Partial<TypeofPdfArticleFiltersSchema> = {
+            title: req.query.title?.toString(),
+            extractedText: req.query.extractedText?.toString(),
+            author: req.query.author?.toString(),
         }
+
+        const articles = await this.pdfArticleService.getList(offset, limit, filters)
+
+        SendResponse(res, {
+            cases: [
+                {
+                    condition: () => true,
+                    status: status.OK,
+                    message: articles.length > 0 ? 'Articles fetched' : 'No articles found',
+                }
+            ],
+            data: articles
+        })
+    } catch (e) {
+        SendError(res, e)
     }
-    
-    async getFilteredArticles(req: Request, res: Response) {
-        try {
-            const fileters: TypeofPdfArticleFiltersSchema = {
-                title: req.query.title?.toString() || '',
-                extractedText: req.query.extractedText?.toString() || '',
-                author: req.query.authors?.toString() || '',
-            }
-
-            ValidateObjectFieldsNotNull(fileters)
-
-            const candidates = await this.pdfArticleService.getFiltered(fileters)
-
-            SendResponse(res, {
-                cases: [
-                    {
-                        condition: () => true,
-                        status: status.OK,
-                        message: candidates.length > 0 ? 'Article fetched' : 'Articles not found'
-                    }
-                ],
-                data: candidates
-            })
-        } catch (e) {
-            SendError(res, e)
-        }
-    }
+}
     
     async createArticle(req: Request, res: Response) {
         try {

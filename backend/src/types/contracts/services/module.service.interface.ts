@@ -12,12 +12,8 @@ export interface IBaseService<
     getBySlug(slug: string): Promise<TFull>
     getList(
         offset?: number,
-        limit?: number
-    ): Promise<TPreview[]>
-    getFiltered(
-        filters: TFilters,
-        offset?: number,
         limit?: number,
+        filters?: Partial<TFilters>,
     ): Promise<TPreview[]>
     create?(options: TCreate, fileConfig: FileConfig): Promise<TFull>
     bulkCreate?(data: TCreate[], fileConfig: FileConfig): Promise<OperationResult>

@@ -20,6 +20,7 @@ import { TypeofRewardPreviewSchema } from "../schemas/reward/RewardPreview.schem
 import { IRewardService } from "#src/types/contracts/services/rewards/reward.service.interface.js";
 import { TypeofRewardFiltersSchema } from "../schemas/reward/RewardFilters.schema.js";
 import { TypeofRewardSchema } from "../schemas/reward/Reward.schema.js";
+import { Reward } from "#src/infrastructure/sequelize/models/Reward/Reward.model.js";
 
 @injectable()
 export class RewardServiceImpl implements IRewardService {
@@ -49,27 +50,30 @@ export class RewardServiceImpl implements IRewardService {
         }
     }
 
-    async getList(offset = 0, limit = 10): Promise<TypeofRewardPreviewSchema[]> {
-        try {
-            const rewards = await this.sequelize.findAll(offset, limit)
-            return await this.mapper.toPreview(rewards)
-        } catch (e) {
-            RethrowApiError(`Service error: Method - getRewards`, e)
-        }
-    }
-
-    async getFiltered(filters: TypeofRewardFiltersSchema, offset = 0, limit = 10): Promise<TypeofRewardPreviewSchema[]> {
+    async getList(
+        offset = 0,
+        limit = 10,
+        filters: Partial<TypeofRewardFiltersSchema> = {},
+    ): Promise<TypeofRewardPreviewSchema[]> {
         try {
             const where: any = {}
 
-            if (filters.label) {
-                where.label = { [Op.iLike]: `%${filters.label}%` }
+            // строим условия фильтрации только если поля переданы
+            if (filters.label) where.label = { [Op.iLike]: `%${filters.label}%` }
+
+            let rewards: Reward[]
+
+            if (Object.keys(where).length) {
+            // есть фильтры → ищем по where
+            rewards = await this.sequelize.findAll(offset, limit, where)
+            } else {
+            // нет фильтров → отдаём всё
+            rewards = await this.sequelize.findAll(offset, limit)
             }
-            
-            const candidates = await this.sequelize.findAll(offset, limit, where)
-            return await this.mapper.toPreview(candidates)
+
+            return await this.mapper.toPreview(rewards)
         } catch (e) {
-            RethrowApiError(`Service error: Method - getFilteredRewards`, e)
+            RethrowApiError(`Service error: Method - getRewardsFiltered`, e)
         }
     }
 

@@ -56,28 +56,20 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         }
     }
 
-    async getList(offset: number = 0, limit: number = 10): Promise<TypeofPdfAcrticlePreviewSchema[]> {
-        try {
-            const articles = await this.sequelize.findAll(offset, limit)
-            return await this.mapper.toPreview(articles)
-        } catch (e) {
-            RethrowApiError('Service error: Method - getArticles', e)
-        }
-    }
-
-    async getFiltered(
-        filters: TypeofPdfArticleFiltersSchema,
-        offset = 0,
-        limit = 10,
+    async getList(
+        offset: number = 0,
+        limit: number = 10,
+        filters: Partial<TypeofPdfArticleFiltersSchema> = {},
     ): Promise<TypeofPdfAcrticlePreviewSchema[]> {
         try {
+            // строим elasticQuery только если есть title или extractedText
             const elasticQuery: Record<string, string> = {}
             if (filters.title) elasticQuery.title = filters.title
             if (filters.extractedText) elasticQuery.extractedText = filters.extractedText
 
             const author = filters.author || null
-
             let idsFromElastic: number[] = []
+
             if (Object.keys(elasticQuery).length) {
                 const elasticCandidates = await this.elastic.searchArticles(elasticQuery)
                 idsFromElastic = elasticCandidates.map(a => a.id)
@@ -97,7 +89,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
 
             return await this.mapper.toPreview(articles)
         } catch (e) {
-            RethrowApiError('Service error: Method - getFilteredArticles', e)
+            RethrowApiError('Service error: Method - getArticlesFiltered', e)
         }
     }
 

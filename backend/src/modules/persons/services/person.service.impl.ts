@@ -52,31 +52,31 @@ export class PersonServiceImpl implements IPersonService {
         }
     }
 
-    async getList(offset = 0, limit = 10): Promise<TypeofPersonPreviewSchema[]> {
-        try {
-            const persons = await this.sequelize.findAll(offset, limit)
-            
-            return await this.mapper.toPreview(persons)
-        } catch (e) {
-            RethrowApiError(`Service error: Method - getPersons`, e)
-        }
-    }
-
-    async getFiltered(filters: TypeofPersonFiltersSchema, offset = 0, limit = 10): Promise<TypeofPersonPreviewSchema[]> {
+    async getList(
+        offset = 0,
+        limit = 10,
+        filters: Partial<TypeofPersonFiltersSchema> = {},
+    ): Promise<TypeofPersonPreviewSchema[]> {
         try {
             const where: any = {}
-            if (filters.name) {
-                where.name = { [Op.iLike]: `%${filters.name}%` }
-            }
-            if (filters.rank) {
-                where.rank = { [Op.iLike]: `%${filters.rank}%`}
-            }
-            if (Object.keys(where).length === 0) throw ApiError.BadRequest('Invalid filter params')
-            const candidates = await this.sequelize.findAll(offset, limit, where)
 
-            return await this.mapper.toPreview(candidates)
+            // строим фильтры только если они переданы
+            if (filters.name) where.name = { [Op.iLike]: `%${filters.name}%` }
+            if (filters.rank) where.rank = { [Op.iLike]: `%${filters.rank}%` }
+
+            let persons: Person[]
+
+            if (Object.keys(where).length) {
+            // есть фильтры → используем их
+            persons = await this.sequelize.findAll(offset, limit, where)
+            } else {
+            // нет фильтров → отдаём всё
+            persons = await this.sequelize.findAll(offset, limit)
+            }
+
+            return await this.mapper.toPreview(persons)
         } catch (e) {
-            RethrowApiError(`Service error: Method - getFilteredPersons`, e)
+            RethrowApiError(`Service error: Method - getPersonsFiltered`, e)
         }
     }
 

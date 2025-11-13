@@ -18,7 +18,6 @@ export class RewardRouter {
 
     setup() {
         this.router.get('/', this.rewardController.getRewards.bind(this.rewardController))
-        this.router.post('/filtered', this.rewardController.getFilteredRewards.bind(this.rewardController))
         this.router.get('/slug/:slug', this.rewardController.getRewardBySlug.bind(this.rewardController))
         this.router.get('/:id', this.rewardController.getRewardById.bind(this.rewardController))
 

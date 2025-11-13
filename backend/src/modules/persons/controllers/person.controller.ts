@@ -9,7 +9,7 @@ import { ValidateId } from "#src/shared/validations/ids/id.validate.js";
 import { ValidatePaginationParams } from "#src/shared/validations/paginationParams.validate.js";
 import { ValidateObjectFieldsNotNull } from "#src/shared/validations/objectFieldsNotNull.validate.js";
 import { ValidateIdArray } from "#src/shared/validations/ids/idArray.validate.js";
-import { PersonFiltersSchema } from "#src/modules/persons/schemas/PersonFilters.schema.js";
+import { PersonFiltersSchema, TypeofPersonFiltersSchema } from "#src/modules/persons/schemas/PersonFilters.schema.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
 import { IBaseService } from "#src/types/contracts/services/module.service.interface.js";
@@ -87,51 +87,22 @@ export class PersonControllerImpl {
 
             ValidatePaginationParams(offset, limit)
 
-            const persons = await this.personService.getList(offset, limit)
+            const filters: Partial<TypeofPersonFiltersSchema> = {
+                name: req.query.name?.toString(),
+                rank: req.query.rank?.toString(),
+            }
+
+            const persons = await this.personService.getList(offset, limit, filters)
 
             SendResponse(res, {
-                cases: [
-                    {
-                        condition: () => true,
-                        status: status.OK,
-                        message: persons?.length !== 0 ? 'Persons fetched' : 'No more data found'
-                    }
-                ],
-                data: persons
-            })
-        } catch (e) {
-            SendError(res, e)
-        }
-    }
-
-    /**
-     * Возвращает массив объектов Person по указанным фильтрам
-     * @param req В body запроса указываются параметры для фильтрации. Параметры могут быть любым свойством Person
-     * @param res 
-     * @throws {BadRequest} Если ни один параметр фильтрации не указан
-     * @throws {Internal} Если возникает непредсказанная ошибка
-     */
-    async getFilteredPersons(req: Request, res: Response) {
-        try {
-            const filters = req.body
-
-            const offset = Number(req.query.offset) || 0
-            const limit = Math.min(Number(req.query.limit) || 20, 100)
-
-            ValidateObjectFieldsNotNull(filters)
-            const validatedFilters = PersonFiltersSchema.parse(filters)
-
-            const persons = await this.personService.getFiltered(validatedFilters, offset, limit)
-
-            SendResponse(res, {
-                cases: [
-                    {
-                        condition: () => true,
-                        status: status.OK,
-                        message: persons?.length !== 0 ? 'Persons fetched' : 'No cadidates found'
-                    }
-                ],
-                data: persons
+            cases: [
+                {
+                condition: () => true,
+                status: status.OK,
+                message: persons?.length !== 0 ? 'Persons fetched' : 'No candidates found'
+                }
+            ],
+            data: persons
             })
         } catch (e) {
             SendError(res, e)

@@ -18,7 +18,6 @@ export class PersonRouter {
 
     setup() {
         this.router.get('/', this.personController.getPersons.bind(this.personController))
-        this.router.post('/filtered', this.personController.getFilteredPersons.bind(this.personController))
         this.router.get('/slug/:slug', this.personController.getPersonBySlug.bind(this.personController)) 
         this.router.get('/:id', this.personController.getPersonById.bind(this.personController))
 

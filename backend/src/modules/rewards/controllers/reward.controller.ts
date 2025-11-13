@@ -8,7 +8,7 @@ import { ValidateObjectFieldsNotNull } from "#src/shared/validations/objectField
 import { ValidateId } from "#src/shared/validations/ids/id.validate.js";
 import { ValidateIdArray } from "#src/shared/validations/ids/idArray.validate.js";
 import { ValidatePaginationParams } from "#src/shared/validations/paginationParams.validate.js";
-import { RewardFiltersSchema } from "#src/modules/rewards/schemas/reward/RewardFilters.schema.js";
+import { RewardFiltersSchema, TypeofRewardFiltersSchema } from "#src/modules/rewards/schemas/reward/RewardFilters.schema.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
 import { status } from "#src/consts/status.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
@@ -65,59 +65,31 @@ export class RewardControllerImpl {
 
     async getRewards(req: Request, res: Response) {
         try {
-            const [offset, limit] = ['offset', 'limit'].map(k => Number(req.query[k]))
+            const offset = Number(req.query.offset) || 0
+            const limit = Math.min(Number(req.query.limit) || 20, 100)
 
             ValidatePaginationParams(offset, limit)
 
-            const rewards = await this.rewardService.getList(offset, limit)
+            const filters: Partial<TypeofRewardFiltersSchema> = {
+                label: req.query.label?.toString(),
+            }
+
+            const rewards = await this.rewardService.getList(offset, limit, filters)
 
             SendResponse(res, {
-                cases: [
-                    {
-                        condition: () => true,
-                        status: status.OK,
-                        message: rewards?.length !== 0 ? 'Rewards fetched' : 'No more data found'
-                    }
-                ],
-                data: rewards
+            cases: [
+                {
+                condition: () => true,
+                status: status.OK,
+                message: rewards?.length !== 0 ? 'Rewards fetched' : 'No candidates found'
+                }
+            ],
+            data: rewards
             })
         } catch (e) {
             SendError(res, e)
         }
     }
-
-    /**
-     * Этот обработчик будет для POST запроса, тк он служит для фильтрации данных
-     * Чуть подробнее написал в методе getFilteredMDXArticle
-     * @param req 
-     * @param res 
-     */
-    async getFilteredRewards(req: Request, res: Response) {
-        try {
-            const filters = req.body
-
-            const [offset, limit] = ['offset', 'limit'].map(k => Number(req.query[k]))
-
-            ValidateObjectFieldsNotNull(filters)
-            const validatedFilters = RewardFiltersSchema.parse(filters)
-
-            const rewards = await this.rewardService.getFiltered(validatedFilters, offset, limit)
-
-            SendResponse(res, {
-                cases: [
-                    {
-                        condition: () => true,
-                        status: status.OK,
-                        message: rewards?.length !== 0 ? 'Rewards fetched' : 'No cadidates found'
-                    }
-                ],
-                data: rewards
-            })
-        } catch (e) {
-            SendError(res, e)
-        }
-    }
-
     async bulkCreateRewards(req: Request, res: Response) {
         try {
             if (!req.body.data) {
