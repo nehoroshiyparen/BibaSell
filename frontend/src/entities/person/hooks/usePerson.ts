@@ -1,24 +1,14 @@
 import type { PersonFilters } from "../model/types/PersonFilters";
-import { fetchPersons, fetchPersonsWithFilters } from "../model/person.thunks";
+import { fetchPersons } from "../model/person.thunks";
 import { useAppDispatch, useAppSelector } from "src/app/store/hooks";
 import type { RootState } from "src/app/store";
 
 export function usePerson() {
     const dispatch = useAppDispatch()
 
-    // const globalLoading = useAppSelector(selectLoader)
-
-    const useLoad = async(page: number, limit?: number) => {     
+    const useLoad = async(params: { page: number, limit?: number, filters?: PersonFilters }) => {     
         try {
-            await dispatch(fetchPersons({ page, limit }))
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
-    const useLoadWithFilters = async(filters: PersonFilters, page: number, limit?: number) => {
-        try {
-            await dispatch(fetchPersonsWithFilters({ filters, page, limit }))
+            await dispatch(fetchPersons({ page: params.page, limit: params.limit, filters: params.filters }))
         } catch (e) {
             console.log(e)
         }
@@ -26,7 +16,6 @@ export function usePerson() {
 
     const usePersonState = () => {
         const persons = useAppSelector((state: RootState) => state.person.persons)
-        const filteredPersons = useAppSelector((state: RootState) => state.person.filteredPersons)
         const page = useAppSelector((state: RootState) => state.person.page)
         const hasMore = useAppSelector((state: RootState) => state.person.hasMore) 
         const searchQuery = useAppSelector((state: RootState) => state.person.searchQuery)
@@ -34,7 +23,6 @@ export function usePerson() {
 
         return {
             persons,
-            filteredPersons,
             page,
             hasMore,
             searchQuery,
@@ -42,5 +30,5 @@ export function usePerson() {
         }
     }
 
-    return { useLoad, useLoadWithFilters, usePersonState }
+    return { useLoad, usePersonState }
 }

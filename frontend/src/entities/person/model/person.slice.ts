@@ -1,10 +1,9 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { PersonPreview } from "./types/PersonPreview";
-import { fetchPersons, fetchPersonsWithFilters } from "./person.thunks";
+import { fetchPersons } from "./person.thunks";
 
 type PersonState = {
     persons: PersonPreview[],
-    filteredPersons: PersonPreview[],
 
     page: number,
     hasMore: boolean,
@@ -17,7 +16,6 @@ type PersonState = {
 
 const initialState: PersonState = {
     persons: [],
-    filteredPersons: [],
 
     page: 0,
     hasMore: true,
@@ -44,23 +42,11 @@ const personSlice = createSlice({
             state.hasMore = true
         },
 
-        setFilteredPersons: (state, action: PayloadAction<PersonPreview[]>) => {
-            state.filteredPersons = action.payload
-        },
-        pushFilteredPersons: (state, action: PayloadAction<PersonPreview[]>) => {
-            state.filteredPersons = [...state.filteredPersons, ...action.payload]
-        },
-        resetFilteredPersons: (state) => {
-            state.filteredPersons = []
-            state.page = 0
-            state.hasMore = true
-        },
-
         setSearchQuery: (state, action: PayloadAction<string>) => {
             state.searchQuery = action.payload
-            state.filteredPersons = []
             state.page = 0
             state.hasMore = true
+            state.persons = []
         },
 
         setLoading: (state, action: PayloadAction<boolean>) => {
@@ -89,31 +75,11 @@ const personSlice = createSlice({
                 state.isLoading = false
                 state.error = action.payload as string
             })
-
-        builder
-            .addCase(fetchPersonsWithFilters.pending, (state) => {
-                // state.isLoading = true Комопонент управляет этим состоянием, поэтому здесь это излишне
-                state.error = null
-            })
-            .addCase(fetchPersonsWithFilters.fulfilled, (state, action) => {
-                state.isLoading = false
-                if (action.payload.length === 0) {
-                    state.hasMore = false
-                } else {
-                    state.filteredPersons = state.page === 0 ? action.payload : [...state.filteredPersons, ...action.payload]
-                    state.page += 1
-                }
-            })
-            .addCase(fetchPersonsWithFilters.rejected, (state, action) => {
-                state.isLoading = false
-                state.error = action.payload as string
-            })
     }
 })
 
 export const { 
     setPersons, pushPersons, resetPersons, 
-    setFilteredPersons, pushFilteredPersons, resetFilteredPersons, 
     setSearchQuery,
     setLoading, setError     
 } = personSlice.actions

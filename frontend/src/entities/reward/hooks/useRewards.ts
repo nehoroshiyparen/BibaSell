@@ -1,25 +1,17 @@
 import { useAppDispatch } from "src/app/store/hooks";
-import { fetchRewards, fetchRewardsWithFilters } from "../model/reward.thunks";
+import { fetchRewards } from "../model/reward.thunks";
 import type { RewardFilters } from "../model/types/RewardFilters";
 
 export function useRewards() {
     const dispatch = useAppDispatch()
 
-    const load = async(page: number, limit?: number) => {
+    const load = async(params: { page: number, limit?: number, filters?: RewardFilters }) => {
         try {
-            await dispatch(fetchRewards({ page, limit }))
+            await dispatch(fetchRewards({ page: params.page, limit: params.limit, filters: params.filters}))
         } catch (e) {
             console.log(e)
         }
     }
 
-    const loadWithFilters = async(filters: RewardFilters, page: number, limit?: number) => {
-        try {
-            await dispatch(fetchRewardsWithFilters({ filters, page, limit }))
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
-    return { load, loadWithFilters }
+    return { load }
 }

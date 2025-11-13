@@ -1,24 +1,19 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { RewardPreview } from "./types/RewardPerview";
-import { getFilteredRewardsApi, getRewardsApi } from "../api";
+import { getRewardsApi } from "../api";
 import type { RewardFilters } from "./types/RewardFilters";
 
 type FetchRewradsArg = {
     page: number,
-    limit?: number
-}
-
-type FetchRewardsWithFilters = {
-    filters: RewardFilters,
-    page: number,
-    limit?: number
+    limit?: number,
+    filters?: RewardFilters,
 }
 
 export const fetchRewards = createAsyncThunk<RewardPreview[], FetchRewradsArg>(
     'reward/fetchRewards',
-    async ({ page, limit }, { rejectWithValue }) => {
+    async ({ page, limit, filters }, { rejectWithValue }) => {
         try {
-            const data = await getRewardsApi(page*10, limit ?? 10)
+            const data = await getRewardsApi(page*10, limit ?? 10, filters)
             return data
         } catch (e) {
             if (e instanceof Error) return rejectWithValue(e.message)
@@ -26,16 +21,3 @@ export const fetchRewards = createAsyncThunk<RewardPreview[], FetchRewradsArg>(
         }
     }
 )
-
-export const fetchRewardsWithFilters = createAsyncThunk<
-    RewardPreview[],
-    FetchRewardsWithFilters
->('rewards/fetchRewardsWithFilters', async ({ filters, page, limit }, { rejectWithValue }) => {
-    try {
-        const data = await getFilteredRewardsApi(filters, page*10, limit ?? 10)
-        return data
-    } catch (e) {
-        if (e instanceof Error) return rejectWithValue(e.message)
-        return rejectWithValue(String(e))
-    }
-})

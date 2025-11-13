@@ -5,7 +5,6 @@ import { SortTypes } from "src/features/SearchArticles/types/SortTypes"
 
 export type ArticleState = {
     articles: ArticlePreview[],
-    filteredArticles: ArticlePreview[],
 
     page: number,
     hasMore: boolean,
@@ -28,7 +27,6 @@ export type ArticleState = {
 
 const initialState: ArticleState = {
     articles: [],
-    filteredArticles: [],
 
     page: 0,
     hasMore: true,

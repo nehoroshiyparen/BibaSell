@@ -58,17 +58,14 @@ export class RewardServiceImpl implements IRewardService {
         try {
             const where: any = {}
 
-            // строим условия фильтрации только если поля переданы
             if (filters.label) where.label = { [Op.iLike]: `%${filters.label}%` }
 
             let rewards: Reward[]
 
             if (Object.keys(where).length) {
-            // есть фильтры → ищем по where
-            rewards = await this.sequelize.findAll(offset, limit, where)
+                rewards = await this.sequelize.findAll(offset, limit, where)
             } else {
-            // нет фильтров → отдаём всё
-            rewards = await this.sequelize.findAll(offset, limit)
+                rewards = await this.sequelize.findAll(offset, limit)
             }
 
             return await this.mapper.toPreview(rewards)

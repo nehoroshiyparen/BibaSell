@@ -1,5 +1,5 @@
 export interface RewardFilters {
-    label: string
+    label?: string
 }
 
 

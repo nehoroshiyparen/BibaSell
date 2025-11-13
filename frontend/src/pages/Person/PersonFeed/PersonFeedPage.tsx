@@ -9,9 +9,9 @@ import { setLoading } from "src/entities/person/model"
 
 const PersonFeedPage = () => {
     const dispatch = useAppDispatch()
-    const { useLoad, useLoadWithFilters, usePersonState } = usePerson()
+    const { useLoad, usePersonState } = usePerson()
     
-    const { persons, filteredPersons, hasMore, isLoading, searchQuery, page } = usePersonState()
+    const { persons, hasMore, isLoading, searchQuery, page } = usePersonState()
     const bottomRef = useRef<HTMLDivElement | null>(null)
 
     let debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -19,11 +19,8 @@ const PersonFeedPage = () => {
     const loadData = async() => {
         if (!hasMore || isLoading) return
 
-        if (searchQuery.trim() === '') {
-            await useLoad(page)
-        } else {
-            await useLoadWithFilters({ name: searchQuery }, page)
-        }
+        const filters = searchQuery.trim() ? { name: searchQuery.trim() } : {}
+        await useLoad({ page, filters })
     }
 
     const debounceFilters = () => {
@@ -33,8 +30,9 @@ const PersonFeedPage = () => {
 
         dispatch(setLoading(true))
 
-        debounceTimer.current = setTimeout(async() => {
-            useLoadWithFilters({name: searchQuery}, page)
+        debounceTimer.current = setTimeout(async () => {
+            const filters = searchQuery.trim() ? { name: searchQuery.trim() } : {}
+            await useLoad({ page, filters })
         }, 1000)
     }
 
@@ -62,7 +60,7 @@ const PersonFeedPage = () => {
     }, [bottomRef.current, page, hasMore, searchQuery])
 
     const hasFilter = searchQuery.trim() !== ''
-    const isEmpty = hasFilter && filteredPersons.length === 0
+    const isEmpty = hasFilter && persons.length === 0
 
     return (
         <div className="w-screen flex justify-center">
@@ -77,7 +75,7 @@ const PersonFeedPage = () => {
                                 <EmptyFeed searchQuery={searchQuery}/>
                             ) : (
                                 <>
-                                    <PersonFeed persons={hasFilter ? filteredPersons : persons}/>
+                                    <PersonFeed persons={persons}/>
                                     {persons && <div ref={bottomRef}/>}
                                 </>
                             )

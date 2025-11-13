@@ -1,24 +1,19 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { PersonPreview } from "./types/PersonPreview";
-import { getFilteredPersonsApi, getPersonsApi } from "../api";
 import type { PersonFilters } from "./types/PersonFilters";
+import { getPersonsApi } from "../api";
 
 type FetchPersonArgs = {
     page: number,
     limit?: number
-}
-
-type FetchPersonsWithFiltersArg = {
-    filters: PersonFilters,
-    page: number,
-    limit?: number
+    filters?: PersonFilters,
 }
 
 export const fetchPersons = createAsyncThunk<PersonPreview[], FetchPersonArgs>(
     'person/fetchPersons',
-    async ({ page, limit }, { rejectWithValue }) => {
+    async ({ page, limit, filters }, { rejectWithValue }) => {
         try {
-            const data = await getPersonsApi(page*10, limit ?? 10)
+            const data = await getPersonsApi(page*10, limit ?? 10, filters)
             return data
         } catch (e) {
             if (e instanceof Error) return rejectWithValue(e.message)
@@ -26,16 +21,3 @@ export const fetchPersons = createAsyncThunk<PersonPreview[], FetchPersonArgs>(
         }
     }
 )
-
-export const fetchPersonsWithFilters = createAsyncThunk<
-    PersonPreview[],
-    FetchPersonsWithFiltersArg
->('person/fetchPersonsWithFilters', async ({ filters, page, limit }, { rejectWithValue }) => {
-    try {
-        const data = await getFilteredPersonsApi(filters, page * 10, limit ?? 10)
-        return data
-    } catch (e) {
-        if (e instanceof Error) return rejectWithValue(e.message)
-        return rejectWithValue(String(e))
-    }
-})

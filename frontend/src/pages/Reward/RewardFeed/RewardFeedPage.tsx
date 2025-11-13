@@ -9,18 +9,17 @@ import FeedLoad from "src/shared/ui/Feed/FeedLoad"
 import RewardFeed from "src/features/RewardsFeed/RewardFeed"
 
 const RewardFeedPage = () => {
-    const { load, loadWithFilters } = useRewards()
+    const { load } = useRewards()
 
     const dispatch = useAppDispatch()
     const rewards = useAppSelector((state: RootState) => state.reward.rewards)
-    const filteredRewards = useAppSelector((state: RootState) => state.reward.filteredRewards)
     const page = useAppSelector((state: RootState) => state.reward.page)
     const hasMore = useAppSelector((state: RootState) => state.reward.hasMore)
     const searchQuery = useAppSelector((state: RootState) => state.reward.searchQuery)
     const isLoading = useAppSelector((state: RootState) => state.reward.isLoading)
 
     const hasFilter = searchQuery.trim() !== ''
-    const isEmpty = hasFilter && filteredRewards.length === 0
+    const isEmpty = hasFilter && rewards.length === 0
 
     const bottomRef = useRef<HTMLDivElement | null>(null)
     let debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -28,11 +27,8 @@ const RewardFeedPage = () => {
     const loadData = async() => {
         if (!hasMore || isLoading) return
 
-        if (searchQuery.trim() === '') {
-            await load(page)
-        } else {
-            await loadWithFilters({ label: searchQuery }, page)
-        }
+        const filters = searchQuery.trim() ? { label: searchQuery.trim() } : {}
+        await load({ page, filters })
     }
 
     const debounceFilters = () => {
@@ -43,7 +39,8 @@ const RewardFeedPage = () => {
         dispatch(setLoading(true))
 
         debounceTimer.current = setTimeout(async() => {
-            loadWithFilters({label: searchQuery}, page)
+            const filters = searchQuery.trim() ? { label: searchQuery.trim() } : {}
+            await load({ page, filters })
         }, 1000)
     }
 
@@ -83,7 +80,7 @@ const RewardFeedPage = () => {
                                 <EmptyFeed searchQuery={searchQuery}/>
                             ) : (
                                 <>
-                                    <RewardFeed rewards={hasFilter ? filteredRewards : rewards}/>
+                                    <RewardFeed rewards={rewards}/>
                                     {rewards && <div ref={bottomRef}/>}
                                 </>
                             )
