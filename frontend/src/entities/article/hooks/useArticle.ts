@@ -17,6 +17,7 @@ import {
     setError,
 } from "../model";
 import type { ArticlePreview } from "../model/types/ArticlePreview";
+import type { SortTypes } from "src/features/SearchArticles/types/SortTypes";
 
 export function useArticle() {
     const dispatch = useAppDispatch()
@@ -50,7 +51,7 @@ export function useArticle() {
             setArticles: (data: ArticlePreview[]) => dispatch(setArticles(data)),
             pushArticles: (data: ArticlePreview[]) => dispatch(pushArticles(data)),
             resetArticles: () => dispatch(resetArticles()),
-            setSortType: (type: any) => dispatch(setSortType(type)),
+            setSortType: (type: SortTypes) => dispatch(setSortType(type)),
             setAuthorFilter: (value: string) => dispatch(setAuthorFilter(value)),
             setTitleFilter: (value: string) => dispatch(setTitleFilter(value)),
             setContentFilter: (value: string) => dispatch(setContentFilter(value)),

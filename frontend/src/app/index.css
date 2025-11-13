@@ -20,13 +20,15 @@
 
     --color-bg: #ffe5b4;
     --color-text: #000000; /* text */
-    --color-ts: #ffffff; /* text-secondary */
+    --color-text-secondary: #ffffff; /* text-secondary */
+    --color-text-grey: #b8b8b8;
     --color-tt: #961e1e; /* text-third */
     --color-ta: #dbbc83; /* text-accent */
     --color-as: #FF6600; /* accent-secondary */ 
     --color-at: #fc9f61; /* accent-third */
     --color-ad: #C7A2823D; /* accent-dim */ 
-    --color-bg-dim: #ffe9bf;
+    --color-bg-dim: #fddc9e;
+    --color-text-grey-dim: #8f724d;
 
     --font-base: 'Bounded', sans-serif;
     --font-base-light: 'BoundedLight', sans-serif;
@@ -66,12 +68,14 @@ html, body { overflow-x: hidden; }
 
     --color-bg: #ffe5b4;
     --color-text: #000000;
-    --color-ts: #ffffff;
+    --color-text-secondary: #ffffff;
+    --color-text-grey: #929292;
     --color-ta: #dbbc83;
     --color-as: #FF6600;
     --color-at: #fc9f61;
     --color-ad: #C7A2823D; 
     --color-bg-dim: #ffe9bf;
+    --color-text-grey-dim: #747474;
 
     --font-base: 'Bounded', sans-serif;
     --font-base-light: 'BoundedLight', sans-serif;

@@ -99,7 +99,7 @@ const Footer = () => {
                         </div>
                     </div>
                 </div>
-                <div className='absolute bottom-40 left-0 _casual-span text-ts pl-20'>
+                <div className='absolute bottom-40 left-0 _casual-span text-text-secondary pl-20'>
                     <span>
                         @ Официальный сайт проекта  «Бессметртный полк СПбГУТ»
                     </span>

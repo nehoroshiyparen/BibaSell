@@ -7,7 +7,7 @@ export type MenuButtonProps = {
 
 const MenuButton: React.FC<MenuButtonProps> = ({label, link}) => {
     return (
-        <Link to={link} className="border-[3px] border-text border-solid box-border pt-10 pb-10 pl-30 pr-30 rounded-2xl text-center transition-all hover:bg-at hover:border-at hover:text-ts">
+        <Link to={link} className="border-[3px] border-text border-solid box-border pt-10 pb-10 pl-30 pr-30 rounded-2xl text-center transition-all hover:bg-at hover:border-at hover:text-text-secondary">
             <div className="text-[5rem] font-base">
                 <p>{label}</p>
             </div>

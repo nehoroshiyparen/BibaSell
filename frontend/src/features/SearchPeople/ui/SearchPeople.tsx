@@ -24,8 +24,8 @@ const SearchPeople = () => {
                     id="PeopleSearch"
                     name="PeopleSearch"
                     type="text"
-                    placeholder="..."
-                    className="text-3xl text-ts font-base flex-1 h-full outline-none placeholder-at"
+                    placeholder="Имя героя..."
+                    className="text-3xl text-text-secondary font-base flex-1 h-full outline-none placeholder-at"
                     value={searchQuery}
                     onChange={e => dispatch(setSearchQuery(e.target.value))}
                 />

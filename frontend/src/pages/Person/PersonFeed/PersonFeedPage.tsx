@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react"
 import { usePerson } from "src/entities/person/hooks/usePerson"
 import SearchPeople from "src/features/SearchPeople/ui/SearchPeople"
-import PersonFeed from "src/widgets/PersonFeed/PersonFeed"
+import PersonFeed from "src/features/PersonFeed/PersonFeed"
 import EmptyFeed from "../../../shared/ui/Feed/EmptyFeed"
 import { useAppDispatch } from "src/app/store/hooks"
 import FeedLoad from "../../../shared/ui/Feed/FeedLoad"

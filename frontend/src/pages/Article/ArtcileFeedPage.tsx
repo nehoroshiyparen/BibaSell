@@ -1,10 +1,9 @@
 import { useEffect, useRef } from "react"
 import { useArticle } from "src/entities/article/hooks/useArticle"
-import ArticleFeed from "src/widgets/ArticleFeed/ArticleFeed"
-import SideMenu from "./ui/SideMenu"
-import SearchArticles from "src/features/SearchArticles/ui/SearchArticles"
+import ArticleFeed from "src/features/ArticleFeed/ArticleFeed"
 import FeedLoad from "src/shared/ui/Feed/FeedLoad"
 import EmptyFeed from "src/shared/ui/Feed/EmptyFeed"
+import SearchArticlesPanel from "src/features/SearchArticles/ui/SearchArticlesPanel"
 
 const ArticleFeedPage = () => {
     const { useLoad, useArticleState } = useArticle()
@@ -38,13 +37,14 @@ const ArticleFeedPage = () => {
 
     return (
         <div className="w-screen flex justify-center">
-            <div className="w-full pt-10 pl-30 pr-30 box-border flex gap-30">
-                <SideMenu/>
-                <div className="flex-1">
+            <div className="w-full pt-10 pl-30 pr-30 box-border flex gap-30 items-start relative">
+                <div className="flex flex-col gap-10">
                     <div className="flex flex-col gap-10 w-full">
                         <span className="text-[5em] font-base">СТАТЬИ</span>
-                        <SearchArticles/>
                     </div>
+                    <SearchArticlesPanel/>
+                </div>
+                <div className="flex-1 flex flex-col gap-10 items-start">
                     {
                         isLoading ? (
                             <FeedLoad/>

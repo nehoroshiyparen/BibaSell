@@ -12,12 +12,8 @@ import { RewardServiceImpl } from "#src/modules/rewards/services/reward.service.
 import { RewardControllerImpl } from "#src/modules/rewards/controllers/reward.controller.js";
 import { RewardRouter } from "#src/routes/reward.routes.js";
 import { AppImpl } from "#src/app.impl.js";
-import { IMDXArticleService } from "#src/types/contracts/services/mdxArticles/mdxArticle.service.interface.js";
-import { MDXArticleServiceImpl } from "#src/modules/mdxArticles/services/mdxArticle.service.impl.js";
-import { MDXArticleControllerImpl } from "#src/modules/mdxArticles/controllers/mdxArticle.controller.js";
 import { IRedis } from "#src/types/contracts/core/redis.interface.js";
 import { RedisImpl } from "#src/infrastructure/redis/redis.impl.js";
-import { MDXArticleRouter } from "#src/routes/mdxArticle.routes.js";
 import { S3PdfArticleServiceImpl } from "#src/modules/pdfArticles/services/S3PdfArticle.service.impl.js";
 import { PdfArticleSequelizeRepo } from "#src/modules/pdfArticles/repositories/pdfArticle.sequelize-repo.js";
 import { PdfArticleElasticRepo } from "#src/modules/pdfArticles/repositories/pdfArticle.elastic-repo.js";
@@ -52,20 +48,17 @@ container.bind<IBaseS3Repo>(TYPES.S3).to(BaseS3Repo).inSingletonScope()
 // Routers
 container.bind<PersonRouter>(TYPES.PersonRouter).to(PersonRouter).inSingletonScope()
 container.bind<RewardRouter>(TYPES.RewardRouter).to(RewardRouter).inSingletonScope()
-container.bind<MDXArticleRouter>(TYPES.MDXArticleRouter).to(MDXArticleRouter).inSingletonScope()
 container.bind<PdfArticleRouter>(TYPES.PdfArticleRouter).to(PdfArticleRouter).inSingletonScope()
 container.bind<IndexRouter>(TYPES.IndexRouter).to(IndexRouter).inSingletonScope()
 
 // Controllers
 container.bind<PersonControllerImpl>(TYPES.PersonController).to(PersonControllerImpl).inSingletonScope()
 container.bind<RewardControllerImpl>(TYPES.RewardController).to(RewardControllerImpl).inSingletonScope()
-container.bind<MDXArticleControllerImpl>(TYPES.MDXArticleController).to(MDXArticleControllerImpl).inSingletonScope()
 container.bind<PdfArticleControllerImpl>(TYPES.PdfArticleController).to(PdfArticleControllerImpl).inSingletonScope()
 
 // Services
 container.bind<IPersonService>(TYPES.PersonService).to(PersonServiceImpl).inSingletonScope()
 container.bind<IRewardService>(TYPES.RewardService).to(RewardServiceImpl).inSingletonScope()
-container.bind<IMDXArticleService>(TYPES.MDXArticleService).to(MDXArticleServiceImpl).inSingletonScope()
 container.bind<IPdfArticleService>(TYPES.PdfArticleService).to(PdfArticleServiceImpl).inSingletonScope()
 
 // S3 services

@@ -6,7 +6,7 @@ import { setLoading } from "src/entities/reward/model"
 import SearchRewards from "src/features/SearchRewards/SearchRewards"
 import EmptyFeed from "src/shared/ui/Feed/EmptyFeed"
 import FeedLoad from "src/shared/ui/Feed/FeedLoad"
-import RewardFeed from "src/widgets/RewardsFeed/RewardFeed"
+import RewardFeed from "src/features/RewardsFeed/RewardFeed"
 
 const RewardFeedPage = () => {
     const { load, loadWithFilters } = useRewards()
