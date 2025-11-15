@@ -1,21 +1,40 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { useArticle } from "src/entities/article/hooks/useArticle"
 import ArticleFeed from "src/features/ArticleFeed/ArticleFeed"
 import FeedLoad from "src/shared/ui/Feed/FeedLoad"
 import EmptyFeed from "src/shared/ui/Feed/EmptyFeed"
 import SearchArticlesPanel from "src/features/SearchArticles/ui/SearchArticlesPanel"
+import type { ArticleFilters } from "src/entities/article/model/types/ArticleFilters"
 
 const ArticleFeedPage = () => {
     const { useLoad, useArticleState } = useArticle()
     
-    const { articles, page, hasMore, isLoading, isFilterActive } = useArticleState()
+    const { 
+        articles,
+        page,
+        hasMore,
+        isLoading,
+        selectedTitleFilter,
+        selectedAuthorFilter,
+        selectedContentFilter,
+    } = useArticleState()
     const bottomRef = useRef<HTMLDivElement | null>(null)
 
-    const isEmpty = isFilterActive && articles.length === 0
+    const filters = useMemo<ArticleFilters>(() => ({
+        title: selectedTitleFilter,
+        authors: selectedAuthorFilter ? [selectedAuthorFilter] : [],
+        extractedText: selectedContentFilter,
+    }), [
+        selectedTitleFilter,
+        selectedAuthorFilter,
+        selectedContentFilter
+    ])
+
+    const isEmpty = false
 
     const loadData = async() => {
         if (!hasMore || isLoading) return
-        await useLoad(page)
+        await useLoad({ offset: page, filters })
     }
 
     useEffect(() => {
@@ -33,7 +52,7 @@ const ArticleFeedPage = () => {
         observer.observe(bottomRef.current)
 
         return () => observer.disconnect()
-    }, [bottomRef.current, page, hasMore, isFilterActive])
+    }, [bottomRef.current, page, hasMore])
 
     return (
         <div className="w-screen flex justify-center">

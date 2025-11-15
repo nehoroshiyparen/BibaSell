@@ -10,7 +10,10 @@ const SearchArticlesPanel = () => {
         titleFilter,
         authorFilter,
         contentFilter,
-        sortType
+        sortType,
+        setSelectedAuthorFilter,
+        setSelectedContentFilter,
+        setSelectedTitleFilter
     } = useArticleState()
 
     const [isSubmitButtonAcitve, setIsSubmitButtonAcitve] = useState<boolean>(false)
@@ -23,6 +26,15 @@ const SearchArticlesPanel = () => {
         }
     }, [titleFilter, authorFilter, contentFilter, sortType])
 
+    const applyFilters = () => {
+        if (isSubmitButtonAcitve) {
+            setSelectedAuthorFilter(authorFilter)
+            setSelectedContentFilter(contentFilter)
+            setSelectedTitleFilter(titleFilter)
+        }
+    }
+
+
     return (
         <div className="flex justify-center">
             <div className="w-full max-h-auto box-border p-10 bg-ad rounded-2xl flex flex-col items-start gap-20">
@@ -30,7 +42,13 @@ const SearchArticlesPanel = () => {
                     <SearchParamButton/>
                     <SearchSortButton/>
                 </div>
-                <button className={`box-border pl-6 pr-6 pt-4 pb-4 rounded-3xl border-2 ${isSubmitButtonAcitve ? 'bg-at border-as text-text cursor-pointer' : 'bg-ta border-ta text-text-grey-dim'} `}>
+                <button 
+                    className={
+                        `box-border pl-6 pr-6 pt-4 pb-4 rounded-3xl border-2 
+                        ${isSubmitButtonAcitve ? 'bg-at border-as text-text cursor-pointer' : 
+                        'bg-ta border-ta text-text-grey-dim'} `}
+                    onClick={applyFilters}
+                >
                     <span className='font-base text-4xl'>
                         Искать
                     </span>

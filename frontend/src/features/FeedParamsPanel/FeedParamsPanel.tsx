@@ -1,4 +1,3 @@
-import type React from "react"
 import type { FeedParamsPanelProps } from "./types/FeedParamsProps"
 import FeedParam from "./ui/FeedParam"
 

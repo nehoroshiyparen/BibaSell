@@ -18,11 +18,14 @@ export type ArticleState = {
     authorFilter: string
     titleFilter: string
     contentFilter: string
+
+    selectedTitleFilter: string
+    selectedAuthorFilter: string
+    selectedContentFilter: string
+
     isAuthorFilterEnabled: boolean
     isTitleFilterEnabled: boolean
     isContentFilterEnabled: boolean
-
-    isFilterActive: boolean
 }
 
 const initialState: ArticleState = {
@@ -37,14 +40,17 @@ const initialState: ArticleState = {
     error: null,
     
     sortType: SortTypes.none,
-    authorFilter: '',
     titleFilter: '',
+    authorFilter: '',
     contentFilter: '',
+
+    selectedTitleFilter: '',
+    selectedAuthorFilter: '',
+    selectedContentFilter: '',
+
     isAuthorFilterEnabled: false,
     isTitleFilterEnabled: false,
     isContentFilterEnabled: false,
-
-    isFilterActive: false, 
 }
 
 const articleSlice = createSlice({
@@ -76,6 +82,27 @@ const articleSlice = createSlice({
             state.contentFilter = action.payload
         },
 
+        setSelectedTitleFilter: (state, action: PayloadAction<string>) => {
+            state.selectedTitleFilter = action.payload
+            state.isTitleFilterEnabled = !!action.payload.trim()
+            state.page = 0,
+            state.hasMore = true
+        },
+
+        setSelectedAuthorFilter: (state, action: PayloadAction<string>) => {
+            state.selectedAuthorFilter = action.payload
+            state.isAuthorFilterEnabled = !!action.payload.trim()
+            state.page = 0,
+            state.hasMore = true
+        },
+
+        setSelectedContentFilter: (state, action: PayloadAction<string>) => {
+            state.selectedContentFilter = action.payload
+            state.isContentFilterEnabled = !!action.payload.trim()
+            state.page = 0,
+            state.hasMore = true
+        },
+
         setIsAuthorFilterEnabled: (state, action: PayloadAction<boolean>) => {
             state.isAuthorFilterEnabled = action.payload
         },
@@ -84,21 +111,6 @@ const articleSlice = createSlice({
         },
         setIsContentFilterEnabled: (state, action: PayloadAction<boolean>) => {
             state.isContentFilterEnabled = action.payload
-        },
-        setIsFilterActive: (state) => {
-            state.isFilterActive = Boolean(
-                state.sortType !== SortTypes.none ||
-                state.authorFilter ||
-                state.titleFilter ||
-                state.contentFilter ||
-                state.isAuthorFilterEnabled ||
-                state.isTitleFilterEnabled ||
-                state.isContentFilterEnabled
-            )
-            if (state.isFilterActive) {
-                state.page = 0
-                state.hasMore = true
-            }
         },
         
 
@@ -140,7 +152,9 @@ export const {
     setIsAuthorFilterEnabled,
     setIsTitleFilterEnabled,
     setIsContentFilterEnabled,
-    setIsFilterActive,
+    setSelectedAuthorFilter,
+    setSelectedContentFilter,
+    setSelectedTitleFilter,
     setLoading, setError
 } = articleSlice.actions
 export default articleSlice.reducer

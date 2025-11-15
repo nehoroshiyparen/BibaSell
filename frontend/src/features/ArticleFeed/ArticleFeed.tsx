@@ -20,26 +20,29 @@ const ArticleFeed = ({ articles }: ArticleFeedParams) => {
 
     const { useArticleState } = useArticle()
     const {
-        titleFilter, isTitleFilterEnabled,
-        authorFilter, isAuthorFilterEnabled,
-        contentFilter, isContentFilterEnabled
+        selectedTitleFilter, isTitleFilterEnabled, setSelectedTitleFilter,
+        selectedAuthorFilter, isAuthorFilterEnabled, setSelectedAuthorFilter,
+        selectedContentFilter, isContentFilterEnabled, setSelectedContentFilter
     } = useArticleState()
     
     const activeSearchParams = {
         titleFilter: {
             name: 'Название',
-            param: titleFilter,
+            param: selectedTitleFilter,
             isActive: isTitleFilterEnabled,
+            clearFunc: setSelectedTitleFilter,
         },
         authorFilter: {
             name: 'Автор',
-            param: authorFilter,
+            param: selectedAuthorFilter,
             isActive: isAuthorFilterEnabled,
+            clearFunc: setSelectedAuthorFilter
         },
         contentFilter: {
             name: 'Содержание',
-            param: contentFilter,
+            param: selectedContentFilter,
             isActive: isContentFilterEnabled,
+            clearFunc: setSelectedContentFilter,
         }
     }
 
@@ -48,8 +51,8 @@ const ArticleFeed = ({ articles }: ArticleFeedParams) => {
             <FeedParamsPanel<ArticlePreviewType, typeof activeSearchParams> feedEntities={articles} params={activeSearchParams}/>
             <Masonry
                 breakpointCols={breakpointColumns}
-                className="flex gap-6"                  // контейнер колонок
-                columnClassName="space-y-6"             // отступы между элементами
+                className="flex gap-6"
+                columnClassName="space-y-6"
             >
                 {articles.map(article => (
                     <ArticlePreview article={article}/>

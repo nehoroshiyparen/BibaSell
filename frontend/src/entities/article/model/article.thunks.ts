@@ -11,9 +11,9 @@ type FetchArticleArgs = {
 
 export const fetchArticles = createAsyncThunk<ArticlePreview[], FetchArticleArgs>(
     'article/fetchArticles',
-    async ({ page, limit }, { rejectWithValue }) => {
+    async ({ page, limit, filters }, { rejectWithValue }) => {
         try {
-            const data = await getArticlesApi(page*10, limit ?? 10)
+            const data = await getArticlesApi(page*10, limit ?? 10, filters)
             return data
         } catch (e) {
             if (e instanceof Error) return rejectWithValue(e.message)

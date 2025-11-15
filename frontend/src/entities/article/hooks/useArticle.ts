@@ -12,20 +12,23 @@ import {
     setIsAuthorFilterEnabled,
     setIsTitleFilterEnabled,
     setIsContentFilterEnabled,
-    setIsFilterActive,
     setLoading,
     setError,
+    setSelectedAuthorFilter,
+    setSelectedContentFilter,
+    setSelectedTitleFilter,
 } from "../model";
 import type { ArticlePreview } from "../model/types/ArticlePreview";
 import type { SortTypes } from "src/features/SearchArticles/types/SortTypes";
+import type { ArticleFilters } from "../model/types/ArticleFilters";
 
 export function useArticle() {
     const dispatch = useAppDispatch()
 
     // Default limit = 10
-    const useLoad = async(page: number, limit?: number) => {
+    const useLoad = async(params: { offset: number, limit?: number, filters?: ArticleFilters }) => {
         try {
-            await dispatch(fetchArticles({ page, limit }))
+            await dispatch(fetchArticles({ page: params.offset, limit: params.limit, filters: params.filters }))
         } catch (e) {
             console.log(e)
         }
@@ -44,8 +47,9 @@ export function useArticle() {
         const isAuthorFilterEnabled = useAppSelector((state: RootState) => state.article.isAuthorFilterEnabled)
         const isTitleFilterEnabled = useAppSelector((state: RootState) => state.article.isTitleFilterEnabled)
         const isContentFilterEnabled = useAppSelector((state: RootState) => state.article.isContentFilterEnabled)
-
-        const isFilterActive = useAppSelector((state: RootState) => state.article.isFilterActive)
+        const selectedAuthorFilter = useAppSelector((state: RootState) => state.article.selectedAuthorFilter)
+        const selectedContentFilter = useAppSelector((state: RootState) => state.article.selectedContentFilter)
+        const selectedTitleFilter = useAppSelector((state: RootState) => state.article.selectedTitleFilter)
 
         const actions = {
             setArticles: (data: ArticlePreview[]) => dispatch(setArticles(data)),
@@ -58,7 +62,9 @@ export function useArticle() {
             setIsAuthorFilterEnabled: (val: boolean) => dispatch(setIsAuthorFilterEnabled(val)),
             setIsTitleFilterEnabled: (val: boolean) => dispatch(setIsTitleFilterEnabled(val)),
             setIsContentFilterEnabled: (val: boolean) => dispatch(setIsContentFilterEnabled(val)),
-            setIsFilterActive: () => dispatch(setIsFilterActive()),
+            setSelectedAuthorFilter: (val: string) => dispatch(setSelectedAuthorFilter(val)),
+            setSelectedContentFilter: (val: string) => dispatch(setSelectedContentFilter(val)),
+            setSelectedTitleFilter: (val: string) => dispatch(setSelectedTitleFilter(val)),
             setLoading: (val: boolean) => dispatch(setLoading(val)),
             setError: (val: string | null) => dispatch(setError(val)),
         }
@@ -75,7 +81,9 @@ export function useArticle() {
             isAuthorFilterEnabled,
             isTitleFilterEnabled,
             isContentFilterEnabled,
-            isFilterActive,
+            selectedAuthorFilter,
+            selectedContentFilter,
+            selectedTitleFilter,
 
             ...actions
         }
