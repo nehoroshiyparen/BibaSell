@@ -14,6 +14,7 @@ import { inject, injectable } from "inversify";
 import { getSlug } from "#src/shared/slugging/getSlug.js";
 import { pdfParse } from "#src/shared/files/pdf/pdf-parse.js";
 import { cleanup } from "#src/shared/utils/object.cleanup.js";
+import { cleanText } from '../utils/files/cleanText.js'
 import { PdfArticleUpdateDto } from "../types/dto/PdfArticleUpdate.dto.js";
 import { generateUuid } from "#src/shared/crypto/generateUuid.js";
 import { S3PdfArticleServiceImpl } from "./S3PdfArticle.service.impl.js";
@@ -62,56 +63,47 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         filters: Partial<TypeofPdfArticleFiltersSchema> = {},
     ): Promise<TypeofPdfAcrticlePreviewSchema[]> {
         try {
-            // 1. нормализуем фильтры (поддерживаем разные имена с фронта)
-            const title = (filters.title || (filters as any).titleFilter || '').trim()
-            const extractedText = (filters.extractedText || (filters as any).content || '').trim()
-            const author = (filters.author || (Array.isArray((filters as any).authors) ? (filters as any).authors[0] : '') || '').trim()
+            const title = cleanText(filters.title || (filters as any).titleFilter)
+            const extractedText = cleanText(filters.extractedText || (filters as any).content)
+            console.log(extractedText)
+            const author = cleanText(
+                filters.author || (Array.isArray((filters as any).authors) ? (filters as any).authors[0] : '')
+            )
 
-            // 2. строим elasticQuery только если есть meaningful value
+            console.log('title: ', title)
+
             const elasticQuery: Record<string, string> = {}
             if (title) elasticQuery.title = title
             if (extractedText) elasticQuery.extractedText = extractedText
 
             let idsFromElastic: number[] = []
             if (Object.keys(elasticQuery).length > 0) {
-            const elasticCandidates = await this.elastic.searchArticles(elasticQuery)
-            idsFromElastic = elasticCandidates.map(a => a.id)
-            // если elastic вернул ноль кандидатов — сразу возвращаем пустой массив
-            if (idsFromElastic.length === 0) return []
+                const elasticCandidates = await this.elastic.searchArticles(elasticQuery)
+                idsFromElastic = elasticCandidates.map(a => a.id)
+                if (idsFromElastic.length === 0) return []
             }
 
             let articles: PdfArticle[] = []
 
-            // 3. три основных сценария:
-            // a) есть и author и idsFromElastic -> делаем WHERE id IN (...) AND author = ? с offset/limit
-            // b) есть author, но нет idsFromElastic -> обычный findByAuthor
-            // c) нет author, но есть idsFromElastic -> findByIds (с поддержкой offset/limit)
-            // d) ничего -> findAll
-
             if (author && idsFromElastic.length) {
-            // оптимально: делаем запрос по ids + author + пагинация
-            // важно: slice ids для текущей страницы, либо использовать ORDER BY FIELD(...) в SQL
             const pagedIds = idsFromElastic.slice(offset, offset + limit)
-            // если после slice ничего не осталось — возвращаем пустой
             if (pagedIds.length === 0) return []
 
             articles = await this.sequelize.findByAuthorAndIds(author, pagedIds)
-            // если нужен строгий порядок как в elasticCandidates:
-            // после получения articles — упорядочи их согласно pagedIds
             const articlesMap = new Map(articles.map(a => [a.id, a]))
-                articles = pagedIds
-                    .map(id => articlesMap.get(id))
-                    .filter(Boolean) as PdfArticle[]
+            articles = pagedIds
+                .map(id => articlesMap.get(id))
+                .filter((a): a is PdfArticle => Boolean(a))
             } else if (author) {
                 articles = await this.sequelize.findByAuthor(author, offset, limit)
             } else if (idsFromElastic.length) {
-                // берем только нужные id для текущей страницы (чтобы корректно пагинировать)
                 const pagedIds = idsFromElastic.slice(offset, offset + limit)
                 if (pagedIds.length === 0) return []
                 articles = await this.sequelize.findByIds(pagedIds)
-                // упорядочить по pagedIds, если нужно
                 const articlesMap = new Map(articles.map(a => [a.id, a]))
-                articles = pagedIds.map(id => articlesMap.get(id)).filter(Boolean) as PdfArticle[]
+                articles = pagedIds
+                    .map(id => articlesMap.get(id))
+                    .filter((a): a is PdfArticle => Boolean(a))
             } else {
                 articles = await this.sequelize.findAll(offset, limit)
             }
@@ -136,7 +128,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
 
             if (!pdfData) throw ApiError.BadRequest('Article cant be created without file. File is not attached')
 
-            const extractedText = await pdfParse(pdfData)
+            const extractedText = cleanText(await pdfParse(pdfData))
 
             if (!options.title) throw ApiError.BadRequest("Article must have a title")
             const slug = getSlug(options.title)

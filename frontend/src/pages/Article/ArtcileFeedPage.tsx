@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef } from "react"
 import { useArticle } from "src/entities/article/hooks/useArticle"
 import ArticleFeed from "src/features/ArticleFeed/ArticleFeed"
 import FeedLoad from "src/shared/ui/Feed/FeedLoad"
-import EmptyFeed from "src/shared/ui/Feed/EmptyFeed"
 import SearchArticlesPanel from "src/features/SearchArticles/ui/SearchArticlesPanel"
 import type { ArticleFilters } from "src/entities/article/model/types/ArticleFilters"
 
@@ -29,8 +28,6 @@ const ArticleFeedPage = () => {
         selectedAuthorFilter,
         selectedContentFilter
     ])
-
-    const isEmpty = false
 
     const loadData = async() => {
         if (!hasMore || isLoading) return
@@ -68,14 +65,10 @@ const ArticleFeedPage = () => {
                         isLoading ? (
                             <FeedLoad/>
                         ) : (
-                            isEmpty ? (
-                                 <EmptyFeed />
-                            ) : (
-                                <>
-                                    <ArticleFeed articles={articles}/>
-                                    {articles && <div ref={bottomRef} className="ref"/>}
-                                </>
-                            )
+                            <>
+                                <ArticleFeed articles={articles}/>
+                                {articles && <div ref={bottomRef} className="ref"/>}
+                            </>
                         )
                     }
                 </div>

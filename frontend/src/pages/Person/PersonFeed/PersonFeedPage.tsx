@@ -62,6 +62,8 @@ const PersonFeedPage = () => {
     const hasFilter = searchQuery.trim() !== ''
     const isEmpty = hasFilter && persons.length === 0
 
+    console.log(persons)
+
     return (
         <div className="w-screen flex justify-center">
             <div className="w-full box-border pl-70 pr-70">

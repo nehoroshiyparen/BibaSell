@@ -73,23 +73,30 @@ export class ElasticImpl implements IElastic {
         from: number = 0,
         size: number = 10,
     ): Promise<T[]> {
-        const should = Object.entries(query)
-            .filter(([_, value]) => value)
-            .map(([field, value]) => ({ match: { [field]: value }}))
+        try {
+            const should = Object.entries(query)
+                .filter(([_, value]) => value)
+                .map(([field, value]) => ({ match: { [field]: value }}))
 
-        const res = await this.client.search<T>({
-            index,
-            from,
-            size,
-            query: {
-                bool: {
-                    should,
-                    minimum_should_match: 1 // хотя бы одно совпадение
+            const res = await this.client.search<T>({
+                index,
+                from,
+                size,
+                query: {
+                    bool: {
+                        should,
+                        minimum_should_match: 1
+                    }
                 }
+            })
+            this.logger.operations.fetched(stringifyObject(res.hits.hits.map(hit => hit._source)))
+            return res.hits.hits.map(hit => hit._source as T)
+        } catch (e: any) {
+            if (e.meta?.body?.error?.type === 'index_not_found_exception') {
+            return []
             }
-        })
-        this.logger.operations.fetched(stringifyObject(res.hits.hits.map(hit => hit._source)))
-        return res.hits.hits.map(hit => hit._source as T)
+            throw e
+        }
     }
 
     async deleteDocument(index: string, id: string | number): Promise<estypes.DeleteResponse> {

@@ -26,4 +26,8 @@ export class PdfArticleElasticRepo {
     async destroyArticle(id: number) {
         return await this.elastic.deleteDocument(this.index, id)
     }
+
+    public getIndexName() {
+        return this.index
+    }
 }

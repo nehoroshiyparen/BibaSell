@@ -6,22 +6,28 @@ type ArticlePreviewProps = {
 }
 
 const ArticlePreview: React.FC<ArticlePreviewProps> = ({ article }) => {
+    const date = new Date(article.publishedAt);
+
+    const formatted = date.toLocaleDateString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+    });
+
     return (
         <div className="max-h-250 relative rounded-3xl border-2 border-at overflow-hidden group ">
             <div className="absolute z-10 w-full h-full flex items-end justify-start box-border p-10">
                 <div className="flex flex-col gap-7 transition-transform translate-y-30 duration-500 group-hover:-translate-y-5">
-                    {/* Название — видно всегда */}
                     <div>
                         <span className="text-4xl font-base text-text-secondary">
                         {article.title}
                         </span>
                     </div>
 
-                    {/* Нижняя часть — появляется */}
                     <div className="flex flex-col gap-7 opacity-0 translate-y-20 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
                         <div>
                             <span className="text-2xl text-text-grey font-base-light font-bold">
-                                {article.publishedAt.toString()} |{" "}
+                                {formatted} |
                                 {article.authors.map(author => author.name).join(", ")}
                             </span>
                         </div>
@@ -41,7 +47,11 @@ const ArticlePreview: React.FC<ArticlePreviewProps> = ({ article }) => {
                 group-hover:opacity-100
             "/>
             <div className="w-full h-full">
-                <img src={article.preview} className="w-full h-full object-cover object-center"/>
+                <img 
+                    src={article.preview} 
+                    className="w-full h-full object-cover object-center opacity-0 transition-opacity duration-500"
+                    onLoad={(e) => (e.currentTarget.style.opacity = "1")}
+                />
             </div>
         </div>
     )

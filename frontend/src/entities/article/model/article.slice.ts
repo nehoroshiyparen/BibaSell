@@ -63,7 +63,7 @@ const articleSlice = createSlice({
         pushArticles: (state, action: PayloadAction<ArticlePreview[]>) => {
             state.articles = [...state.articles, ...action.payload]
         },
-        resetArticles: (state) => {
+        resetArticles: (state: ArticleState) => {
             state.articles = []
             state.page = 0,
             state.hasMore = true
@@ -82,9 +82,12 @@ const articleSlice = createSlice({
             state.contentFilter = action.payload
         },
 
-        setSelectedTitleFilter: (state, action: PayloadAction<string>) => {
+        setSelectedTitleFilter: (state: ArticleState, action: PayloadAction<string>) => {
             state.selectedTitleFilter = action.payload
             state.isTitleFilterEnabled = !!action.payload.trim()
+            
+            // reset
+            state.articles = []
             state.page = 0,
             state.hasMore = true
         },
@@ -92,6 +95,9 @@ const articleSlice = createSlice({
         setSelectedAuthorFilter: (state, action: PayloadAction<string>) => {
             state.selectedAuthorFilter = action.payload
             state.isAuthorFilterEnabled = !!action.payload.trim()
+            
+            // reset
+            state.articles = []
             state.page = 0,
             state.hasMore = true
         },
@@ -99,6 +105,9 @@ const articleSlice = createSlice({
         setSelectedContentFilter: (state, action: PayloadAction<string>) => {
             state.selectedContentFilter = action.payload
             state.isContentFilterEnabled = !!action.payload.trim()
+           
+            // reset
+            state.articles = []
             state.page = 0,
             state.hasMore = true
         },
