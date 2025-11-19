@@ -16,7 +16,7 @@ const Cards = () => {
                             Поделитесь фотографиями и историей  о воинском пути, боевых заслугах.
                         </span>
                     </div>
-                    <div className="_casual-span text-as">
+                    <div className="_casual-span text-accent-secondary">
                         <Link to={'/'} className="flex gap-10 font-bold">
                             <span>Добавить участника</span>
                             <ShareIcon size="4rem"/>

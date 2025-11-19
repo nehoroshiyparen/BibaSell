@@ -3,7 +3,6 @@ import { useAppSelector } from "../store/hooks"
 import type { AppRoute } from "./config/routes.config"
 import PrivateRoute from "./PrivateRoute"
 import PublicRoute from "./PublicRoute"
-import { useEffect } from "react"
 
 type RouteWrapperProps = {
     route: AppRoute,
@@ -12,6 +11,8 @@ type RouteWrapperProps = {
 
 const RouteWrapper = ({ route, children }: RouteWrapperProps) => {
     const Layout = route.layout
+    const Header = route.header
+    const Footer = route.footer
     const LoadingScreen = route.loader.loadingScreen
     const Spinner = route.loader.spinner.component
 
@@ -35,7 +36,10 @@ const RouteWrapper = ({ route, children }: RouteWrapperProps) => {
                 spinner={<Spinner width={route.loader.spinner.width} height={route.loader.spinner.height}/>}
                 show={isLoading}
             />
-            <Layout>
+            <Layout
+                header={Header ? <Header /> : null}
+                footer={Footer ? <Footer /> : null}
+            >
                 {content}
             </Layout>
         </>

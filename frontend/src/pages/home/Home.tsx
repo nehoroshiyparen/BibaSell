@@ -6,7 +6,7 @@ import MDXArticleBlock from "./ui/ArticleBlock"
 
 const Home = () => {
     return (
-        <div className="flex flex-col overflow-hidden">
+        <div className="flex flex-col overflow-hidden box-border pt-60">
             <GreetingBlock/>
             <CardsBlock/>
             <MapsBlock/>

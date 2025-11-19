@@ -18,17 +18,28 @@
 :root {
     font-size: 8px;
 
-    --color-bg: #ffe5b4;
+    --color-bg: #e3cdb3;
     --color-text: #000000; /* text */
     --color-text-secondary: #ffffff; /* text-secondary */
     --color-text-grey: #b8b8b8;
-    --color-tt: #961e1e; /* text-third */
-    --color-ta: #dbbc83; /* text-accent */
-    --color-as: #FF6600; /* accent-secondary */ 
-    --color-at: #fc9f61; /* accent-third */
-    --color-ad: #C7A2823D; /* accent-dim */ 
+    --color-text-third: #961e1e; /* text-third */
+    --color-accent-first: #e5b78f; /* text-accent */
+    --color-accent-secondary: #FF6600; /* accent-secondary */ 
+    --color-accent-third: #E7915D; /* accent-third */
+    --color-accent-brown: #935831;
+    --color-accent-dim: #C7A2823D; /* accent-dim */ 
     --color-bg-dim: #fddc9e;
     --color-text-grey-dim: #8f724d;
+
+    --color-header-bg: #e3cdb3;
+    --color-header-buttons: #e5b78f;
+    --color-article-header-bg: #d37e49;
+
+    --color-gradient-footer: #c6a181;
+
+    --color-bg-search: #e4c0a0;
+
+    --color-gradient-hover-el: #e5b78f;
 
     --font-base: 'Bounded', sans-serif;
     --font-base-light: 'BoundedLight', sans-serif;
@@ -70,12 +81,23 @@ html, body { overflow-x: hidden; }
     --color-text: #000000;
     --color-text-secondary: #ffffff;
     --color-text-grey: #929292;
-    --color-ta: #dbbc83;
-    --color-as: #FF6600;
-    --color-at: #fc9f61;
-    --color-ad: #C7A2823D; 
+    --color-accent-first: #dbbc83;
+    --color-accent-secondary: #FF6600;
+    --color-accent-third: #fc9f61;
+    --color-accent-dim: #C7A2823D; 
+    --color-accent-brown: #935831;
     --color-bg-dim: #ffe9bf;
     --color-text-grey-dim: #747474;
+
+    --color-header-bg: #e3cdb3;
+    --color-header-buttons: #e5b78f;
+    --color-article-header-bg: #d37e49;
+
+    --color-gradient-footer: #c6a181;
+
+    --color-bg-search: #e4c0a0;
+
+    --color--gradient-hover-el: #e5b78f;
 
     --font-base: 'Bounded', sans-serif;
     --font-base-light: 'BoundedLight', sans-serif;

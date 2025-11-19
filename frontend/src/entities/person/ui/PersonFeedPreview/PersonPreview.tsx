@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom"
-import type { PersonPreview } from "../../model/types/PersonPreview"
-import './PersonFeedPreview.css'
+import type { PersonPreview as PersonPreviewType } from "../../model/types/PersonPreview"
+import './PersonPreview.css'
 
 type PersonFeedPreviewProps = {
-    person: PersonPreview
+    person: PersonPreviewType
 }
 
-const PersonFeedPreview:React.FC<PersonFeedPreviewProps> = ({ person }) => {
+const PersonPreview:React.FC<PersonFeedPreviewProps> = ({ person }) => {
     return (
         <Link to={`${person.slug}`} className="_person-feed-preview w-full h-170 relative cursor-pointer">
             <div className="_person-feed-preview-bg"/>
@@ -36,4 +36,4 @@ const PersonFeedPreview:React.FC<PersonFeedPreviewProps> = ({ person }) => {
     )
 }
 
-export default PersonFeedPreview
+export default PersonPreview

@@ -25,7 +25,7 @@ const Footer = () => {
                     </div>
                     <div className="flex justify-between text-[2.5rem] font-base-light font-bold w-full">
                         <div className='flex flex-col gap-6'>
-                            <div className='text-as'>
+                            <div className='text-accent-secondary'>
                                 <span>
                                     Галлерея памяти
                                 </span>
@@ -47,7 +47,7 @@ const Footer = () => {
                             </div>
                         </div>
                         <div className='flex flex-col gap-6'>
-                            <div className='text-as'>
+                            <div className='text-accent-secondary'>
                                 <span>
                                     Библиотека
                                 </span>
@@ -64,7 +64,7 @@ const Footer = () => {
                             </div>
                         </div>
                         <div className='flex flex-col gap-6'>
-                            <div className='text-as'>
+                            <div className='text-accent-secondary'>
                                 <span>
                                     О нас
                                 </span>

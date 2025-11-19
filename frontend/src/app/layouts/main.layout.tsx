@@ -1,18 +1,23 @@
-import Footer from "src/widgets/Footer/Footer"
-import Header from "src/widgets/Header/ui/Header"
-
-const MainLayout = ({ children }: { children: React.ReactElement }) => {
+const MainLayout = ({
+    header,
+    footer,
+    children,
+}: {
+    header?: React.ReactNode;
+    footer?: React.ReactNode;
+    children: React.ReactNode;
+}) => {
     return (
         <div className="flex flex-col">
-            <div className="header flex h-60 w-full fixed inset-0 z-50 justify-center header_gradient">
-                <Header/>
-            </div>
-            <div className="_container flex-1 flex justify-center box-border pt-50">
+            {header}
+
+            <div className="_container flex-1 flex justify-center">
                 {children}
             </div>
-            <Footer/>
-        </div>
-    )
-}
 
-export default MainLayout
+            {footer}
+        </div>
+    );
+};
+
+export default MainLayout;

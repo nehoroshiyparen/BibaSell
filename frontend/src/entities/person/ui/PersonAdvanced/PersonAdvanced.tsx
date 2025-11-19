@@ -21,7 +21,7 @@ const PersonAdvanced:React.FC<PersonAdvancedProps> = ({ person }) => {
                     <div className="text-7xl text-text font-base">
                         <span>{person.name}</span>
                     </div>
-                    <div className="text-at font-base text-5xl">
+                    <div className="text-accent-third font-base text-5xl">
                         <span>Биография</span>
                     </div>
                     <div className="text-text font-base text-4xl/15">
@@ -30,7 +30,7 @@ const PersonAdvanced:React.FC<PersonAdvancedProps> = ({ person }) => {
                 </div>
             </div>
             <div className="w-full flex flex-col gap-15">
-                <div className="text-5xl text-at font-base">
+                <div className="text-5xl text-accent-third font-base">
                     Награды
                 </div>
                 <div>

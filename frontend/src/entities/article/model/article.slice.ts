@@ -2,6 +2,7 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
 import type { ArticlePreview } from "./types/ArticlePreview"
 import { fetchArticles } from "./article.thunks"
 import { SortTypes } from "src/features/SearchArticles/types/SortTypes"
+import type { ArticleAdvanced } from "./types/ArticleAdvanced"
 
 export type ArticleState = {
     articles: ArticlePreview[],
@@ -26,6 +27,8 @@ export type ArticleState = {
     isAuthorFilterEnabled: boolean
     isTitleFilterEnabled: boolean
     isContentFilterEnabled: boolean
+
+    selectedArticle: ArticleAdvanced | null,
 }
 
 const initialState: ArticleState = {
@@ -51,6 +54,8 @@ const initialState: ArticleState = {
     isAuthorFilterEnabled: false,
     isTitleFilterEnabled: false,
     isContentFilterEnabled: false,
+
+    selectedArticle: null
 }
 
 const articleSlice = createSlice({
@@ -122,6 +127,12 @@ const articleSlice = createSlice({
             state.isContentFilterEnabled = action.payload
         },
         
+        setSelectedArticle: (state, action: PayloadAction<ArticleAdvanced>) => {
+            state.selectedArticle = action.payload
+        },
+        resetSelectedArticle: (state) => {
+            state.selectedArticle = null
+        },
 
         setLoading: (state, action: PayloadAction<boolean>) => {
             state.isLoading = action.payload
@@ -164,6 +175,8 @@ export const {
     setSelectedAuthorFilter,
     setSelectedContentFilter,
     setSelectedTitleFilter,
+    setSelectedArticle,
+    resetSelectedArticle,
     setLoading, setError
 } = articleSlice.actions
 export default articleSlice.reducer

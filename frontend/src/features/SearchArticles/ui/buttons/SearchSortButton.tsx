@@ -25,7 +25,7 @@ const SearchSortButton = () => {
             <div className="">
                 <button 
                     className="font-base text-4xl text-text
-                    border-b-2 border-at box-border pl-3 pr-3 mb-5
+                    border-b-2 border-accent-third box-border pl-3 pr-3 mb-5
                     leading-15 cursor-pointer flex gap-3 items-center"
                     onClick={() => setIsOpen(prev => !prev)}
                 >
@@ -34,7 +34,7 @@ const SearchSortButton = () => {
                         size={'2.5rem'} 
                         strokeWidth={24} 
                         direction={`${isOpen ? 'down' : 'right'}`}
-                        color={`${isOpen ? 'var(--color-at)' : 'var(--color-text)'}`}
+                        color={`${isOpen ? 'var(--color-accent-third)' : 'var(--color-text)'}`}
                     />
                 </button>
                 <div 

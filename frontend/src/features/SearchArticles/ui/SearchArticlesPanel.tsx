@@ -37,7 +37,7 @@ const SearchArticlesPanel = () => {
 
     return (
         <div className="flex justify-center">
-            <div className="w-full max-h-auto box-border p-10 bg-ad rounded-2xl flex flex-col items-start gap-20">
+            <div className="w-full max-h-auto box-border p-10 bg-accent-dim rounded-2xl flex flex-col items-start gap-20">
                 <div className="flex flex-col gap-10">
                     <SearchParamButton/>
                     <SearchSortButton/>
@@ -45,8 +45,8 @@ const SearchArticlesPanel = () => {
                 <button 
                     className={
                         `box-border pl-6 pr-6 pt-4 pb-4 rounded-3xl border-2 
-                        ${isSubmitButtonAcitve ? 'bg-at border-as text-text cursor-pointer' : 
-                        'bg-ta border-ta text-text-grey-dim'} `}
+                        ${isSubmitButtonAcitve ? 'bg-accent-third border-accent-secondary text-text cursor-pointer' : 
+                        'bg-accent-first border-accent-first text-text-grey-dim'} `}
                     onClick={applyFilters}
                 >
                     <span className='font-base text-4xl'>

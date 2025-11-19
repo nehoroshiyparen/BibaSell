@@ -52,7 +52,7 @@ const ArticleFeedPage = () => {
     }, [bottomRef.current, page, hasMore])
 
     return (
-        <div className="w-screen flex justify-center">
+        <div className="w-screen flex justify-center box-border pt-60">
             <div className="w-full pt-10 pl-30 pr-30 box-border flex gap-30 items-start relative">
                 <div className="flex flex-col gap-10">
                     <div className="flex flex-col gap-10 w-full">

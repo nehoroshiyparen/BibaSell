@@ -10,6 +10,7 @@ import { Author } from "#src/infrastructure/sequelize/models/Author/Author.model
 import { PdfArticleUpdateDto } from "../types/dto/PdfArticleUpdate.dto.js";
 import { BaseSequelizeRepo } from "#src/infrastructure/sequelize/base.sequelize-repo.js";
 import { StoreLogger } from "#src/lib/logger/instances/store.logger.js";
+import { PdfArticleAuthors } from "#src/infrastructure/sequelize/models/Associations/PdfArticleAuthors.model.js";
 
 @injectable()
 export class PdfArticleSequelizeRepo extends BaseSequelizeRepo<PdfArticle> {
@@ -33,6 +34,20 @@ export class PdfArticleSequelizeRepo extends BaseSequelizeRepo<PdfArticle> {
             defaultPreview: data.defaultPreview,
             extractedText: data.extractedText
         }, { transaction })
+
+        if (data.authors && data.authors.length > 0) {
+            const authors = await Promise.all(
+                data.authors.map(name => Author.create({ name }, { transaction }))
+            )
+
+            const articleAuthors = authors.map(author => ({
+                author_id: author.id,
+                pdfArticle_id: article.id
+            }))
+
+            await PdfArticleAuthors.bulkCreate(articleAuthors, { transaction })
+        }
+
         return article
     }
 

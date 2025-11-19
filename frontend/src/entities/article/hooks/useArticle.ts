@@ -17,10 +17,13 @@ import {
     setSelectedAuthorFilter,
     setSelectedContentFilter,
     setSelectedTitleFilter,
+    setSelectedArticle,
+    resetSelectedArticle,
 } from "../model";
 import type { ArticlePreview } from "../model/types/ArticlePreview";
 import type { SortTypes } from "src/features/SearchArticles/types/SortTypes";
 import type { ArticleFilters } from "../model/types/ArticleFilters";
+import type { ArticleAdvanced } from "../model/types/ArticleAdvanced";
 
 export function useArticle() {
     const dispatch = useAppDispatch()
@@ -51,6 +54,8 @@ export function useArticle() {
         const selectedContentFilter = useAppSelector((state: RootState) => state.article.selectedContentFilter)
         const selectedTitleFilter = useAppSelector((state: RootState) => state.article.selectedTitleFilter)
 
+        const selectedArticle = useAppSelector((state: RootState) => state.article.selectedArticle)
+
         const actions = {
             setArticles: (data: ArticlePreview[]) => dispatch(setArticles(data)),
             pushArticles: (data: ArticlePreview[]) => dispatch(pushArticles(data)),
@@ -65,6 +70,8 @@ export function useArticle() {
             setSelectedAuthorFilter: (val: string) => dispatch(setSelectedAuthorFilter(val)),
             setSelectedContentFilter: (val: string) => dispatch(setSelectedContentFilter(val)),
             setSelectedTitleFilter: (val: string) => dispatch(setSelectedTitleFilter(val)),
+            setSelectedArticle: (val: ArticleAdvanced) => dispatch(setSelectedArticle(val)),
+            resetSelectedArticle: () => dispatch(resetSelectedArticle()),
             setLoading: (val: boolean) => dispatch(setLoading(val)),
             setError: (val: string | null) => dispatch(setError(val)),
         }
@@ -84,6 +91,7 @@ export function useArticle() {
             selectedAuthorFilter,
             selectedContentFilter,
             selectedTitleFilter,
+            selectedArticle,
 
             ...actions
         }

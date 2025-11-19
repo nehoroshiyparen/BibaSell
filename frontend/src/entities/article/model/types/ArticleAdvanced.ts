@@ -4,7 +4,7 @@ export interface ArticleAdvanced {
     id: number,
     title: string,
     key: string,
-    fistpage_key: string,
+    preview: string,
     publishedAt: Date,
     authors: Author[]
 }

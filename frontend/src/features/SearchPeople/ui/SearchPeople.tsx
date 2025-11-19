@@ -16,16 +16,16 @@ const SearchPeople = () => {
                 Введите имя чтобы найти своего героя
             </div>
             <form 
-                className="w-full rounded-full bg-ta border-solid border-[3px] border-at box-border p-1 pl-3 pr-3 flex gap-5 items-center" 
+                className="w-full rounded-full bg-bg-search border-solid border-[3px] border-accent-brown box-border p-1 pl-3 pr-3 flex gap-5 items-center" 
                 onSubmit={e => e.preventDefault()}
             >
-                <SearchIcon size={'3.5rem'} color="var(--color-at)"/>
+                <SearchIcon size={'3.5rem'} color="var(--color-accent-brown)"/>
                 <input 
                     id="PeopleSearch"
                     name="PeopleSearch"
                     type="text"
                     placeholder="Имя героя..."
-                    className="text-3xl text-text-secondary font-base flex-1 h-full outline-none placeholder-at"
+                    className="text-3xl text-text-secondary font-base flex-1 h-full outline-none placeholder-accent-brown"
                     value={searchQuery}
                     onChange={e => dispatch(setSearchQuery(e.target.value))}
                 />

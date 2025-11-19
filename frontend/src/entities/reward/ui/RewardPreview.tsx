@@ -7,7 +7,7 @@ type RewardPreviewProps = {
 
 const RewardPreview:React.FC<RewardPreviewProps> = ({ reward }) => {
     return (
-        <Link to={`/rewards/${reward.slug}`} className="aspect-square bg-ad rounded-2xl border-solid border-[3px] border-ta flex justify-center items-center">
+        <Link to={`/rewards/${reward.slug}`} className="aspect-square bg-accent-dim rounded-2xl border-solid border-[3px] border-accent-third flex justify-center items-center">
              <div className="h-full w-full box-border p-15 grid grid-rows-[1fr_auto] gap-5">
                 <div className="min-h-0 min-w-0 flex items-center justify-center overflow-hidden">
                     <img

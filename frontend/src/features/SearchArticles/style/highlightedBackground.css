@@ -11,7 +11,7 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  background: radial-gradient(circle, #c28f2f93 10%, transparent 25%); /* костылечек с цветом. Не хочу с этим копаться щас */
+  background: radial-gradient(circle, var(--color-gradient-hover-el) 10%, transparent 25%); /* костылечек с цветом. Не хочу с этим копаться щас */
   transform: translate(-50%, -50%);
   transition: width 0.8s ease, height 0.3s ease, opacity 0.3s ease;
   border-radius: 50%;

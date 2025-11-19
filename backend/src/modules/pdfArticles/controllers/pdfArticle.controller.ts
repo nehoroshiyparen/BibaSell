@@ -43,6 +43,27 @@ export class PdfArticleControllerImpl {
         }
     }
 
+    async getArticleBySlug(req: Request, res: Response) {
+        try {
+            const slug = String(req.params.slug)
+
+            const article = await this.pdfArticleService.getBySlug(slug)
+
+            SendResponse(res, {
+                cases: [
+                    { 
+                        condition: () => true,
+                        status: status.OK,
+                        message: 'Article fetched'
+                    }
+                ],
+                data: article
+            })
+        } catch (e) {
+            SendError(res, e)
+        }
+    }
+
     async getArticles(req: Request, res: Response) {
     try {
         const offset = Number(req.query.offset) || 0

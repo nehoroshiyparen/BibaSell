@@ -7,10 +7,22 @@ import PersonFeedPage from "src/pages/Person/PersonFeed/PersonFeedPage";
 import PersonPage from "src/pages/Person/PersonPage/PersonPage";
 import RewardFeedPage from "src/pages/Reward/RewardFeed/RewardFeedPage";
 import RewardPage from "src/pages/Reward/RewardPage/RewardPage";
-import ArticleFeedPage from "src/pages/Article/ArtcileFeedPage";
+import ArticleFeedPage from "src/pages/Article/ArticleFeed/ArtcileFeedPage";
+import ArticlePage from "src/pages/Article/ArticlePage/ArticlePage";
+import Header from "src/widgets/Header/ui/Header";
+import Footer from "src/widgets/Footer/Footer";
+import ArticleHeader from "src/widgets/ArticleHeader/ArticleHeader";
+
+export interface LayoutProps {
+    children: React.ReactNode;
+    header?: React.ReactNode;
+    footer?: React.ReactNode;
+}
 
 export type AppRoute = {
-    layout: ComponentType<{ children: React.ReactElement }>,
+    layout: ComponentType<LayoutProps>,
+    header: ComponentType<any>,
+    footer: ComponentType<any>,
     loader: {
         loadingScreen: ComponentType<{ spinner: React.ReactElement, show: boolean }>,
         spinner: {
@@ -27,6 +39,8 @@ export type AppRoute = {
 export const appRoutes: AppRoute[] = [
     {
         layout: MainLayout,
+        header: Header,
+        footer: Footer,
         loader: {
             loadingScreen: LoadingScreen,
             spinner: {
@@ -41,6 +55,8 @@ export const appRoutes: AppRoute[] = [
     },
     {
         layout: MainLayout,
+        header: Header,
+        footer: Footer,
         loader: {
             loadingScreen: LoadingScreen,
             spinner: {
@@ -55,6 +71,8 @@ export const appRoutes: AppRoute[] = [
     },
     {
         layout: MainLayout,
+        header: Header,
+        footer: Footer,
         loader: {
             loadingScreen: LoadingScreen,
             spinner: {
@@ -69,6 +87,8 @@ export const appRoutes: AppRoute[] = [
     },
     {
         layout: MainLayout,
+        header: Header,
+        footer: Footer,
         loader: {
             loadingScreen: LoadingScreen,
             spinner: {
@@ -83,6 +103,8 @@ export const appRoutes: AppRoute[] = [
     },
     {
         layout: MainLayout,
+        header: Header,
+        footer: Footer,
         loader: {
             loadingScreen: LoadingScreen,
             spinner: {
@@ -97,6 +119,8 @@ export const appRoutes: AppRoute[] = [
     },
     {
         layout: MainLayout,
+        header: Header,
+        footer: Footer,
         loader: {
             loadingScreen: LoadingScreen,
             spinner: {
@@ -107,6 +131,22 @@ export const appRoutes: AppRoute[] = [
         },
         path: '/articles',
         element: ArticleFeedPage,
+        protected: false
+    },
+    {
+        layout: MainLayout,
+        header: ArticleHeader,
+        footer: Footer,
+        loader: {
+            loadingScreen: LoadingScreen,
+            spinner: {
+                component: CatSpinner,
+                width: 200,
+                height: 200,
+            },
+        },
+        path: '/articles/:slug',
+        element: ArticlePage,
         protected: false
     },
 ]

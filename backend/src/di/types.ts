@@ -9,7 +9,6 @@ export const TYPES = {
     // Routers
     PersonRouter: Symbol.for('PersonRouter'),
     RewardRouter: Symbol.for('RewardRouter'),
-    MDXArticleRouter: Symbol.for('MDXArticleRouter'),
     PdfArticleRouter: Symbol.for('PdfArticleRouter'),
     IndexRouter: Symbol.for('IndexRouter'),
 
@@ -22,7 +21,6 @@ export const TYPES = {
     // Services
     PersonService: Symbol.for('PersonService'),
     RewardService: Symbol.for('RewardService'),
-    MDXArticleService: Symbol.for('MDXArticleService'),
     PdfArticleService: Symbol.for('PdfArticleService'),
 
     // S3 services

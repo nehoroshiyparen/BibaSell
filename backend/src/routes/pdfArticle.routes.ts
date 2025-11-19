@@ -17,6 +17,7 @@ export class PdfArticleRouter {
 
     setup() {
         this.router.get('/', this.pdfArticleController.getArticles.bind(this.pdfArticleController))
+        this.router.get('/slug/:slug', this.pdfArticleController.getArticleBySlug.bind(this.pdfArticleController))
         this.router.get('/:id', this.pdfArticleController.getArticleById.bind(this.pdfArticleController))
 
         this.router.post('/', prepareTempDir, upload.fields([

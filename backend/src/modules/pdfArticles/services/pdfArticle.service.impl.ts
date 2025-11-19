@@ -65,12 +65,9 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         try {
             const title = cleanText(filters.title || (filters as any).titleFilter)
             const extractedText = cleanText(filters.extractedText || (filters as any).content)
-            console.log(extractedText)
             const author = cleanText(
                 filters.author || (Array.isArray((filters as any).authors) ? (filters as any).authors[0] : '')
             )
-
-            console.log('title: ', title)
 
             const elasticQuery: Record<string, string> = {}
             if (title) elasticQuery.title = title

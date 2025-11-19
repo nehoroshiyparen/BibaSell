@@ -68,7 +68,7 @@ const RewardFeedPage = () => {
     }, [bottomRef.current, page, hasMore, searchQuery])
 
     return (
-        <div className="w-screen flex justify-center">
+        <div className="w-screen flex justify-center box-border pt-60">
             <div className="w-full box-border pl-70 pr-70">
                 <div className="flex flex-col gap-20 box-border pt-25 items-center">
                     <SearchRewards/>

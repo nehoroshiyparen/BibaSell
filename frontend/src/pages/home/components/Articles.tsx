@@ -9,9 +9,9 @@ const Article = () => {
                 <p>СТАТЬИ И ЛИТЕРАТУРА</p>
             </div>
             <div className="flex justify-around items-start">
-                <div className="w-160 aspect-[6/7] relative bg-ta rounded-4xl border-[3px] border-solid border-text box-border p-10 overflow-hidden">
+                <div className="w-160 aspect-[6/7] relative bg-accent-first rounded-4xl border-[3px] border-solid border-text box-border p-10 overflow-hidden">
                     <div className="absolute z-0 w-full h-full">
-                        <SearchIcon size={'100%'} color="var(--color-at)" className="scale-x-[-1] absolute left-[-10rem]"/>
+                        <SearchIcon size={'100%'} color="var(--color-accent-third)" className="scale-x-[-1] absolute left-[-10rem]"/>
                     </div>
                     <div className="relative z-1 flex flex-col justify-between h-full">
                         <div className="flex flex-col gap-8">
@@ -27,9 +27,9 @@ const Article = () => {
                         </div>
                     </div>
                 </div>
-                <div className="w-160 aspect-[6/7] relative bg-ta rounded-4xl border-[3px] border-solid border-text box-border p-10 overflow-hidden">
+                <div className="w-160 aspect-[6/7] relative bg-accent-first rounded-4xl border-[3px] border-solid border-text box-border p-10 overflow-hidden">
                     <div className="absolute z-0 w-full h-full">
-                        <BookIcon size={'95%'} color="var(--color-at)" className="absolute right-[-4rem]"/>
+                        <BookIcon size={'95%'} color="var(--color-accent-third)" className="absolute right-[-4rem]"/>
                     </div>
                     <div className="relative z-1 flex flex-col justify-between h-full">
                         <div className="flex flex-col gap-8">
@@ -45,7 +45,7 @@ const Article = () => {
                         </div>
                     </div>
                 </div>
-                <div className="border-l-[3px] border-solid border-as flex max-w-200 box-border pl-15 pb-15">
+                <div className="border-l-[3px] border-solid border-accent-secondary flex max-w-200 box-border pl-15 pb-15">
                     <span className="_casual-span text-t">
                         Находите и изучайте
                         интересующие вас темы. Добавляйте

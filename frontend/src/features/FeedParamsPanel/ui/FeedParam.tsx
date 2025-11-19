@@ -10,9 +10,9 @@ const FeedParam: React.FC<FeedParamPropsExtended> = (props) => {
     return (
         <>
             {props.isActive ?
-                <div className="box-border p-5 bg-ta rounded-2xl relative">
+                <div className="box-border p-5 bg-accent-first rounded-2xl relative">
                     <button 
-                        className="absolute -right-2 -top-2 box-border p-2 rounded-full bg-as cursor-pointer"
+                        className="absolute -right-2 -top-2 box-border p-2 rounded-full bg-accent-secondary cursor-pointer"
                         onClick={() => props.clearFunc('')}
                     >
                         <CrossIcon size={10} color="white"/>

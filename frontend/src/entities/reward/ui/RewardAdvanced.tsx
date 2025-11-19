@@ -24,7 +24,7 @@ const RewardAdvanced:React.FC<RewardAdvancedProps> = ({ reward }) => {
                         <span>{reward.label}</span>
                     </div>
                     <div className="flex flex-col gap-5">
-                        <div className="text-at font-base text-5xl">
+                        <div className="text-accent-third font-base text-5xl">
                             <span>Учрежден</span>
                         </div>
                         <div className="text-text font-base text-4xl/15">
@@ -32,7 +32,7 @@ const RewardAdvanced:React.FC<RewardAdvancedProps> = ({ reward }) => {
                         </div>
                     </div>
                     <div className="flex flex-col gap-5">
-                        <div className="text-at font-base text-5xl">
+                        <div className="text-accent-third font-base text-5xl">
                             <span>Награждений</span>
                         </div>
                         <div className="text-text font-base text-4xl/15">

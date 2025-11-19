@@ -6,8 +6,8 @@ export default {
         bg: "var(--color-bg)",
         text: "var(--color-t)",
         text_sec: "var(--color-ts)",
-        text_trd: "var(--color-tt)",
-        accent: "var(--color-ta)",
+        text_trd: "var(--color-text-third)",
+        accent: "var(--color-accent-first)",
       },
       screens: {
         s: '1280px',
