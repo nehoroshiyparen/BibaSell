@@ -73,7 +73,7 @@ const RewardFeedPage = () => {
                 <div className="flex flex-col gap-20 box-border pt-25 items-center">
                     <SearchRewards/>
 
-                    {isLoading ? (
+                    {(isLoading && hasFilter) ? (
                             <FeedLoad/>
                         ) : (
                             isEmpty ? (

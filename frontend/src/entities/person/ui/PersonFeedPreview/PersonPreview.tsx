@@ -1,12 +1,15 @@
 import { Link } from "react-router-dom"
 import type { PersonPreview as PersonPreviewType } from "../../model/types/PersonPreview"
 import './PersonPreview.css'
+import { useState } from "react"
 
 type PersonFeedPreviewProps = {
     person: PersonPreviewType
 }
 
 const PersonPreview:React.FC<PersonFeedPreviewProps> = ({ person }) => {
+    const [loaded, setLoaded] = useState(false);
+
     return (
         <Link to={`${person.slug}`} className="_person-feed-preview w-full h-170 relative cursor-pointer">
             <div className="_person-feed-preview-bg"/>
@@ -14,8 +17,10 @@ const PersonPreview:React.FC<PersonFeedPreviewProps> = ({ person }) => {
                 <div className="h-full">
                     <img 
                         src={person.key ? person.key : "/images/persons/unknown.png"} 
-                        onLoad={(e) => (e.currentTarget.style.opacity = "1")}
-                        className="h-full aspect-[194/261] rounded-4xl object-cover opacity-0 transition-opacity duration-500"
+                        onLoad={() => setLoaded(true)}
+                        className={`h-full aspect-[194/261] rounded-4xl object-cover transition-opacity duration-500 ${
+                            loaded ? "opacity-100" : "opacity-0"
+                        }`}
                         style={{boxShadow: "0 0 20px rgba(0,0,0,0.4)"}}
                     />
                 </div>

@@ -6,7 +6,7 @@ import {
   type PDFDocumentProxy,
   type PDFPageProxy,
 } from "pdfjs-dist";
-import SearchIcon from "src/assets/svg/SearchIcon/SearchIcon";
+
 import MoreIcon from "src/assets/svg/MoreIcon/MoreIcon";
 
 GlobalWorkerOptions.workerSrc = "/lib/pdf/pdf.worker.js";
@@ -20,12 +20,22 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ url }) => {
     const [pdf, setPdf] = useState<PDFDocumentProxy| null>(null)
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(0)
+    const [isLoading, setIsLoading] = useState<boolean>(true)
+    const [viewportSize, setViewportSize] = useState<{ width: number, height: number } | null>(null);
 
     useEffect(() => {
         (async () => {
             const loaded = await getDocument(url).promise
             setPdf(loaded)
             setTotalPages(loaded.numPages)
+
+             const firstPage = await loaded.getPage(1);
+            const vp = firstPage.getViewport({ scale: 1.5 });
+
+            setViewportSize({ width: vp.width, height: vp.height });
+
+
+            setIsLoading(false);   
         })()
     }, [url])
 
@@ -55,10 +65,8 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ url }) => {
                 await renderTask.promise;
                 if (canceled) renderTask.cancel();
             } catch (err) {
-                if (err instanceof Error && err.name === "RenderingCancelledException") {
-                    // нормальное поведение при отмене
-                } else {
-                    console.error(err);
+                if (!(err instanceof Error && err.name === "RenderingCancelledException")) {
+                    console.error(err)
                 }
             }
         })();
@@ -70,39 +78,40 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ url }) => {
     }, [pdf, page])
 
     return (
-        <div className="w-full">
-            <div className="flex flex-col items-center gap-12">
-                <div className="flex justify-between">
-                    <div className="flex items-center">
-                        <button
-                            className="cursor-pointer"
-                            onClick={() => setPage((p) => Math.max(1, p - 1))}
-                            disabled={page === 1}
-                        >
-                            <MoreIcon size={120} direction="left" color="var(--color-accent-brown)"/>
-                        </button>
-                    </div>
-                    <canvas ref={canvasRef} className="shadow-[0_0_20px_#000000]"/>
-                    <div className="flex items-center">
-                        <button
-                            className="cursor-pointer"
-                            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                            disabled={page === totalPages}
-                        >
-                            <MoreIcon size={120} direction="right" color="var(--color-accent-brown)"/>
-                        </button>
-                    </div>
-                </div>
-                <div className="flex flex-col gap-4">
-                    <span className="text-3xl font-base">
-                        {page} / {totalPages}
-                    </span>
-                    <div className="box-border p-3 rounded-4xl bg-bg-search">
-                        <SearchIcon size={36} color="var(--color-accent-brown)"/>
-                    </div>
-                </div>
+        <div className="w-full flex justify-center">
+            <div className="flex items-center">
+                <button
+                    className="cursor-pointer"
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1 || isLoading}
+                >
+                    <MoreIcon size={120} direction="left" color="var(--color-accent-brown)"/>
+                </button>
             </div>
-        </div>
+
+            <div className="relative shadow-[0_0_20px_#000000] w-[892px] h-[1262px]">
+                <canvas
+                    ref={canvasRef}
+                    className="absolute top-0 left-0"
+                />
+
+                {isLoading &&
+                    <div className="absolute z-1 top-0 left-0 w-full h-full flex justify-center items-center bg-white">
+                        <span className="font-base text-5xl font-bold">Документ загружается...</span>
+                    </div>
+                }
+            </div>
+
+            <div className="flex items-center">
+                <button
+                    className="cursor-pointer"
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages || isLoading}
+                >
+                    <MoreIcon size={120} direction="right" color="var(--color-accent-brown)"/>
+                </button>
+            </div> 
+        </div>    
     )
 }
 

@@ -50,7 +50,7 @@ const SearchSortButton = () => {
                         onClick={() => setSortType(SortTypes.none)}
                     >
                         <span className="font-base-light text-2xl font-bold">
-                            Без фильтров
+                            Без сортировки
                         </span>
                     </button>
                     <button 
