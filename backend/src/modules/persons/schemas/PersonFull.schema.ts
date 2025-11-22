@@ -8,5 +8,11 @@ export const PersonFullSchema = z.object({
     description: z.string(),
     rank: z.string(),
     comments: z.string(),
+    rewards: z.array(
+        z.object({
+            key: z.string(),
+            label: z.string()
+        })
+    )
 })
 export type TypeofPersonFullSchema = z.infer<typeof PersonFullSchema>

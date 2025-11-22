@@ -13,7 +13,18 @@ export class PersonMapper {
 
     async toFull(person: Person): Promise<TypeofPersonFullSchema> {
         const urls = await this.s3.getSignedUrls([person.key])
-        return { ...person.toJSON(), key: urls[person.key] }
+
+        const rewards = person.rewards ?? [];
+        const rewardUrls = await this.s3.getSignedUrls(rewards.map(reward => reward.key))
+        
+        return {
+            ...person.toJSON(),
+            key: urls[person.key],
+            rewards: person.rewards?.map(reward => ({
+                key: rewardUrls[reward.key],
+                label: reward.label
+            }))
+        }
     }
 
     async toPreview(persons: Person[]): Promise<TypeofPersonPreviewSchema[]>  {

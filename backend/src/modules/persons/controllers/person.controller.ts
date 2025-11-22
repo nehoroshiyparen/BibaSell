@@ -2,17 +2,14 @@ import { Request, Response } from "express";
 import { PersonArraySchema } from "../schemas/PersonArraySchema.js";
 import { SendError, SendResponse } from "#src/lib/http/index.js";
 import { status } from "#src/consts/status.js";
-
 import { injectable, inject } from "inversify";
 import { TYPES } from "#src/di/types.js";
 import { ValidateId } from "#src/shared/validations/ids/id.validate.js";
 import { ValidatePaginationParams } from "#src/shared/validations/paginationParams.validate.js";
-import { ValidateObjectFieldsNotNull } from "#src/shared/validations/objectFieldsNotNull.validate.js";
 import { ValidateIdArray } from "#src/shared/validations/ids/idArray.validate.js";
-import { PersonFiltersSchema, TypeofPersonFiltersSchema } from "#src/modules/persons/schemas/PersonFilters.schema.js";
+import { TypeofPersonFiltersSchema } from "#src/modules/persons/schemas/PersonFilters.schema.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
-import { IBaseService } from "#src/types/contracts/services/module.service.interface.js";
 import { IPersonService } from "#src/types/contracts/services/persons/person.service.interface.js";
 
 @injectable()

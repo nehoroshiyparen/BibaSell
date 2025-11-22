@@ -1,4 +1,5 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
+import { Reward } from "../Reward/Reward.model.js";
 
 export class Person extends Model {
     declare id: number
@@ -9,6 +10,8 @@ export class Person extends Model {
     declare rank?: string
     declare comments?: string
     declare key: string // S3 key
+
+    declare rewards: Reward[]
 
     static initialize(sequelize: Sequelize) {
         this.init({

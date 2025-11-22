@@ -87,7 +87,7 @@ export class PersonServiceImpl implements IPersonService {
         try {
             const images = fileConfig.files.images as Express.Multer.File[]
             const fileMap = new Map(
-                images.map(file => [path.parse(file.originalname).name, file])
+                images?.map(file => [path.parse(file.originalname).name, file])
             )
 
             for (const [index, person] of persons.entries()) {
@@ -104,11 +104,13 @@ export class PersonServiceImpl implements IPersonService {
                     }
 
                     const slug = getSlug(person.name)!
-                    await this.sequelize.create(
+                    const createdPerson = await this.sequelize.create(
                         { ...person, slug },
                         S3Key ? { key: S3Key } : {},
                         transaction
                     )
+
+                    if (person.rewards && person.rewards.length > 0) await this.sequelize.createPersonsRewrads({ person_id: createdPerson.id, rewards: person.rewards }, { transaction })
 
                     if (S3Key && buffer && file)  {
                         await this.s3.upload(S3Key, buffer, { 
