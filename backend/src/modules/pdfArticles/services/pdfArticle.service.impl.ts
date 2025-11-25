@@ -231,7 +231,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
 
     async bulkDelete(ids: number[]): Promise<OperationResult> {
         const transaction = await this.sequelize.createTransaction()
-        const errorStack: any = null
+        const errorStack: ErrorStack = {}
 
         try {
             const articles = await this.sequelize.findAll()

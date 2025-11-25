@@ -169,7 +169,7 @@ export class PersonServiceImpl implements IPersonService {
 
     async bulkDelete(ids: number[]): Promise<OperationResult> {
         const transaction = await this.sequelize.createTransaction()
-        const errorStack: any = null;
+        const errorStack: ErrorStack = {};
     
         try {
             const persons = await this.sequelize.findAll()

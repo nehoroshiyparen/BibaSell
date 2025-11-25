@@ -159,7 +159,7 @@ export class RewardServiceImpl implements IRewardService {
 
     async bulkDelete(ids: number[]): Promise<OperationResult> {
         const transaction = await this.sequelize.createTransaction()
-        const errorStack: any = null
+        const errorStack: ErrorStack = {}
     
         try {
             const rewards = await this.sequelize.findAll()
