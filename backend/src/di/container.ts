@@ -35,6 +35,10 @@ import { elasticLogger, redisLogger, s3Logger, sequelizeLogger, StoreLogger } fr
 import { PdfArticleMapper } from "#src/modules/pdfArticles/mappers/pdfArticle.mapper.js";
 import { PersonMapper } from "#src/modules/persons/mappers/person.mapper.js";
 import { RewardMapper } from "#src/modules/rewards/mappers/reward.mapper.js";
+import { IUploadService } from "#src/types/contracts/services/upload/upload.service.interface.js";
+import { UploadServiceImpl } from "#src/modules/upload/services/upload.service.js";
+import { UploadControllerImpl } from "#src/modules/upload/controllers/upload.controller.js";
+import { UploadRouter } from "#src/routes/upload.routes.js";
 
 const container = new Container()
 
@@ -50,16 +54,19 @@ container.bind<PersonRouter>(TYPES.PersonRouter).to(PersonRouter).inSingletonSco
 container.bind<RewardRouter>(TYPES.RewardRouter).to(RewardRouter).inSingletonScope()
 container.bind<PdfArticleRouter>(TYPES.PdfArticleRouter).to(PdfArticleRouter).inSingletonScope()
 container.bind<IndexRouter>(TYPES.IndexRouter).to(IndexRouter).inSingletonScope()
+container.bind<UploadRouter>(TYPES.UploadRouter).to(UploadRouter).inSingletonScope()
 
 // Controllers
 container.bind<PersonControllerImpl>(TYPES.PersonController).to(PersonControllerImpl).inSingletonScope()
 container.bind<RewardControllerImpl>(TYPES.RewardController).to(RewardControllerImpl).inSingletonScope()
 container.bind<PdfArticleControllerImpl>(TYPES.PdfArticleController).to(PdfArticleControllerImpl).inSingletonScope()
+container.bind<UploadControllerImpl>(TYPES.UploadControllerImpl).to(UploadControllerImpl).inSingletonScope()
 
 // Services
 container.bind<IPersonService>(TYPES.PersonService).to(PersonServiceImpl).inSingletonScope()
 container.bind<IRewardService>(TYPES.RewardService).to(RewardServiceImpl).inSingletonScope()
 container.bind<IPdfArticleService>(TYPES.PdfArticleService).to(PdfArticleServiceImpl).inSingletonScope()
+container.bind<IUploadService>(TYPES.UploadService).to(UploadServiceImpl).inSingletonScope()
 
 // S3 services
 container.bind<S3PersonServiceImpl>(TYPES.S3PersonService).to(S3PersonServiceImpl).inSingletonScope()

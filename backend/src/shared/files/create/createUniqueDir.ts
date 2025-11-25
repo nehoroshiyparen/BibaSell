@@ -14,5 +14,7 @@ export function createUniqueDir() {
 
     fs.mkdirSync(tempDir, { recursive: true })
 
+    console.log(tempDir)
+
     return tempDir
 }

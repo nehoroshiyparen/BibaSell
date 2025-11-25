@@ -81,7 +81,8 @@ export class PersonServiceImpl implements IPersonService {
     }
 
     async bulkCreate(persons: TypeofPersonSchema[], fileConfig: FileConfig): Promise<OperationResult> {
-        const errorStack: ErrorStack = {}
+        const errorStack: ErrorStack = {};
+        let personRewardsErrorStack: ErrorStack | null = {};
         let created = 0
     
         try {
@@ -90,7 +91,7 @@ export class PersonServiceImpl implements IPersonService {
                 images?.map(file => [path.parse(file.originalname).name, file])
             )
 
-            for (const [index, person] of persons.entries()) {
+            for (const [_, person] of persons.entries()) {
                 const transaction = await this.sequelize.createTransaction()
                 let S3Key: string | null = null
                 let buffer: Buffer | null = null
@@ -110,7 +111,7 @@ export class PersonServiceImpl implements IPersonService {
                         transaction
                     )
 
-                    if (person.rewards && person.rewards.length > 0) await this.sequelize.createPersonsRewrads({ person_id: createdPerson.id, rewards: person.rewards }, { transaction })
+                    personRewardsErrorStack = person.rewards && person.rewards.length > 0 ? await this.sequelize.createPersonsRewrads({ person_id: createdPerson.id, rewards: person.rewards }, { transaction }) : null
 
                     if (S3Key && buffer && file)  {
                         await this.s3.upload(S3Key, buffer, { 
@@ -122,8 +123,19 @@ export class PersonServiceImpl implements IPersonService {
                     created++
                 } catch (e) {
                     await this.sequelize.rollbackTransaction(transaction)
-                    errorStack[index] = {
-                        message: isError(e) ? e.message : 'Internal error',
+
+                    let message = 'Internal error'
+                    if (isError(e)) {
+                        message = e.message
+                        const pgError = (e as any).original
+                        if (pgError?.detail) {
+                            message += ` - ${pgError.detail}`
+                        }
+                    }
+                    
+                    errorStack[person.name] = {
+                        message,
+                        personRewardsErrorStack,
                         code: 'PERSON_CREATE_ERROR'
                     }
                 }
@@ -157,7 +169,7 @@ export class PersonServiceImpl implements IPersonService {
 
     async bulkDelete(ids: number[]): Promise<OperationResult> {
         const transaction = await this.sequelize.createTransaction()
-        const errorStack: ErrorStack = {}
+        const errorStack: any = null;
     
         try {
             const persons = await this.sequelize.findAll()

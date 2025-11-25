@@ -10,5 +10,5 @@ interface ExtendedRewardFilters {
     addition: string,
     description: string,
     count: number,
-    realeseDate: Date,
+    releaseDate: Date,
 }

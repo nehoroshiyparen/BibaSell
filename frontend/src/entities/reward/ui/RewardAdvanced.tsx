@@ -28,7 +28,7 @@ const RewardAdvanced:React.FC<RewardAdvancedProps> = ({ reward }) => {
                             <span>Учрежден</span>
                         </div>
                         <div className="text-text font-base text-4xl/15">
-                            <span>{reward.realeseDate.toLocaleString('Ru-ru')}</span>
+                            <span>{reward.releaseDate.toLocaleString('Ru-ru')}</span>
                         </div>
                     </div>
                     <div className="flex flex-col gap-5">

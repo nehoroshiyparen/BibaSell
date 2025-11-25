@@ -84,7 +84,7 @@ export class RewardServiceImpl implements IRewardService {
                 images.map(file => [path.parse(file.originalname).name, file])
             )
 
-            for (const [index, reward] of rewards.entries()) {
+            for (const [_, reward] of rewards.entries()) {
                 const transaction = await this.sequelize.createTransaction()
 
                 try {
@@ -115,13 +115,21 @@ export class RewardServiceImpl implements IRewardService {
                 } catch (e) {
                     await this.sequelize.rollbackTransaction(transaction)
 
-                    errorStack[index] = {
-                        message: isError(e) ? e.message : 'Internal error',
+                    let message = 'Internal error'
+                    if (isError(e)) {
+                        message = e.message
+                        const pgError = (e as any).original
+                        if (pgError?.detail) {
+                            message += ` - ${pgError.detail}`
+                        }
+                    }
+
+                    errorStack[reward.label] = {
+                        message,
                         code: 'REWARD_CREATE_ERROR'
                     }
                 }
             }
-            fileConfig && removeDir(fileConfig.tempDirPath)
     
             return Object.keys(errorStack).length > 0
                 ? { success: false, created, errors: errorStack }
@@ -151,7 +159,7 @@ export class RewardServiceImpl implements IRewardService {
 
     async bulkDelete(ids: number[]): Promise<OperationResult> {
         const transaction = await this.sequelize.createTransaction()
-        const errorStack: ErrorStack = {}
+        const errorStack: any = null
     
         try {
             const rewards = await this.sequelize.findAll()

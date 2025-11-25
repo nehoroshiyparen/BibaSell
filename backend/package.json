@@ -19,6 +19,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/fs-extra": "^11.0.4",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.0.14",
     "@types/pdf-parse": "^1.1.5",

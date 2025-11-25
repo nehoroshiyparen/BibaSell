@@ -11,17 +11,20 @@ export const TYPES = {
     RewardRouter: Symbol.for('RewardRouter'),
     PdfArticleRouter: Symbol.for('PdfArticleRouter'),
     IndexRouter: Symbol.for('IndexRouter'),
+    UploadRouter: Symbol.for('UploadRouter'),
 
     // Controllers
     PersonController: Symbol.for('PersonController'),
     RewardController: Symbol.for('RewardController'),
     MDXArticleController: Symbol.for('MDXArticleController'),
     PdfArticleController: Symbol.for('PdfArticleController'),
+    UploadControllerImpl: Symbol.for('UploadControllerImpl'),
 
     // Services
     PersonService: Symbol.for('PersonService'),
     RewardService: Symbol.for('RewardService'),
     PdfArticleService: Symbol.for('PdfArticleService'),
+    UploadService: Symbol.for('UploadService'),
 
     // S3 services
     S3PersonService: Symbol.for('S3PersonServiceImpl'),

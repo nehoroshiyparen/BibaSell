@@ -5,7 +5,7 @@ export const RewardFullSchema = z.object({
     slug: z.string(),
     key: z.string(),
     label: z.string(),
-    realeseDate: z.string(),
+    releaseDate: z.string(),
     count: z.number(),
     addition: z.string(),
     description: z.string(),

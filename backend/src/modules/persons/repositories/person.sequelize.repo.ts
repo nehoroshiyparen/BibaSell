@@ -11,6 +11,9 @@ import { stringifyObject } from "#src/shared/utils/stringifyObject.js";
 import { TypeofPersonRewardsSchema } from "../schemas/PersonRewards.schema.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
 import { PersonRewards } from "#src/infrastructure/sequelize/models/Associations/PersonRewards.model.js";
+import { OperationResult } from "#src/types/interfaces/http/OperationResult.js";
+import { ErrorStack } from "#src/types/interfaces/http/ErrorStack.interface.js";
+import { isError } from "#src/shared/typeGuards/isError.js";
 
 @injectable()
 export class PersonSequelizeRepo extends BaseSequelizeRepo<Person> {
@@ -37,7 +40,10 @@ export class PersonSequelizeRepo extends BaseSequelizeRepo<Person> {
     async createPersonsRewrads(
         data: TypeofPersonRewardsSchema, 
         options?: { transaction?: Transaction 
-    }): Promise<number> {
+    }): Promise<OperationResult> {
+        const errorStack: ErrorStack = {};
+        let created = 0
+
         const transaction = options?.transaction;
 
         const labels = data.rewards.map(r => r.label);
@@ -60,9 +66,32 @@ export class PersonSequelizeRepo extends BaseSequelizeRepo<Person> {
             reward_id: rewardsMap.get(r.label)!,
         }));
 
-        await PersonRewards.bulkCreate(personRewardsToCreate, { transaction });
+        Promise.all(
+            personRewardsToCreate.map(async r => {
+                try {
+                    await PersonRewards.create(r, { transaction })
+                    created++
+                } catch (e) {
+                    let message = 'Internal error'
+                    if (isError(e)) {
+                        message = e.message
+                        const pgError = (e as any).original
+                        if (pgError?.detail) {
+                            message += ` - ${pgError.detail}`
+                        }
+                    }
 
-        return personRewardsToCreate.length;
+                    errorStack[`person_id: ${r.person_id}, reward_id: ${r.reward_id}`] = {
+                        message,
+                        code: 'REWARD_CREATE_ERROR'
+                    }
+                }
+            })
+        )
+
+        return Object.keys(errorStack).length > 0
+                ? { success: false, created, errors: errorStack }
+                : { success: true, created }
     }
 
     /**
