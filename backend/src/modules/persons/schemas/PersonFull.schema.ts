@@ -15,4 +15,33 @@ export const PersonFullSchema = z.object({
         })
     )
 })
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *      TypeofPersonFullSchema:
+ *          type: object
+ *          properties:
+ *              id:
+ *                  type: integer
+ *              name: 
+ *                  type: string
+ *              addition: 
+ *                  type: string
+ *              description: 
+ *                  type: string
+ *              rank:
+ *                  type: string
+ *              comments: 
+ *                  type: string
+ *              rewards:  
+ *                  type: array
+ *                  items:
+ *                      type: object
+ *                      properties:
+ *                          key: 
+ *                              type: string
+ *                          label: 
+ *                              type: string
+ */
 export type TypeofPersonFullSchema = z.infer<typeof PersonFullSchema>

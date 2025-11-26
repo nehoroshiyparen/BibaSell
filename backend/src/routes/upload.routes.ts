@@ -15,10 +15,67 @@ export class UploadRouter {
     }
 
     setup() {
+        /**
+         * @swagger
+         * /api/upload/reward:
+         *   patch:
+         *     summary: Занести заготовленный список данных о наградах на сервер. Данные хранятся в папке src/data/rewards на сервере
+         *     tags:
+         *       - Upload
+         *     responses:
+         *       200:
+         *         description: Успешный ответ
+         *         content:
+         *           application/json:
+         *             schema:
+         *               allOf:
+         *                 - $ref: '#/components/schemas/BaseResponse'
+         *                 - type: object
+         *                   properties:
+         *                     data:
+         *                       type: object
+         *                       properties:
+         *                         success:
+         *                           type: boolean
+         *                         created:
+         *                           type: integer
+         *                       example:
+         *                         success: true
+         *                         created: 1
+         */
         this.router.patch('/reward',
                         prepareTempDir,
                         this.uploadController.uploadRewardPack.bind(this.uploadController)
                     )
+
+        /**
+         * @swagger
+         * /api/upload/person:
+         *   patch:
+         *     summary: Занести заготовленный список данных о солдатах на сервер. Данные хранятся в папке src/data/person на сервере
+         *     tags:
+         *       - Upload
+         *     responses:
+         *       200:
+         *         description: Успешный ответ
+         *         content:
+         *           application/json:
+         *             schema:
+         *               allOf:
+         *                 - $ref: '#/components/schemas/BaseResponse'
+         *                 - type: object
+         *                   properties:
+         *                     data:
+         *                       type: object
+         *                       properties:
+         *                         success:
+         *                           type: boolean
+         *                         created:
+         *                           type: integer
+         *                       example:
+         *                         success: true
+         *                         created: 1
+         */
         this.router.patch('/person',
                         prepareTempDir,
                         this.uploadController.uploadPersonPack.bind(this.uploadController)

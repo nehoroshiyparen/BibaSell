@@ -6,4 +6,21 @@ export const PdfArticleUpdateSchema = z.object({
     authors: z.array(z.string()).nullable().optional(),
     functions: UpdateOptionsSchema.optional(),
 })
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     TypeofPdfArticleUpdateSchema:
+ *       type: object
+ *       properties:
+ *         title:
+ *           type: string
+ *         authors:
+ *           type: string
+ *         functions:
+ *           type: object
+ *           properties:
+ *             removePreview:
+ *               type: boolean
+ */
 export type TypeofPdfArticleUpdateSchema = z.infer<typeof PdfArticleUpdateSchema>

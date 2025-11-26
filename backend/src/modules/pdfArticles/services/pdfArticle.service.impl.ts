@@ -102,7 +102,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
                     .map(id => articlesMap.get(id))
                     .filter((a): a is PdfArticle => Boolean(a))
             } else {
-                articles = await this.sequelize.findAll(offset, limit)
+                articles = await this.sequelize.findAll({offset, limit})
             }
 
             return await this.mapper.toPreview(articles)
@@ -234,7 +234,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         const errorStack: ErrorStack = {}
 
         try {
-            const articles = await this.sequelize.findAll()
+            const articles = await this.sequelize.findAll({ where: { id: ids }})
 
             const foundIds = articles.map(a => a.id)
             const missingIds = ids.filter(id => !foundIds.includes(id))

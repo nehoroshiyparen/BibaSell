@@ -12,6 +12,7 @@ export const TYPES = {
     PdfArticleRouter: Symbol.for('PdfArticleRouter'),
     IndexRouter: Symbol.for('IndexRouter'),
     UploadRouter: Symbol.for('UploadRouter'),
+    SwaggerRouter: Symbol.for('SwaggerRouter'),
 
     // Controllers
     PersonController: Symbol.for('PersonController'),

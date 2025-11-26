@@ -35,7 +35,7 @@ export abstract class BaseSequelizeRepo<T extends Model> {
         return record
     }
 
-    async findAll(offset?: number, limit?: number, where?: WhereOptions<any>): Promise<T[]> {
+    async findAll({ offset, limit, where }: { offset?: number, limit?: number, where?: WhereOptions<any> }): Promise<T[]> {
         const options = this.getFindAllOptions()
 
         const whereOptions: any = { where }

@@ -20,7 +20,7 @@ export class PdfArticleMapper {
             key: pdfUrls[article.key], 
             preview: previewUrls ? previewUrls[article.preview_key] : article.defaultPreview,
             publishedAt: article.publishedAt,
-            authors: article.authors || [],
+            authors: article.authors?.map(a => ({ id: a.id, name: a.name })) || [],
         }
     }
 

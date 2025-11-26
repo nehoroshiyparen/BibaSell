@@ -63,9 +63,9 @@ export class RewardServiceImpl implements IRewardService {
             let rewards: Reward[]
 
             if (Object.keys(where).length) {
-                rewards = await this.sequelize.findAll(offset, limit, where)
+                rewards = await this.sequelize.findAll({offset, limit, where})
             } else {
-                rewards = await this.sequelize.findAll(offset, limit)
+                rewards = await this.sequelize.findAll({offset, limit})
             }
 
             return await this.mapper.toPreview(rewards)
@@ -162,7 +162,7 @@ export class RewardServiceImpl implements IRewardService {
         const errorStack: ErrorStack = {}
     
         try {
-            const rewards = await this.sequelize.findAll()
+            const rewards = await this.sequelize.findAll({ where: { id: ids }})
 
             const foundIds = rewards.map(r => r.id)
             const missingIds = ids.filter(id => !foundIds.includes(id))
@@ -170,7 +170,9 @@ export class RewardServiceImpl implements IRewardService {
                 errorStack[id] = { message: `Reward with id ${id} not found`, code: 'REWARD_NOT_FOUND' }
             }
 
-            await this.sequelize.destroy(foundIds, transaction)
+            if (foundIds.length > 0) {
+                await this.sequelize.destroy(foundIds, transaction)
+            }
 
             for (const reward of rewards) {
                 if (reward.key) {

@@ -75,7 +75,7 @@ export class UploadServiceImpl implements IUploadService {
         const dataToCreate = data.map(r => ({
             label: r.label,
             releaseDate: r.releaseDate,
-            count: Number(r.count.trim()),
+            count: Number(r.count.replace(/[^\d]/g, "")),
             addition: r.addition,
             description: r.description
         }));

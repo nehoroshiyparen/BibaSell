@@ -39,6 +39,7 @@ import { IUploadService } from "#src/types/contracts/services/upload/upload.serv
 import { UploadServiceImpl } from "#src/modules/upload/services/upload.service.js";
 import { UploadControllerImpl } from "#src/modules/upload/controllers/upload.controller.js";
 import { UploadRouter } from "#src/routes/upload.routes.js";
+import { SwaggerRouter } from "#src/routes/swagger.routes.js";
 
 const container = new Container()
 
@@ -55,6 +56,7 @@ container.bind<RewardRouter>(TYPES.RewardRouter).to(RewardRouter).inSingletonSco
 container.bind<PdfArticleRouter>(TYPES.PdfArticleRouter).to(PdfArticleRouter).inSingletonScope()
 container.bind<IndexRouter>(TYPES.IndexRouter).to(IndexRouter).inSingletonScope()
 container.bind<UploadRouter>(TYPES.UploadRouter).to(UploadRouter).inSingletonScope()
+container.bind<SwaggerRouter>(TYPES.SwaggerRouter).to(SwaggerRouter).inSingletonScope()
 
 // Controllers
 container.bind<PersonControllerImpl>(TYPES.PersonController).to(PersonControllerImpl).inSingletonScope()

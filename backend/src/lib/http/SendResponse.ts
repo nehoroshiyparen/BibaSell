@@ -1,5 +1,4 @@
 import { Response } from "express";
-import { ApiResponse } from "#src/types/interfaces/http/Response.interface.js";
 import { ResponsePayload } from "#src/types/contracts/http/ResponsePayload.interface.js";
 import { resolveCase } from "./resolveField.js";
 

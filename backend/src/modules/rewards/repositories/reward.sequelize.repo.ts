@@ -24,7 +24,7 @@ export class RewardSequelizeRepo extends BaseSequelizeRepo<Reward> {
         transaction?: Transaction
     ): Promise<Reward> {
         const reward = await Reward.create(
-            { ...data, ...options },
+            { ...data, releaseDate: Number(data.releaseDate.trim()), ...options },
             { transaction }
         )
         this.logger.operations.created(stringifyObject(reward), reward.id)

@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op, where } from "sequelize";
 import { inject, injectable } from "inversify";
 import { Person } from "#src/infrastructure/sequelize/models/Person/Person.model.js";
 import { TypeofPersonArraySchema } from "#src/modules/persons/schemas/PersonArraySchema.js";
@@ -68,10 +68,10 @@ export class PersonServiceImpl implements IPersonService {
 
             if (Object.keys(where).length) {
             // есть фильтры → используем их
-            persons = await this.sequelize.findAll(offset, limit, where)
+            persons = await this.sequelize.findAll({offset, limit, where})
             } else {
             // нет фильтров → отдаём всё
-            persons = await this.sequelize.findAll(offset, limit)
+            persons = await this.sequelize.findAll({offset, limit})
             }
 
             return await this.mapper.toPreview(persons)
@@ -91,6 +91,8 @@ export class PersonServiceImpl implements IPersonService {
                 images?.map(file => [path.parse(file.originalname).name, file])
             )
 
+            console.log(fileMap)
+
             for (const [_, person] of persons.entries()) {
                 const transaction = await this.sequelize.createTransaction()
                 let S3Key: string | null = null
@@ -98,6 +100,7 @@ export class PersonServiceImpl implements IPersonService {
 
                 try {
                     const file = fileMap.get(person.name)
+                    console.log(file, person.name)
 
                     if (file) {
                         S3Key = generateUuid()
@@ -170,17 +173,21 @@ export class PersonServiceImpl implements IPersonService {
     async bulkDelete(ids: number[]): Promise<OperationResult> {
         const transaction = await this.sequelize.createTransaction()
         const errorStack: ErrorStack = {};
+
+        console.log(ids)
     
         try {
-            const persons = await this.sequelize.findAll()
+            const persons = await this.sequelize.findAll({where: { id: ids }})
 
             const foundIds = persons.map(p => p.id)
-            const missingIds = ids.filter(id => foundIds.includes(id))
+            const missingIds = ids.filter(id => !foundIds.includes(id));
             for (const id of missingIds) {
                 errorStack[id] = { message: `Person with id ${id} not found`, code: 'PERSON_NOT_FOUND' }
             }
 
-            await this.sequelize.destroy(foundIds, transaction)
+            if (foundIds.length > 0) {
+                await this.sequelize.destroy(foundIds, transaction)
+            }
 
             for (const person of persons) {
                 if (person.key) {

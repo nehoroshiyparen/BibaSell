@@ -31,6 +31,7 @@ export function SendError(
     }
 
     const response: ApiResponse<void> = {
+        status: 400,
         message: responseMessage,
         error: {
             code: errorCode,
