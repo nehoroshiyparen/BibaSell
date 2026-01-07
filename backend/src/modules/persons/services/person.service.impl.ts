@@ -90,8 +90,6 @@ export class PersonServiceImpl implements IPersonService {
                 images?.map(file => [path.parse(file.originalname).name, file])
             )
 
-            console.log(fileMap)
-
             for (const [_, person] of persons.entries()) {
                 const transaction = await this.sequelize.createTransaction()
                 let S3Key: string | null = null
@@ -99,7 +97,6 @@ export class PersonServiceImpl implements IPersonService {
 
                 try {
                     const file = fileMap.get(person.name)
-                    console.log(file, person.name)
 
                     if (file) {
                         S3Key = generateUuid()
@@ -172,8 +169,6 @@ export class PersonServiceImpl implements IPersonService {
     async bulkDelete(ids: number[]): Promise<OperationResult> {
         const transaction = await this.sequelize.createTransaction()
         const errorStack: ErrorStack = {};
-
-        console.log(ids)
     
         try {
             const persons = await this.sequelize.findAll({where: { id: ids }})
@@ -205,7 +200,7 @@ export class PersonServiceImpl implements IPersonService {
                 : { success: true }
         } catch (e) {
             await this.sequelize.rollbackTransaction(transaction)
-            throw RethrowApiError(`Service error: Method - bulkDeletePersons`, e);
+            RethrowApiError(`Service error: Method - bulkDeletePersons`, e);
         }
     }
 

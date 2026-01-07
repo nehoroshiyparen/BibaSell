@@ -11,7 +11,8 @@ export abstract class BaseS3Service {
     }
 
     async upload(key: string, body: Buffer, options?: { prefix?: string; contentType?: string }): Promise<void> {
-        return this.s3.upload(this.buildKey(key, options?.prefix), body, options)
+        const usedPrefix = options?.prefix ?? (Array.isArray(this.prefix) ? this.prefix[0] : this.prefix)
+        return this.s3.upload(this.buildKey(key, usedPrefix), body, options)
     }
 
     async get(key: string, prefix?: string): Promise<Buffer> {

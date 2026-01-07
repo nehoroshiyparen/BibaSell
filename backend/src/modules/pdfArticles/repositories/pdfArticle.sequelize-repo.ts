@@ -106,7 +106,7 @@ export class PdfArticleSequelizeRepo extends BaseSequelizeRepo<PdfArticle> {
 
     async update(id: number, data: PdfArticleUpdateDto, transaction?: Transaction): Promise<PdfArticle> {
         const article = await PdfArticle.findByPk(id)
-        if (!article) throw ApiError.NotFound(`Article with id: ${id} is not exists`)
+        if (!article) throw ApiError.NotFound(`Article with id: ${id} does not exists`)
 
         return await article.update({ ...data, updatedAt: new Date() }, { transaction })
     }
