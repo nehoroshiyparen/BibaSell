@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { ApiResponse } from "#src/types/interfaces/http/Response.interface.js";
 import { ApiError } from "../../shared/ApiError/ApiError.js";
-import { errorCodes } from "#src/consts/errorCodes.js";
+import { errorCodes } from "#src/consts/index.js";
 import { status } from "#src/consts/status.js";
 import { isError } from "../../shared/typeGuards/isError.js";
 import { ZodError } from "zod";

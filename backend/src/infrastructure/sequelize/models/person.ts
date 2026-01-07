@@ -1,5 +1,5 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
-import { Reward } from "../Reward/Reward.model.js";
+import { Reward } from "./reward.js";
 
 export class Person extends Model {
     declare id: number

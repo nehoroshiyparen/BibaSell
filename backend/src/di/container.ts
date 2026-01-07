@@ -1,13 +1,13 @@
 import { Container } from "inversify";
 import { PersonServiceImpl } from "#src/modules/persons/services/person.service.impl.js";
 import { TYPES } from "./types.js";
-import { IPersonService } from "#src/types/contracts/services/persons/person.service.interface.js";
+import { IPersonService } from "#src/types/contracts/services/person.service.interface.js";
 import { PersonControllerImpl } from "#src/modules/persons/controllers/person.controller.js";
 import { PersonRouter } from "#src/routes/person.routes.js";
 import { IndexRouter } from "#src/routes/index.js";
 import { IApp, IDatabase } from "#src/types/contracts/index.js";
 import { DatabaseImpl } from "#src/infrastructure/sequelize/database.impl.js";
-import { IRewardService } from "#src/types/contracts/services/rewards/reward.service.interface.js";
+import { IRewardService } from "#src/types/contracts/services/reward.service.interface.js";
 import { RewardServiceImpl } from "#src/modules/rewards/services/reward.service.impl.js";
 import { RewardControllerImpl } from "#src/modules/rewards/controllers/reward.controller.js";
 import { RewardRouter } from "#src/routes/reward.routes.js";
@@ -23,7 +23,7 @@ import { IBaseS3Repo } from "#src/types/contracts/core/base.s3-repo.interface.js
 import { BaseS3Repo } from "#src/infrastructure/S3/base.s3-repo.js";
 import { PdfArticleRouter } from "#src/routes/pdfArticle.routes.js";
 import { PdfArticleControllerImpl } from "#src/modules/pdfArticles/controllers/pdfArticle.controller.js";
-import { IPdfArticleService } from "#src/types/contracts/services/pdfArticles/pdfArticle.service.interface.js";
+import { IPdfArticleService } from "#src/types/contracts/services/pdfArticle.service.interface.js";
 import { PdfArticleServiceImpl } from "#src/modules/pdfArticles/services/pdfArticle.service.impl.js";
 import { S3RewardServiceImpl } from "#src/modules/rewards/services/S3Reward.service.impl.js";
 import { S3PersonServiceImpl } from "#src/modules/persons/services/S3Person.service.impl.js";
@@ -35,11 +35,17 @@ import { elasticLogger, redisLogger, s3Logger, sequelizeLogger, StoreLogger } fr
 import { PdfArticleMapper } from "#src/modules/pdfArticles/mappers/pdfArticle.mapper.js";
 import { PersonMapper } from "#src/modules/persons/mappers/person.mapper.js";
 import { RewardMapper } from "#src/modules/rewards/mappers/reward.mapper.js";
-import { IUploadService } from "#src/types/contracts/services/upload/upload.service.interface.js";
+import { IUploadService } from "#src/types/contracts/services/upload.service.interface.js";
 import { UploadServiceImpl } from "#src/modules/upload/services/upload.service.js";
 import { UploadControllerImpl } from "#src/modules/upload/controllers/upload.controller.js";
 import { UploadRouter } from "#src/routes/upload.routes.js";
 import { SwaggerRouter } from "#src/routes/swagger.routes.js";
+import { MapControllerImpl } from "#src/modules/maps/map.controller.js";
+import { IMapService } from "#src/types/contracts/services/map.service.interface.js";
+import { MapServiceImpl } from "#src/modules/maps/map.service.impl.js";
+import { MapSequelizeRepo } from "#src/modules/maps/map.sequelize.repo.js";
+import { S3MapServiceImpl } from "#src/modules/maps/S3Map.service.impl.js";
+import { MapMapper } from "#src/modules/maps/map.mapper.js";
 
 const container = new Container()
 
@@ -63,22 +69,26 @@ container.bind<PersonControllerImpl>(TYPES.PersonController).to(PersonController
 container.bind<RewardControllerImpl>(TYPES.RewardController).to(RewardControllerImpl).inSingletonScope()
 container.bind<PdfArticleControllerImpl>(TYPES.PdfArticleController).to(PdfArticleControllerImpl).inSingletonScope()
 container.bind<UploadControllerImpl>(TYPES.UploadControllerImpl).to(UploadControllerImpl).inSingletonScope()
+container.bind<MapControllerImpl>(TYPES.UploadControllerImpl).to(MapControllerImpl).inSingletonScope()
 
 // Services
 container.bind<IPersonService>(TYPES.PersonService).to(PersonServiceImpl).inSingletonScope()
 container.bind<IRewardService>(TYPES.RewardService).to(RewardServiceImpl).inSingletonScope()
 container.bind<IPdfArticleService>(TYPES.PdfArticleService).to(PdfArticleServiceImpl).inSingletonScope()
 container.bind<IUploadService>(TYPES.UploadService).to(UploadServiceImpl).inSingletonScope()
+container.bind<IMapService>(TYPES.MapService).to(MapServiceImpl).inSingletonScope()
 
 // S3 services
 container.bind<S3PersonServiceImpl>(TYPES.S3PersonService).to(S3PersonServiceImpl).inSingletonScope()
 container.bind<S3RewardServiceImpl>(TYPES.S3RewardService).to(S3RewardServiceImpl).inSingletonScope()
 container.bind<S3PdfArticleServiceImpl>(TYPES.S3PdfArticleService).to(S3PdfArticleServiceImpl).inSingletonScope()
+container.bind<S3MapServiceImpl>(TYPES.S3MapService).to(S3MapServiceImpl).inSingletonScope()
 
 // Sequelize repositories
 container.bind<PersonSequelizeRepo>(TYPES.PersonSequelizeRepo).to(PersonSequelizeRepo).inSingletonScope()
 container.bind<RewardSequelizeRepo>(TYPES.RewardSequelizeRepo).to(RewardSequelizeRepo).inSingletonScope()
 container.bind<PdfArticleSequelizeRepo>(TYPES.PdfArticleSequelizeRepo).to(PdfArticleSequelizeRepo).inSingletonScope()
+container.bind<MapSequelizeRepo>(TYPES.MapSequelizeRepo).to(MapSequelizeRepo).inSingletonScope()
 
 // Elastic repositories
 container.bind<PdfArticleElasticRepo>(TYPES.PdfArticleElasticRepo).to(PdfArticleElasticRepo).inSingletonScope()
@@ -87,6 +97,7 @@ container.bind<PdfArticleElasticRepo>(TYPES.PdfArticleElasticRepo).to(PdfArticle
 container.bind<PersonMapper>(TYPES.PersonMapper).to(PersonMapper).inSingletonScope()
 container.bind<RewardMapper>(TYPES.RewardMapper).to(RewardMapper).inSingletonScope()
 container.bind<PdfArticleMapper>(TYPES.PdfArticleMapper).to(PdfArticleMapper).inSingletonScope()
+container.bind<MapMapper>(TYPES.MapMapper).to(MapMapper).inSingletonScope()
 
 // Loggers
 container.bind<Logger>(TYPES.AppLogger).to(AppLogger).inSingletonScope()

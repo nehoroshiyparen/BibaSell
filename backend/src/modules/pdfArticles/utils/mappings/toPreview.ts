@@ -1,4 +1,4 @@
-import { Author } from "#src/infrastructure/sequelize/models/Author/Author.model.js";
+import { Author } from "#src/infrastructure/sequelize/models/author.js";
 import { PdfArticle } from "#src/infrastructure/sequelize/models/PdfArticle/PdfArticle.model.js";
 import { TypeofPdfAcrticlePreviewSchema } from "../../schemas/pdfArticle/PdfArticlePreview.schema.js";
 import { PdfArticleJson } from "./arrayToPreview.js";

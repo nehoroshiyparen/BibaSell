@@ -3,14 +3,13 @@ import { TypeofPdfArticlePatchSchema } from "../schemas/pdfArticle/PdfArticlePat
 import { inject, injectable } from "inversify";
 import { FindOptions, Model, Sequelize, Transaction, where, WhereOptions } from "sequelize";
 import { IDatabase } from "#src/types/contracts/index.js";
-import { PdfArticle } from "#src/infrastructure/sequelize/models/PdfArticle/PdfArticle.model.js";
-import { TypeofPdfArticleUpdateSchema } from "../schemas/pdfArticle/PdfArticleUpdate.schema.js";
+import { PdfArticle } from "#src/infrastructure/sequelize/models/pdf_article.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
-import { Author } from "#src/infrastructure/sequelize/models/Author/Author.model.js";
+import { Author } from "#src/infrastructure/sequelize/models/author.js";
 import { PdfArticleUpdateDto } from "../types/dto/PdfArticleUpdate.dto.js";
 import { BaseSequelizeRepo } from "#src/infrastructure/sequelize/base.sequelize-repo.js";
 import { StoreLogger } from "#src/lib/logger/instances/store.logger.js";
-import { PdfArticleAuthors } from "#src/infrastructure/sequelize/models/Associations/PdfArticleAuthors.model.js";
+import { PdfArticleAuthors } from "#src/infrastructure/sequelize/models/associations/pdf_article_authors.js";
 
 @injectable()
 export class PdfArticleSequelizeRepo extends BaseSequelizeRepo<PdfArticle> {

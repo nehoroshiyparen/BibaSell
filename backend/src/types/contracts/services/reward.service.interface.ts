@@ -4,7 +4,7 @@ import { TypeofRewardFullSchema } from "#src/modules/rewards/schemas/reward/Rewa
 import { TypeofRewardPreviewSchema } from "#src/modules/rewards/schemas/reward/RewardPreview.schema.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
 import { OperationResult } from "#src/types/interfaces/http/OperationResult.js";
-import { IBaseService } from "../module.service.interface.js";
+import { IBaseService } from "./module.service.interface.js";
 
 export interface IRewardService 
     extends IBaseService<

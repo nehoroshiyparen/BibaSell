@@ -1,4 +1,4 @@
-import { PdfArticle } from "#src/infrastructure/sequelize/models/PdfArticle/PdfArticle.model.js";
+import { PdfArticle } from "#src/infrastructure/sequelize/models/pdf_article.js";
 import { PdfArticleSequelizeRepo } from "#src/modules/pdfArticles/repositories/pdfArticle.sequelize-repo.js";
 import { TYPES } from "#src/di/types.js";
 import { PdfArticleElasticRepo } from "#src/modules/pdfArticles/repositories/pdfArticle.elastic-repo.js";
@@ -23,7 +23,7 @@ import { ErrorStack } from "#src/types/interfaces/http/ErrorStack.interface.js";
 import { readFile } from "#src/shared/files/utils/readFile.js";
 import { removeDir } from "#src/shared/files/remove/removeDir.js";
 import { PdfArticleMapper } from "../mappers/pdfArticle.mapper.js";
-import { IPdfArticleService } from "#src/types/contracts/services/pdfArticles/pdfArticle.service.interface.js";
+import { IPdfArticleService } from "#src/types/contracts/services/pdfArticle.service.interface.js";
 import { getRandomCover } from "../utils/files/getRandomCover.js";
 import { ExtendedTransaction } from "#src/infrastructure/sequelize/extentions/Transaction.js";
 import { readFileFromConfig } from '#src/shared/files/utils/readFileFromConfig.js'
@@ -149,8 +149,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         } catch (err) {
             await this.safeCleanup(pdfKey, previewKey)
             await this.sequelize.rollbackTransaction(transaction)
-            RethrowApiError("Service error: Method - createArticle", err)
-            throw err
+            throw RethrowApiError("Service error: Method - createArticle", err)
         } finally {
              fileConfig && removeDir(fileConfig.tempDirPath)
         }
@@ -200,8 +199,7 @@ export class PdfArticleServiceImpl implements IPdfArticleService {
         } catch (err) {
             await this.sequelize.rollbackTransaction(transaction)
             if (needToRollbackElastic) await this.rollbackElasticChanges(article)
-            RethrowApiError("Service error: Method - updateArticle", err)
-            throw err
+            throw RethrowApiError("Service error: Method - updateArticle", err)
         } finally {
              fileConfig && removeDir(fileConfig.tempDirPath)
         }

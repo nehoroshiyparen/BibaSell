@@ -1,4 +1,4 @@
-import { errorCodes } from "#src/consts/errorCodes.js";
+import { errorCodes } from "#src/consts/index.js";
 import { ApiError } from "./ApiError.js";
 
 export function RethrowApiError(message: string, error: unknown): never {

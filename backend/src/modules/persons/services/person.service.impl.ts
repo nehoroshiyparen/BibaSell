@@ -1,7 +1,6 @@
 import { Op, where } from "sequelize";
 import { inject, injectable } from "inversify";
-import { Person } from "#src/infrastructure/sequelize/models/Person/Person.model.js";
-import { TypeofPersonArraySchema } from "#src/modules/persons/schemas/PersonArraySchema.js";
+import { Person } from "#src/infrastructure/sequelize/models/person.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
 import { RethrowApiError } from "#src/shared/ApiError/RethrowApiError.js";
 import { TYPES } from "#src/di/types.js";
@@ -21,7 +20,7 @@ import { PersonMapper } from "../mappers/person.mapper.js";
 import { TypeofPersonPreviewSchema } from "../schemas/PersonPreview.schema.js";
 import { TypeofPersonFullSchema } from "../schemas/PersonFull.schema.js";
 import { IBaseService } from "#src/types/contracts/services/module.service.interface.js";
-import { IPersonService } from "#src/types/contracts/services/persons/person.service.interface.js";
+import { IPersonService } from "#src/types/contracts/services/person.service.interface.js";
 import { TypeofPersonSchema } from "../schemas/Person.schema.js";
 
 @injectable()

@@ -1,7 +1,7 @@
 import { TYPES } from "#src/di/types.js";
 import { inject, injectable } from "inversify";
 import { S3PersonServiceImpl } from "../services/S3Person.service.impl.js";
-import { Person } from "#src/infrastructure/sequelize/models/Person/Person.model.js";
+import { Person } from "#src/infrastructure/sequelize/models/person.js";
 import { TypeofPersonFullSchema } from "../schemas/PersonFull.schema.js";
 import { TypeofPersonPreviewSchema } from "../schemas/PersonPreview.schema.js";
 

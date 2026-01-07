@@ -1,6 +1,6 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
-import { Author } from "../Author/Author.model.js";
-import { PdfArticle } from "../PdfArticle/PdfArticle.model.js";
+import { Author } from "../author.js";
+import { PdfArticle } from "../pdf_article.js";
 
 export class PdfArticleAuthors extends Model {
     declare author_id: number

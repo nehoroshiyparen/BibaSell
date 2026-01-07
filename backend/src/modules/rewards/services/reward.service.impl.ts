@@ -17,10 +17,10 @@ import path from "path";
 import { RewardMapper } from "../mappers/reward.mapper.js";
 import { TypeofRewardFullSchema } from "../schemas/reward/RewardFull.schema.js";
 import { TypeofRewardPreviewSchema } from "../schemas/reward/RewardPreview.schema.js";
-import { IRewardService } from "#src/types/contracts/services/rewards/reward.service.interface.js";
+import { IRewardService } from "#src/types/contracts/services/reward.service.interface.js";
 import { TypeofRewardFiltersSchema } from "../schemas/reward/RewardFilters.schema.js";
 import { TypeofRewardSchema } from "../schemas/reward/Reward.schema.js";
-import { Reward } from "#src/infrastructure/sequelize/models/Reward/Reward.model.js";
+import { Reward } from "#src/infrastructure/sequelize/models/reward.js";
 
 @injectable()
 export class RewardServiceImpl implements IRewardService {

@@ -3,7 +3,7 @@ import { IDatabase } from "#src/types/contracts/index.js";
 import { inject, injectable } from "inversify";
 import { Sequelize, Transaction, WhereOptions } from "sequelize";
 import { TypeofRewardSchema } from "../schemas/reward/Reward.schema.js";
-import { Reward } from "#src/infrastructure/sequelize/models/Reward/Reward.model.js";
+import { Reward } from "#src/infrastructure/sequelize/models/reward.js";
 import { StoreLogger } from "#src/lib/logger/instances/store.logger.js";
 import { stringifyObject } from "#src/shared/utils/stringifyObject.js";
 import { generateUuid } from "#src/shared/crypto/generateUuid.js";

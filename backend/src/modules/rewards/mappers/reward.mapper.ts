@@ -1,7 +1,7 @@
 import { TYPES } from "#src/di/types.js";
 import { inject, injectable } from "inversify";
 import { S3RewardServiceImpl } from "../services/S3Reward.service.impl.js";
-import { Reward } from "#src/infrastructure/sequelize/models/Reward/Reward.model.js";
+import { Reward } from "#src/infrastructure/sequelize/models/reward.js";
 import { TypeofRewardFullSchema } from "../schemas/reward/RewardFull.schema.js";
 import { TypeofRewardPreviewSchema } from "../schemas/reward/RewardPreview.schema.js";
 

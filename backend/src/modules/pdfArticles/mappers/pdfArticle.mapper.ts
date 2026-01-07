@@ -1,5 +1,5 @@
 import { TYPES } from "#src/di/types.js";
-import { PdfArticle } from "#src/infrastructure/sequelize/models/PdfArticle/PdfArticle.model.js";
+import { PdfArticle } from "#src/infrastructure/sequelize/models/pdf_article.js";
 import { inject, injectable } from "inversify";
 import { TypeofPdfAcrticlePreviewSchema } from "../schemas/pdfArticle/PdfArticlePreview.schema.js";
 import { S3PdfArticleServiceImpl } from "../services/S3PdfArticle.service.impl.js";

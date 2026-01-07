@@ -1,6 +1,5 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
-import { fa } from "zod/locales";
-import { Author } from "../Author/Author.model.js";
+import { Author } from "./author.js";
 
 export class PdfArticle extends Model {
     declare id: number

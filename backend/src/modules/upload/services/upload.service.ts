@@ -1,4 +1,4 @@
-import { IUploadService } from "#src/types/contracts/services/upload/upload.service.interface.js";
+import { IUploadService } from "#src/types/contracts/services/upload.service.interface.js";
 import { inject, injectable } from "inversify";
 import { TypeofRewardUploadPackSchema } from "../schemas/RewardUploadPack.schema.js";
 import { TYPES } from "#src/di/types.js";

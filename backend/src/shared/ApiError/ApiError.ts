@@ -1,4 +1,4 @@
-import { errorCodes } from "#src/consts/errorCodes.js"
+import { errorCodes } from "#src/consts/index.js"
 import { status } from "#src/consts/status.js"
 
 export class ApiError extends Error {

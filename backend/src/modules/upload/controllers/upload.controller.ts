@@ -5,7 +5,7 @@ import { inject, injectable } from "inversify";
 import rewardsJSON from "#src/data/rewards/rewards.json" with { type: 'json'}
 import personJSON from "#src/data/person/person.json" with { type: "json" };
 import { RewardUploadPackSchema } from "../schemas/RewardUploadPack.schema.js";
-import { IUploadService } from "#src/types/contracts/services/upload/upload.service.interface.js";
+import { IUploadService } from "#src/types/contracts/services/upload.service.interface.js";
 import { status } from "#src/consts/status.js";
 import { TYPES } from "#src/di/types.js";
 import { PersonUploadPackSchema } from "../schemas/PersonUploadPack.schema.js";

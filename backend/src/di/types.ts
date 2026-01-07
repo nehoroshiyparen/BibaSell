@@ -20,22 +20,26 @@ export const TYPES = {
     MDXArticleController: Symbol.for('MDXArticleController'),
     PdfArticleController: Symbol.for('PdfArticleController'),
     UploadControllerImpl: Symbol.for('UploadControllerImpl'),
+    MapControllerImpl: Symbol.for('MapControllerImpl'),
 
     // Services
     PersonService: Symbol.for('PersonService'),
     RewardService: Symbol.for('RewardService'),
     PdfArticleService: Symbol.for('PdfArticleService'),
     UploadService: Symbol.for('UploadService'),
+    MapService: Symbol.for('MapService'),
 
     // S3 services
     S3PersonService: Symbol.for('S3PersonServiceImpl'),
     S3RewardService: Symbol.for('S3RewardServiceImpl'),
     S3PdfArticleService: Symbol.for('S3PdfArticleServiceImpl'),
+    S3MapService: Symbol.for('S3MapService'),
 
     // Sequelize repositories
     PersonSequelizeRepo: Symbol.for('PersonSequelizeRepo'),
     RewardSequelizeRepo: Symbol.for('RewardSequelizeRepo'),
     PdfArticleSequelizeRepo: Symbol.for('PdfArticleSequelizeRepo'),
+    MapSequelizeRepo: Symbol.for('MapSequelizeRepo'),
 
     // Elastic repositories
     PdfArticleElasticRepo: Symbol.for('PdfArticleElasticRepo'),
@@ -44,6 +48,7 @@ export const TYPES = {
     PersonMapper: Symbol.for('PersonMapper'),
     RewardMapper: Symbol.for('RewardMapper'),
     PdfArticleMapper: Symbol.for('PdfArticleMapper'),
+    MapMapper: Symbol.for('MapMapper'),
 
     // Loggers
     AppLogger: Symbol.for('Applogger'),
