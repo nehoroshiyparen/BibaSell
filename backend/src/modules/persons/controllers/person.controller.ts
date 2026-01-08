@@ -10,7 +10,7 @@ import { ValidateIdArray } from "#src/shared/validations/ids/idArray.validate.js
 import { TypeofPersonFiltersSchema } from "#src/modules/persons/schemas/PersonFilters.schema.js";
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
-import { IPersonService } from "#src/types/contracts/services/persons/person.service.interface.js";
+import { IPersonService } from "#src/types/contracts/services/person.service.interface.js";
 
 @injectable()
 export class PersonControllerImpl {

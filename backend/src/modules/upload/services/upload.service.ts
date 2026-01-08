@@ -2,8 +2,8 @@ import { IUploadService } from "#src/types/contracts/services/upload.service.int
 import { inject, injectable } from "inversify";
 import { TypeofRewardUploadPackSchema } from "../schemas/RewardUploadPack.schema.js";
 import { TYPES } from "#src/di/types.js";
-import { IRewardService } from "#src/types/contracts/services/rewards/reward.service.interface.js";
-import { IPersonService } from "#src/types/contracts/services/persons/person.service.interface.js";
+import { IRewardService } from "#src/types/contracts/services/reward.service.interface.js";
+import { IPersonService } from "#src/types/contracts/services/person.service.interface.js";
 import path from "path";
 import fs from 'fs'
 import fse from "fs-extra";

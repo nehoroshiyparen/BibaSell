@@ -13,6 +13,7 @@ export const TYPES = {
     IndexRouter: Symbol.for('IndexRouter'),
     UploadRouter: Symbol.for('UploadRouter'),
     SwaggerRouter: Symbol.for('SwaggerRouter'),
+    MapRouter: Symbol.for('MapRouter'),
 
     // Controllers
     PersonController: Symbol.for('PersonController'),

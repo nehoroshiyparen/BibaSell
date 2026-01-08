@@ -4,6 +4,7 @@ import errorReducer from './slices/error.slice'
 import { personReducer } from 'src/entities/person/model'
 import { rewardReducer } from "src/entities/reward/model";
 import { articleReducer } from "src/entities/article/model";
+import { mapReducer } from "src/entities/map/model";
 
 export const store = configureStore({
     reducer: {
@@ -11,7 +12,8 @@ export const store = configureStore({
         error: errorReducer,
         person: personReducer,
         reward: rewardReducer,
-        article: articleReducer
+        article: articleReducer,
+        map: mapReducer
     }
 })
 

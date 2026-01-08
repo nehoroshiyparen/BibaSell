@@ -12,6 +12,7 @@ import ArticlePage from "src/pages/Article/ArticlePage/ArticlePage";
 import Header from "src/widgets/Header/ui/Header";
 import Footer from "src/widgets/Footer/Footer";
 import ArticleHeader from "src/widgets/ArticleHeader/ArticleHeader";
+import MapFeedPage from "src/pages/Map/MapPage";
 
 export interface LayoutProps {
     children: React.ReactNode;
@@ -149,4 +150,20 @@ export const appRoutes: AppRoute[] = [
         element: ArticlePage,
         protected: false
     },
+    {
+        layout: MainLayout,
+        header: Header,
+        footer: Footer,
+        loader: {
+            loadingScreen: LoadingScreen,
+            spinner: {
+                component: CatSpinner,
+                width: 200,
+                height: 200,
+            },
+        },
+        path: '/maps',
+        element: MapFeedPage,
+        protected: false
+    }
 ]

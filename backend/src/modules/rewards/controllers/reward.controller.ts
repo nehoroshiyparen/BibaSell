@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
 import { TYPES } from "#src/di/types.js";
-import { IRewardService } from "#src/types/contracts/services/rewards/reward.service.interface.js"; 
+import { IRewardService } from "#src/types/contracts/services/reward.service.interface.js"; 
 import { RewardArraySchema } from "#src/modules/rewards/schemas/reward/RewardArray.schema.js";
 import { SendError, SendResponse } from "#src/lib/http/index.js";
 import { ValidateObjectFieldsNotNull } from "#src/shared/validations/objectFieldsNotNull.validate.js";

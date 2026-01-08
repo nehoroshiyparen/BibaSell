@@ -2,7 +2,7 @@ import { TYPES } from "#src/di/types.js";
 import { inject, injectable } from "inversify";
 import { ElasticEntity } from "#src/types/interfaces/elastic/ElastucEntity.js";
 import { IElastic } from "#src/types/contracts/core/elastic.interface.js";
-import { PdfArticle } from "#src/infrastructure/sequelize/models/PdfArticle/PdfArticle.model.js"; 
+import { PdfArticle } from "#src/infrastructure/sequelize/models/pdf_article.js";
 import { MappingTypeMapping } from "node_modules/@elastic/elasticsearch/lib/api/types.js";
 
 @injectable()

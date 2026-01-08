@@ -8,6 +8,5 @@ export const getArticleByIdApi = (id: number) => {
         url: ArticleApiUrl + '/' + id,
         method: 'GET'
     }
-
     return request<undefined, ArticleAdvanced>(req)
 }

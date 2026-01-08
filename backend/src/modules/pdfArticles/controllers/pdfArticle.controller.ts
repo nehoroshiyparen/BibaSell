@@ -3,7 +3,7 @@ import { TYPES } from "#src/di/types.js";
 import { IPdfArticleService } from "#src/types/contracts/services/pdfArticle.service.interface.js"; 
 import { FileConfig } from "#src/types/interfaces/files/FileConfig.interface.js";
 import {  TypeofPdfArticleFiltersSchema } from "../schemas/pdfArticle/PdfArticleFilters.schema.js";
-import { PdfArticlePatchSchema, TypeofPdfArticlePatchSchema } from "../schemas/pdfArticle/PdfArticlePatch.schema.js";
+import { PdfArticlePatchSchema } from "../schemas/pdfArticle/PdfArticlePatch.schema.js";
 import { PdfArticleUpdateSchema } from "../schemas/pdfArticle/PdfArticleUpdate.schema.js";
 import { ApiError } from "#src/shared/ApiError/ApiError.js";
 import { SendError } from "#src/lib/http/SendError.js";

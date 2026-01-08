@@ -59,7 +59,7 @@ const initialState: ArticleState = {
 }
 
 const articleSlice = createSlice({
-    name: 'person',
+    name: 'pdfArticles',
     initialState,
     reducers: {
         setArticles: (state, action: PayloadAction<ArticlePreview[]>) => {

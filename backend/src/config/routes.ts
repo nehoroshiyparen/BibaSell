@@ -5,5 +5,6 @@ export const ROUTES = [
     { path: '/rewards', router: TYPES.RewardRouter },
     { path: '/pdfArticles', router: TYPES.PdfArticleRouter },
     { path: '/upload', router: TYPES.UploadRouter },
-    { path: '/docs', router: TYPES.SwaggerRouter }
+    { path: '/docs', router: TYPES.SwaggerRouter },
+    { path: '/maps', router: TYPES.MapRouter }
 ]
