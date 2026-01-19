@@ -1,90 +1,78 @@
-import { useEffect, useRef } from "react"
-import { usePerson } from "src/entities/person/hooks/usePerson"
-import SearchPeople from "src/features/SearchPeople/ui/SearchPeople"
-import PersonFeed from "src/features/PersonFeed/PersonFeed"
-import EmptyFeed from "../../../shared/ui/Feed/EmptyFeed"
-import { useAppDispatch } from "src/app/store/hooks"
-import FeedLoad from "../../../shared/ui/Feed/FeedLoad"
-import { setLoading } from "src/entities/person/model"
+import { useEffect, useRef } from "react";
+import { usePerson } from "src/entities/person/hooks/usePerson";
+import SearchPeople from "src/features/SearchPeople/ui/SearchPeople";
+import PersonFeed from "src/features/PersonFeed/PersonFeed";
+import EmptyFeed from "../../../shared/ui/Feed/EmptyFeed";
+import FeedLoad from "../../../shared/ui/Feed/FeedLoad";
 
 const PersonFeedPage = () => {
-    const dispatch = useAppDispatch()
-    const { useLoad, usePersonState } = usePerson()
-    
-    const { persons, hasMore, isLoading, searchQuery, page } = usePersonState()
-    const bottomRef = useRef<HTMLDivElement | null>(null)
+  const { persons, hasMore, isLoading, searchQuery, page, loadMorePersons } =
+    usePerson();
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
-    let debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  let debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const loadData = async() => {
-        if (!hasMore || isLoading) return
+  const debounceLoad = () => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
 
-        const filters = searchQuery.trim() ? { name: searchQuery.trim() } : {}
-        await useLoad({ page, filters })
+    debounceTimer.current = setTimeout(() => {
+      loadMorePersons();
+    }, 1000);
+  };
+
+  useEffect(() => {
+    if (searchQuery !== "") {
+      debounceLoad();
     }
+  }, [searchQuery]);
 
-    const debounceFilters = () => {
-        if (debounceTimer.current) {
-            clearTimeout(debounceTimer.current)
+  useEffect(() => {
+    if (!bottomRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setTimeout(() => loadMorePersons(), 20);
         }
+      },
+      { root: null, rootMargin: "200px", threshold: 0 },
+    );
 
-        dispatch(setLoading(true))
+    observer.observe(bottomRef.current);
 
-        debounceTimer.current = setTimeout(async () => {
-            const filters = searchQuery.trim() ? { name: searchQuery.trim() } : {}
-            await useLoad({ page, filters })
-        }, 1000)
-    }
+    return () => observer.disconnect();
+  }, [bottomRef.current, page, hasMore, searchQuery]);
 
-    useEffect(() => {
-        if (searchQuery !== '') {
-            debounceFilters()
-        }
-    }, [searchQuery])
+  const hasFilter = searchQuery.trim() !== "";
+  const isEmpty = hasFilter && persons.length === 0;
 
-    useEffect(() => {
-        if (!bottomRef.current) return
+  useEffect(
+    () => () => {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    },
+    [],
+  );
 
-        const observer = new IntersectionObserver(
-            entries => {
-                if (entries[0].isIntersecting) {
-                    setTimeout(() => loadData(), 20)
-                }
-            },
-            { root: null, rootMargin: '200px', threshold: 0 }
-        )
+  return (
+    <div className="w-screen flex justify-center box-border pt-60">
+      <div className="w-full box-border pl-70 pr-70">
+        <div className="flex flex-col gap-20 box-border pt-25 items-center">
+          <SearchPeople />
 
-        observer.observe(bottomRef.current)
-
-        return () => observer.disconnect()
-    }, [bottomRef.current, page, hasMore, searchQuery])
-
-    const hasFilter = searchQuery.trim() !== ''
-    const isEmpty = hasFilter && persons.length === 0
-
-    return (
-        <div className="w-screen flex justify-center box-border pt-60">
-            <div className="w-full box-border pl-70 pr-70">
-                <div className="flex flex-col gap-20 box-border pt-25 items-center">
-                    <SearchPeople/>
-                    
-                    {isLoading && hasFilter ? (
-                        <FeedLoad/>
-                        ) : (
-                            isEmpty ? (
-                                <EmptyFeed searchQuery={searchQuery}/>
-                            ) : (
-                                <>
-                                    <PersonFeed persons={persons}/>
-                                    {persons && <div ref={bottomRef}/>}
-                                </>
-                            )
-                        )
-                    }
-                </div>
-            </div>
+          {isLoading && hasFilter ? (
+            <FeedLoad />
+          ) : isEmpty ? (
+            <EmptyFeed searchQuery={searchQuery} />
+          ) : (
+            <>
+              <PersonFeed persons={persons} />
+              {persons && <div ref={bottomRef} />}
+            </>
+          )}
         </div>
-    )
-}
+      </div>
+    </div>
+  );
+};
 
-export default PersonFeedPage
+export default PersonFeedPage;

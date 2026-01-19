@@ -4,31 +4,40 @@ import { useAppDispatch, useAppSelector } from "src/app/store/hooks";
 import type { RootState } from "src/app/store";
 
 export function usePerson() {
-    const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
-    const useLoad = async(params: { page: number, limit?: number, filters?: PersonFilters }) => {     
-        try {
-            await dispatch(fetchPersons({ page: params.page, limit: params.limit, filters: params.filters }))
-        } catch (e) {
-            console.log(e)
-        }
-    }
+  const { persons, page, hasMore, searchQuery, isLoading } = useAppSelector(
+    (state: RootState) => state.person,
+  );
 
-    const usePersonState = () => {
-        const persons = useAppSelector((state: RootState) => state.person.persons)
-        const page = useAppSelector((state: RootState) => state.person.page)
-        const hasMore = useAppSelector((state: RootState) => state.person.hasMore) 
-        const searchQuery = useAppSelector((state: RootState) => state.person.searchQuery)
-        const isLoading = useAppSelector((state: RootState) => state.person.isLoading)
+  const loadMorePersons = async (filtersOverride?: PersonFilters) => {
+    if (!hasMore || isLoading) return;
 
-        return {
-            persons,
-            page,
-            hasMore,
-            searchQuery,
-            isLoading
-        }
-    }
+    const filters =
+      filtersOverride ??
+      (searchQuery.trim() ? { name: searchQuery.trim() } : {});
+    await dispatch(fetchPersons({ page, filters }));
+  };
 
-    return { useLoad, usePersonState }
+  const reset = () => {
+    dispatch({ type: "person/resetPersons" });
+  };
+
+  const setQuery = (query: string) => {
+    dispatch({ type: "person/setSearchQuery", payload: query });
+  };
+
+  return {
+    // state
+    persons,
+    page,
+    hasMore,
+    searchQuery,
+    isLoading,
+
+    // actions
+    loadMorePersons,
+    reset,
+    setQuery,
+  };
 }
