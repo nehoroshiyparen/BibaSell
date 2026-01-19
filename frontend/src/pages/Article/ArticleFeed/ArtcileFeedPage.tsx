@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useArticle } from "src/entities/article/hooks/useArticle";
-import ArticleFeed from "src/features/ArticleFeed/ArticleFeed";
+import ArticleFeed from "src/entities/article/ui/ArticleFeed/ArticleFeed";
 import FeedLoad from "src/shared/ui/Feed/FeedLoad";
 import SearchArticlesPanel from "src/features/SearchArticles/ui/SearchArticlesPanel";
 

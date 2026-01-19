@@ -29,33 +29,29 @@ export function useArticle() {
     );
   };
 
+  const setDraftTitle = (title: string) => dispatch(setDraftTitleFilter(title));
+  const setDraftAuthor = (authors: string[]) =>
+    dispatch(setDraftAuthorFilter(authors));
+  const setDraftContent = (content: string) =>
+    dispatch(setDraftContentFilter(content));
+
+  const applyDraftFilters = () => dispatch(applyFilters());
+  const resetAllFilters = () => dispatch(resetFilters());
+
   return {
-    // state (осознанно отдаём, без магии)
-    articles: state.articles,
-    page: state.page,
-    hasMore: state.hasMore,
-    isLoading: state.isLoading,
-    error: state.error,
-
-    sortType: state.sortType,
-    draftFilters: state.draftFilters,
-    appliedFilters: state.appliedFilters,
-
-    selectedArticle: state.selectedArticle,
+    // state
+    ...state,
 
     // actions
     loadMoreArticles,
-
-    setSortType: (v: SortTypes) => dispatch(setSortType(v)),
-
-    setDraftAuthorFilter: (v: string[]) => dispatch(setDraftAuthorFilter(v)),
-    setDraftTitleFilter: (v: string) => dispatch(setDraftTitleFilter(v)),
-    setDraftContentFilter: (v: string) => dispatch(setDraftContentFilter(v)),
-
-    applyFilters: () => dispatch(applyFilters()),
-    resetFilters: () => dispatch(resetFilters()),
-
-    setSelectedArticle: (v: ArticleAdvanced) => dispatch(setSelectedArticle(v)),
+    setDraftTitle,
+    setDraftAuthor,
+    setDraftContent,
+    applyDraftFilters,
+    resetAllFilters,
+    setSortType: (sort: SortTypes) => dispatch(setSortType(sort)),
+    setSelectedArticle: (article: ArticleAdvanced) =>
+      dispatch(setSelectedArticle(article)),
     resetSelectedArticle: () => dispatch(resetSelectedArticle()),
   };
 }

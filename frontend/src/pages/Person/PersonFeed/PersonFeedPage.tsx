@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { usePerson } from "src/entities/person/hooks/usePerson";
-import SearchPeople from "src/features/SearchPeople/ui/SearchPeople";
-import PersonFeed from "src/features/PersonFeed/PersonFeed";
+import SearchPeople from "src/entities/person/ui/SearchPeople/ui/SearchPeople";
+import PersonFeed from "src/entities/person/ui/PersonFeed/PersonFeed";
 import EmptyFeed from "../../../shared/ui/Feed/EmptyFeed";
 import FeedLoad from "../../../shared/ui/Feed/FeedLoad";
 

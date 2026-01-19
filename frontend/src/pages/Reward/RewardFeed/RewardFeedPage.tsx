@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 import { useRewards } from "src/entities/reward/hooks/useRewards";
-import SearchRewards from "src/features/SearchRewards/SearchRewards";
+import SearchRewards from "src/entities/reward/ui/SearchRewards/SearchRewards";
 import EmptyFeed from "src/shared/ui/Feed/EmptyFeed";
 import FeedLoad from "src/shared/ui/Feed/FeedLoad";
-import RewardFeed from "src/features/RewardsFeed/RewardFeed";
+import RewardFeed from "src/entities/reward/ui/RewardsFeed/RewardFeed";
 
 const RewardFeedPage = () => {
   const { rewards, page, hasMore, searchQuery, loadMoreRewards, isLoading } =
