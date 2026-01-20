@@ -12,158 +12,179 @@ import ArticlePage from "src/pages/Article/ArticlePage/ArticlePage";
 import Header from "src/widgets/Header/ui/Header";
 import Footer from "src/widgets/Footer/Footer";
 import ArticleHeader from "src/widgets/ArticleHeader/ArticleHeader";
-import MapFeedPage from "src/pages/Map/MapPage";
+import MapFeedPage from "src/pages/Map/MapFeedPage";
+import MapPage from "src/pages/Map/MapPage";
+import MapHeader from "src/widgets/MapHeader/MapHeader";
 
 export interface LayoutProps {
-    children: React.ReactNode;
-    header?: React.ReactNode;
-    footer?: React.ReactNode;
+  children: React.ReactNode;
+  header?: React.ReactNode;
+  footer?: React.ReactNode;
 }
 
 export type AppRoute = {
-    layout: ComponentType<LayoutProps>,
-    header: ComponentType<any>,
-    footer: ComponentType<any>,
-    loader: {
-        loadingScreen: ComponentType<{ spinner: React.ReactElement, show: boolean }>,
-        spinner: {
-            component: ComponentType<{ width: number, height: number }>,
-            width: number,
-            height: number,
-        },
-    },
-    path: string,
-    element: ComponentType,
-    protected: boolean,
-}
+  layout: ComponentType<LayoutProps>;
+  header: ComponentType<any>;
+  footer: ComponentType<any>;
+  loader: {
+    loadingScreen: ComponentType<{
+      spinner: React.ReactElement;
+      show: boolean;
+    }>;
+    spinner: {
+      component: ComponentType<{ width: number; height: number }>;
+      width: number;
+      height: number;
+    };
+  };
+  path: string;
+  element: ComponentType;
+  protected: boolean;
+};
 
 export const appRoutes: AppRoute[] = [
-    {
-        layout: MainLayout,
-        header: Header,
-        footer: Footer,
-        loader: {
-            loadingScreen: LoadingScreen,
-            spinner: {
-                component: CatSpinner,
-                width: 200,
-                height: 200,
-            },
-        },
-        path: '/',
-        element: Home,
-        protected: false
+  {
+    layout: MainLayout,
+    header: Header,
+    footer: Footer,
+    loader: {
+      loadingScreen: LoadingScreen,
+      spinner: {
+        component: CatSpinner,
+        width: 200,
+        height: 200,
+      },
     },
-    {
-        layout: MainLayout,
-        header: Header,
-        footer: Footer,
-        loader: {
-            loadingScreen: LoadingScreen,
-            spinner: {
-                component: CatSpinner,
-                width: 200,
-                height: 200,
-            },
-        },
-        path: '/persons',
-        element: PersonFeedPage,
-        protected: false
+    path: "/",
+    element: Home,
+    protected: false,
+  },
+  {
+    layout: MainLayout,
+    header: Header,
+    footer: Footer,
+    loader: {
+      loadingScreen: LoadingScreen,
+      spinner: {
+        component: CatSpinner,
+        width: 200,
+        height: 200,
+      },
     },
-    {
-        layout: MainLayout,
-        header: Header,
-        footer: Footer,
-        loader: {
-            loadingScreen: LoadingScreen,
-            spinner: {
-                component: CatSpinner,
-                width: 200,
-                height: 200,
-            },
-        },
-        path: '/persons/:slug',
-        element: PersonPage,
-        protected: false
+    path: "/persons",
+    element: PersonFeedPage,
+    protected: false,
+  },
+  {
+    layout: MainLayout,
+    header: Header,
+    footer: Footer,
+    loader: {
+      loadingScreen: LoadingScreen,
+      spinner: {
+        component: CatSpinner,
+        width: 200,
+        height: 200,
+      },
     },
-    {
-        layout: MainLayout,
-        header: Header,
-        footer: Footer,
-        loader: {
-            loadingScreen: LoadingScreen,
-            spinner: {
-                component: CatSpinner,
-                width: 200,
-                height: 200,
-            },
-        },
-        path: '/rewards',
-        element: RewardFeedPage,
-        protected: false
+    path: "/persons/:slug",
+    element: PersonPage,
+    protected: false,
+  },
+  {
+    layout: MainLayout,
+    header: Header,
+    footer: Footer,
+    loader: {
+      loadingScreen: LoadingScreen,
+      spinner: {
+        component: CatSpinner,
+        width: 200,
+        height: 200,
+      },
     },
-    {
-        layout: MainLayout,
-        header: Header,
-        footer: Footer,
-        loader: {
-            loadingScreen: LoadingScreen,
-            spinner: {
-                component: CatSpinner,
-                width: 200,
-                height: 200,
-            },
-        },
-        path: '/rewards/:slug',
-        element: RewardPage,
-        protected: false
+    path: "/rewards",
+    element: RewardFeedPage,
+    protected: false,
+  },
+  {
+    layout: MainLayout,
+    header: Header,
+    footer: Footer,
+    loader: {
+      loadingScreen: LoadingScreen,
+      spinner: {
+        component: CatSpinner,
+        width: 200,
+        height: 200,
+      },
     },
-    {
-        layout: MainLayout,
-        header: Header,
-        footer: Footer,
-        loader: {
-            loadingScreen: LoadingScreen,
-            spinner: {
-                component: CatSpinner,
-                width: 200,
-                height: 200,
-            },
-        },
-        path: '/articles',
-        element: ArticleFeedPage,
-        protected: false
+    path: "/rewards/:slug",
+    element: RewardPage,
+    protected: false,
+  },
+  {
+    layout: MainLayout,
+    header: Header,
+    footer: Footer,
+    loader: {
+      loadingScreen: LoadingScreen,
+      spinner: {
+        component: CatSpinner,
+        width: 200,
+        height: 200,
+      },
     },
-    {
-        layout: MainLayout,
-        header: ArticleHeader,
-        footer: Footer,
-        loader: {
-            loadingScreen: LoadingScreen,
-            spinner: {
-                component: CatSpinner,
-                width: 200,
-                height: 200,
-            },
-        },
-        path: '/articles/:slug',
-        element: ArticlePage,
-        protected: false
+    path: "/articles",
+    element: ArticleFeedPage,
+    protected: false,
+  },
+  {
+    layout: MainLayout,
+    header: ArticleHeader,
+    footer: Footer,
+    loader: {
+      loadingScreen: LoadingScreen,
+      spinner: {
+        component: CatSpinner,
+        width: 200,
+        height: 200,
+      },
     },
-    {
-        layout: MainLayout,
-        header: Header,
-        footer: Footer,
-        loader: {
-            loadingScreen: LoadingScreen,
-            spinner: {
-                component: CatSpinner,
-                width: 200,
-                height: 200,
-            },
-        },
-        path: '/maps',
-        element: MapFeedPage,
-        protected: false
-    }
-]
+    path: "/articles/:slug",
+    element: ArticlePage,
+    protected: false,
+  },
+  {
+    layout: MainLayout,
+    header: Header,
+    footer: Footer,
+    loader: {
+      loadingScreen: LoadingScreen,
+      spinner: {
+        component: CatSpinner,
+        width: 200,
+        height: 200,
+      },
+    },
+    path: "/maps",
+    element: MapFeedPage,
+    protected: false,
+  },
+  {
+    layout: MainLayout,
+    header: MapHeader,
+    footer: Footer,
+    loader: {
+      loadingScreen: LoadingScreen,
+      spinner: {
+        component: CatSpinner,
+        width: 200,
+        height: 200,
+      },
+    },
+    path: "/maps/:slug",
+    element: MapPage,
+    protected: false,
+  },
+];

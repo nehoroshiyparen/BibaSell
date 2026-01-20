@@ -1,10 +1,10 @@
-import z from 'zod'
+import z from "zod";
 
 export const MapPreviewSchema = z.object({
-    id: z.number(),
-    title: z.string(),
-    slug: z.string(),
-    year: z.date(),
-    key: z.string()
-})
-export type TypeofMapPreviewSchema = z.infer<typeof MapPreviewSchema>
+  id: z.number(),
+  title: z.string(),
+  slug: z.string(),
+  year: z.number(),
+  key: z.string(),
+});
+export type TypeofMapPreviewSchema = z.infer<typeof MapPreviewSchema>;

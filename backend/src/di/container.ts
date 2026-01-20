@@ -31,7 +31,13 @@ import { PersonSequelizeRepo } from "#src/modules/persons/repositories/person.se
 import { RewardSequelizeRepo } from "#src/modules/rewards/repositories/reward.sequelize.repo.js";
 import { Logger } from "#src/lib/logger/base.logger.js";
 import { AppLogger } from "#src/lib/logger/instances/app.logger.js";
-import { elasticLogger, redisLogger, s3Logger, sequelizeLogger, StoreLogger } from "#src/lib/logger/instances/store.logger.js";
+import {
+  elasticLogger,
+  redisLogger,
+  s3Logger,
+  sequelizeLogger,
+  StoreLogger,
+} from "#src/lib/logger/instances/store.logger.js";
 import { PdfArticleMapper } from "#src/modules/pdfArticles/mappers/pdfArticle.mapper.js";
 import { PersonMapper } from "#src/modules/persons/mappers/person.mapper.js";
 import { RewardMapper } from "#src/modules/rewards/mappers/reward.mapper.js";
@@ -46,65 +52,151 @@ import { MapServiceImpl } from "#src/modules/maps/map.service.impl.js";
 import { MapSequelizeRepo } from "#src/modules/maps/map.sequelize.repo.js";
 import { S3MapServiceImpl } from "#src/modules/maps/S3Map.service.impl.js";
 import { MapMapper } from "#src/modules/maps/map.mapper.js";
+import { MapRouter } from "#src/routes/map.routes.js";
 
-const container = new Container()
+const container = new Container();
 
 // Core
-container.bind<IApp>(TYPES.App).to(AppImpl).inSingletonScope()
-container.bind<IDatabase>(TYPES.Database).to(DatabaseImpl).inSingletonScope()
-container.bind<IRedis>(TYPES.Redis).to(RedisImpl).inSingletonScope()
-container.bind<IElastic>(TYPES.Elastic).to(ElasticImpl).inSingletonScope()
-container.bind<IBaseS3Repo>(TYPES.S3).to(BaseS3Repo).inSingletonScope()
+container.bind<IApp>(TYPES.App).to(AppImpl).inSingletonScope();
+container.bind<IDatabase>(TYPES.Database).to(DatabaseImpl).inSingletonScope();
+container.bind<IRedis>(TYPES.Redis).to(RedisImpl).inSingletonScope();
+container.bind<IElastic>(TYPES.Elastic).to(ElasticImpl).inSingletonScope();
+container.bind<IBaseS3Repo>(TYPES.S3).to(BaseS3Repo).inSingletonScope();
 
 // Routers
-container.bind<PersonRouter>(TYPES.PersonRouter).to(PersonRouter).inSingletonScope()
-container.bind<RewardRouter>(TYPES.RewardRouter).to(RewardRouter).inSingletonScope()
-container.bind<PdfArticleRouter>(TYPES.PdfArticleRouter).to(PdfArticleRouter).inSingletonScope()
-container.bind<IndexRouter>(TYPES.IndexRouter).to(IndexRouter).inSingletonScope()
-container.bind<UploadRouter>(TYPES.UploadRouter).to(UploadRouter).inSingletonScope()
-container.bind<SwaggerRouter>(TYPES.SwaggerRouter).to(SwaggerRouter).inSingletonScope()
+container
+  .bind<PersonRouter>(TYPES.PersonRouter)
+  .to(PersonRouter)
+  .inSingletonScope();
+container
+  .bind<RewardRouter>(TYPES.RewardRouter)
+  .to(RewardRouter)
+  .inSingletonScope();
+container
+  .bind<PdfArticleRouter>(TYPES.PdfArticleRouter)
+  .to(PdfArticleRouter)
+  .inSingletonScope();
+container
+  .bind<IndexRouter>(TYPES.IndexRouter)
+  .to(IndexRouter)
+  .inSingletonScope();
+container
+  .bind<UploadRouter>(TYPES.UploadRouter)
+  .to(UploadRouter)
+  .inSingletonScope();
+container
+  .bind<SwaggerRouter>(TYPES.SwaggerRouter)
+  .to(SwaggerRouter)
+  .inSingletonScope();
+container.bind<MapRouter>(TYPES.MapRouter).to(MapRouter).inSingletonScope();
 
 // Controllers
-container.bind<PersonControllerImpl>(TYPES.PersonController).to(PersonControllerImpl).inSingletonScope()
-container.bind<RewardControllerImpl>(TYPES.RewardController).to(RewardControllerImpl).inSingletonScope()
-container.bind<PdfArticleControllerImpl>(TYPES.PdfArticleController).to(PdfArticleControllerImpl).inSingletonScope()
-container.bind<UploadControllerImpl>(TYPES.UploadControllerImpl).to(UploadControllerImpl).inSingletonScope()
-container.bind<MapControllerImpl>(TYPES.UploadControllerImpl).to(MapControllerImpl).inSingletonScope()
+container
+  .bind<PersonControllerImpl>(TYPES.PersonController)
+  .to(PersonControllerImpl)
+  .inSingletonScope();
+container
+  .bind<RewardControllerImpl>(TYPES.RewardController)
+  .to(RewardControllerImpl)
+  .inSingletonScope();
+container
+  .bind<PdfArticleControllerImpl>(TYPES.PdfArticleController)
+  .to(PdfArticleControllerImpl)
+  .inSingletonScope();
+container
+  .bind<UploadControllerImpl>(TYPES.UploadControllerImpl)
+  .to(UploadControllerImpl)
+  .inSingletonScope();
+container
+  .bind<MapControllerImpl>(TYPES.MapControllerImpl)
+  .to(MapControllerImpl)
+  .inSingletonScope();
 
 // Services
-container.bind<IPersonService>(TYPES.PersonService).to(PersonServiceImpl).inSingletonScope()
-container.bind<IRewardService>(TYPES.RewardService).to(RewardServiceImpl).inSingletonScope()
-container.bind<IPdfArticleService>(TYPES.PdfArticleService).to(PdfArticleServiceImpl).inSingletonScope()
-container.bind<IUploadService>(TYPES.UploadService).to(UploadServiceImpl).inSingletonScope()
-container.bind<IMapService>(TYPES.MapService).to(MapServiceImpl).inSingletonScope()
+container
+  .bind<IPersonService>(TYPES.PersonService)
+  .to(PersonServiceImpl)
+  .inSingletonScope();
+container
+  .bind<IRewardService>(TYPES.RewardService)
+  .to(RewardServiceImpl)
+  .inSingletonScope();
+container
+  .bind<IPdfArticleService>(TYPES.PdfArticleService)
+  .to(PdfArticleServiceImpl)
+  .inSingletonScope();
+container
+  .bind<IUploadService>(TYPES.UploadService)
+  .to(UploadServiceImpl)
+  .inSingletonScope();
+container
+  .bind<IMapService>(TYPES.MapService)
+  .to(MapServiceImpl)
+  .inSingletonScope();
 
 // S3 services
-container.bind<S3PersonServiceImpl>(TYPES.S3PersonService).to(S3PersonServiceImpl).inSingletonScope()
-container.bind<S3RewardServiceImpl>(TYPES.S3RewardService).to(S3RewardServiceImpl).inSingletonScope()
-container.bind<S3PdfArticleServiceImpl>(TYPES.S3PdfArticleService).to(S3PdfArticleServiceImpl).inSingletonScope()
-container.bind<S3MapServiceImpl>(TYPES.S3MapService).to(S3MapServiceImpl).inSingletonScope()
+container
+  .bind<S3PersonServiceImpl>(TYPES.S3PersonService)
+  .to(S3PersonServiceImpl)
+  .inSingletonScope();
+container
+  .bind<S3RewardServiceImpl>(TYPES.S3RewardService)
+  .to(S3RewardServiceImpl)
+  .inSingletonScope();
+container
+  .bind<S3PdfArticleServiceImpl>(TYPES.S3PdfArticleService)
+  .to(S3PdfArticleServiceImpl)
+  .inSingletonScope();
+container
+  .bind<S3MapServiceImpl>(TYPES.S3MapService)
+  .to(S3MapServiceImpl)
+  .inSingletonScope();
 
 // Sequelize repositories
-container.bind<PersonSequelizeRepo>(TYPES.PersonSequelizeRepo).to(PersonSequelizeRepo).inSingletonScope()
-container.bind<RewardSequelizeRepo>(TYPES.RewardSequelizeRepo).to(RewardSequelizeRepo).inSingletonScope()
-container.bind<PdfArticleSequelizeRepo>(TYPES.PdfArticleSequelizeRepo).to(PdfArticleSequelizeRepo).inSingletonScope()
-container.bind<MapSequelizeRepo>(TYPES.MapSequelizeRepo).to(MapSequelizeRepo).inSingletonScope()
+container
+  .bind<PersonSequelizeRepo>(TYPES.PersonSequelizeRepo)
+  .to(PersonSequelizeRepo)
+  .inSingletonScope();
+container
+  .bind<RewardSequelizeRepo>(TYPES.RewardSequelizeRepo)
+  .to(RewardSequelizeRepo)
+  .inSingletonScope();
+container
+  .bind<PdfArticleSequelizeRepo>(TYPES.PdfArticleSequelizeRepo)
+  .to(PdfArticleSequelizeRepo)
+  .inSingletonScope();
+container
+  .bind<MapSequelizeRepo>(TYPES.MapSequelizeRepo)
+  .to(MapSequelizeRepo)
+  .inSingletonScope();
 
 // Elastic repositories
-container.bind<PdfArticleElasticRepo>(TYPES.PdfArticleElasticRepo).to(PdfArticleElasticRepo).inSingletonScope()
+container
+  .bind<PdfArticleElasticRepo>(TYPES.PdfArticleElasticRepo)
+  .to(PdfArticleElasticRepo)
+  .inSingletonScope();
 
-// Helpers 
-container.bind<PersonMapper>(TYPES.PersonMapper).to(PersonMapper).inSingletonScope()
-container.bind<RewardMapper>(TYPES.RewardMapper).to(RewardMapper).inSingletonScope()
-container.bind<PdfArticleMapper>(TYPES.PdfArticleMapper).to(PdfArticleMapper).inSingletonScope()
-container.bind<MapMapper>(TYPES.MapMapper).to(MapMapper).inSingletonScope()
+// Helpers
+container
+  .bind<PersonMapper>(TYPES.PersonMapper)
+  .to(PersonMapper)
+  .inSingletonScope();
+container
+  .bind<RewardMapper>(TYPES.RewardMapper)
+  .to(RewardMapper)
+  .inSingletonScope();
+container
+  .bind<PdfArticleMapper>(TYPES.PdfArticleMapper)
+  .to(PdfArticleMapper)
+  .inSingletonScope();
+container.bind<MapMapper>(TYPES.MapMapper).to(MapMapper).inSingletonScope();
 
 // Loggers
-container.bind<Logger>(TYPES.AppLogger).to(AppLogger).inSingletonScope()
+container.bind<Logger>(TYPES.AppLogger).to(AppLogger).inSingletonScope();
 
-container.bind<Logger>(TYPES.SequelizeLogger).toConstantValue(sequelizeLogger)
-container.bind<Logger>(TYPES.ElasticLogger).toConstantValue(elasticLogger)
-container.bind<Logger>(TYPES.S3Logger).toConstantValue(s3Logger)
-container.bind<Logger>(TYPES.RedisLogger).toConstantValue(redisLogger)
+container.bind<Logger>(TYPES.SequelizeLogger).toConstantValue(sequelizeLogger);
+container.bind<Logger>(TYPES.ElasticLogger).toConstantValue(elasticLogger);
+container.bind<Logger>(TYPES.S3Logger).toConstantValue(s3Logger);
+container.bind<Logger>(TYPES.RedisLogger).toConstantValue(redisLogger);
 
-export { container }
+export { container };

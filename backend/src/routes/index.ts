@@ -6,23 +6,28 @@ import { IRouter } from "#src/types/contracts/core/router.interface.js";
 
 @injectable()
 export class IndexRouter implements IRouter {
-    private router: Router
+  private router: Router;
 
-    constructor () {
-        this.router = Router()
-        this.setup()
-    }
+  constructor() {
+    this.router = Router();
+    this.setup();
+  }
 
-    async setup() {
-        await Promise.all(ROUTES.map(async ({path, router}) => {
-            try {
-                const instance = await container.getAsync<IRouter>(router);
-                this.router.use('/api' + path, instance.getRouter());
-            } catch (error) {
-                console.error(`❌ Failed ${path}:`, error);
-            }
-        }));
-    }
+  async setup() {
+    await Promise.all(
+      ROUTES.map(async ({ path, router }) => {
+        try {
+          const instance = container.get<IRouter>(router);
+          this.router.use("/api" + path, instance.getRouter());
+          console.log("Connected: " + path);
+        } catch (error) {
+          console.error(`❌ Failed ${path}:`, error);
+        }
+      }),
+    );
+  }
 
-    getRouter() { return this.router }
+  getRouter() {
+    return this.router;
+  }
 }

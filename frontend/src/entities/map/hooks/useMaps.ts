@@ -2,7 +2,12 @@ import { useAppDispatch, useAppSelector } from "src/app/store/hooks";
 import type { MapFilters } from "../model/types/MapFilters";
 import { fetchMaps } from "../model/map.thunks";
 import type { RootState } from "src/app/store";
-import { resetMaps, resetSelectedMap, setSelectedMap } from "../model";
+import {
+  resetMaps,
+  resetSelectedMap,
+  setSearchQuery,
+  setSelectedMap,
+} from "../model";
 import type { MapAdvanced } from "../model/types/MapAdvanced";
 
 export function useMap() {
@@ -27,6 +32,7 @@ export function useMap() {
     // actions
     loadMoreMaps,
     resetMaps: () => dispatch(resetMaps()),
+    setSearchQuery: (v: string) => dispatch(setSearchQuery(v)),
     setSelectedMap: (v: MapAdvanced) => dispatch(setSelectedMap(v)),
     resetSelectedMap: () => dispatch(resetSelectedMap()),
   };

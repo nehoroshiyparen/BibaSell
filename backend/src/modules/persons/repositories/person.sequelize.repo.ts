@@ -17,114 +17,119 @@ import { isError } from "#src/shared/typeGuards/isError.js";
 
 @injectable()
 export class PersonSequelizeRepo extends BaseSequelizeRepo<Person> {
-    constructor(
-        @inject(TYPES.Database) private database: IDatabase,
-        @inject(TYPES.SequelizeLogger) protected logger: StoreLogger
-    ) {
-        super(database.getDatabase(), Person, logger)
+  constructor(
+    @inject(TYPES.Database) private database: IDatabase,
+    @inject(TYPES.SequelizeLogger) protected logger: StoreLogger,
+  ) {
+    super(database.getDatabase(), Person, logger);
+  }
+
+  async create(
+    data: TypeofPersonSchema & { slug: string },
+    options?: { key?: string },
+    transaction?: Transaction,
+  ): Promise<Person> {
+    const person = await Person.create(
+      {
+        ...data,
+        ...options,
+      },
+      { transaction },
+    );
+    this.logger.operations.created(stringifyObject(person), person.id);
+    return person;
+  }
+
+  async createPersonsRewrads(
+    data: TypeofPersonRewardsSchema,
+    options?: { transaction?: Transaction },
+  ): Promise<OperationResult> {
+    const errorStack: ErrorStack = {};
+    let created = 0;
+
+    const transaction = options?.transaction;
+
+    const labels = data.rewards.map((r) => r.label);
+    const rewardsFromDb = await Reward.findAll({
+      where: { label: labels },
+    });
+
+    const rewardsMap = new Map(rewardsFromDb.map((r) => [r.label, r.id]));
+
+    // Проверяем, что все награды существуют
+    for (const reward of data.rewards) {
+      if (!rewardsMap.has(reward.label)) {
+        throw ApiError.NotFound(
+          `Reward with label: ${reward.label} was not found`,
+        );
+      }
     }
 
-    async create(
-        data: TypeofPersonSchema & { slug: string }, 
-        options?: { key?: string }, 
-        transaction?: Transaction
-    ): Promise<Person> {
-        const person = await Person.create({
-            ...data,
-            ...options,
-        }, { transaction })
-        this.logger.operations.created(stringifyObject(person), person.id)
-        return person
-    }
+    // Создаём записи
+    const personRewardsToCreate = data.rewards.map((r) => ({
+      person_id: data.person_id,
+      reward_id: rewardsMap.get(r.label)!,
+    }));
 
-    async createPersonsRewrads(
-        data: TypeofPersonRewardsSchema, 
-        options?: { transaction?: Transaction 
-    }): Promise<OperationResult> {
-        const errorStack: ErrorStack = {};
-        let created = 0
-
-        const transaction = options?.transaction;
-
-        const labels = data.rewards.map(r => r.label);
-        const rewardsFromDb = await Reward.findAll({ 
-            where: { label: labels }
-        });
-
-        const rewardsMap = new Map(rewardsFromDb.map(r => [r.label, r.id]));
-
-        // Проверяем, что все награды существуют
-        for (const reward of data.rewards) {
-            if (!rewardsMap.has(reward.label)) {
-                throw ApiError.NotFound(`Reward with label: ${reward.label} was not found`);
+    Promise.all(
+      personRewardsToCreate.map(async (r) => {
+        try {
+          await PersonRewards.create(r, { transaction });
+          created++;
+        } catch (e) {
+          let message = "Internal error";
+          if (isError(e)) {
+            message = e.message;
+            const pgError = (e as any).original;
+            if (pgError?.detail) {
+              message += ` - ${pgError.detail}`;
             }
+          }
+
+          errorStack[`person_id: ${r.person_id}, reward_id: ${r.reward_id}`] = {
+            message,
+            code: "REWARD_CREATE_ERROR",
+          };
         }
+      }),
+    );
 
-        // Создаём записи
-        const personRewardsToCreate = data.rewards.map(r => ({
-            person_id: data.person_id,
-            reward_id: rewardsMap.get(r.label)!,
-        }));
+    return Object.keys(errorStack).length > 0
+      ? { success: false, created, errors: errorStack }
+      : { success: true, created };
+  }
 
-        Promise.all(
-            personRewardsToCreate.map(async r => {
-                try {
-                    await PersonRewards.create(r, { transaction })
-                    created++
-                } catch (e) {
-                    let message = 'Internal error'
-                    if (isError(e)) {
-                        message = e.message
-                        const pgError = (e as any).original
-                        if (pgError?.detail) {
-                            message += ` - ${pgError.detail}`
-                        }
-                    }
+  /**
+   *
+   * @returns FindById options
+   */
+  protected getFindByIdOptions(): FindOptions {
+    return {
+      include: [
+        {
+          model: Reward,
+          as: "rewards",
+          attributes: ["key", "label"],
+          through: { attributes: [] },
+        },
+      ],
+    };
+  }
 
-                    errorStack[`person_id: ${r.person_id}, reward_id: ${r.reward_id}`] = {
-                        message,
-                        code: 'REWARD_CREATE_ERROR'
-                    }
-                }
-            })
-        )
-
-        return Object.keys(errorStack).length > 0
-                ? { success: false, created, errors: errorStack }
-                : { success: true, created }
-    }
-
-    /**
-     * 
-     * @returns FindById options
-     */
-    protected getFindByIdOptions(): FindOptions | undefined {
-        return {
-            include: [
-                {
-                    model: Reward,
-                    as: 'rewards',
-                    attributes: ['key', 'label'],
-                    through: { attributes: [] }
-                }
-            ]
-        }
-    }
-
-    /**
-     * 
-     * @returns FindBySlug options
-     */
-    protected getBySlugOptions(): FindOptions | undefined {
-        return {
-            include: [
-                {
-                    model: Reward,
-                    as: 'rewards',
-                    attributes: ['key', 'label'],
-                    through: { attributes: [] }
-                }
-            ]
-        }
-    }
+  /**
+   *
+   * @returns FindBySlug options
+   */
+  protected getBySlugOptions(): FindOptions {
+    return {
+      include: [
+        {
+          model: Reward,
+          as: "rewards",
+          attributes: ["key", "label"],
+          through: { attributes: [] },
+        },
+      ],
+    };
+  }
 }

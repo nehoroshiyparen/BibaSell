@@ -9,6 +9,8 @@ export type MapState = {
   page: number;
   hasMore: boolean;
 
+  searchQuery: string;
+
   isLoading: boolean;
   error: string | null;
 
@@ -20,6 +22,8 @@ const initialState: MapState = {
 
   page: 0,
   hasMore: true,
+
+  searchQuery: "",
 
   isLoading: false,
   error: null,
@@ -40,7 +44,9 @@ const mapSlice = createSlice({
     resetMaps(state) {
       resetPagination(state);
     },
-
+    setSearchQuery(state, action: PayloadAction<string>) {
+      state.searchQuery = action.payload;
+    },
     setSelectedMap(state, action: PayloadAction<MapAdvanced>) {
       state.selectedMap = action.payload;
     },
@@ -76,5 +82,6 @@ const mapSlice = createSlice({
   },
 });
 
-export const { resetMaps, setSelectedMap, resetSelectedMap } = mapSlice.actions;
+export const { resetMaps, setSearchQuery, setSelectedMap, resetSelectedMap } =
+  mapSlice.actions;
 export default mapSlice.reducer;

@@ -23,7 +23,7 @@ export function usePerson() {
     dispatch({ type: "person/resetPersons" });
   };
 
-  const setQuery = (query: string) => {
+  const setSearchQuery = (query: string) => {
     dispatch({ type: "person/setSearchQuery", payload: query });
   };
 
@@ -38,6 +38,6 @@ export function usePerson() {
     // actions
     loadMorePersons,
     reset,
-    setQuery,
+    setSearchQuery,
   };
 }

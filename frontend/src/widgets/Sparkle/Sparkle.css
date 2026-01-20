@@ -1,0 +1,14 @@
+.sparkle-shadow {
+  width: var(--sparkle-size, 1px);
+  height: var(--sparkle-size, 1px);
+  background: transparent;
+  border-radius: 50%;
+  /* Убираем анимацию */
+  animation: none;
+  /* Убираем filter blur, если хочешь статичную тень */
+  filter: blur(var(--sparkle-size));
+  /* Статичное состояние */
+  box-shadow: 0 0 var(--sparkle-blur, 6px) var(--sparkle-spread, 2px)
+    var(--sparkle-color, #fff);
+  opacity: 1;
+}
