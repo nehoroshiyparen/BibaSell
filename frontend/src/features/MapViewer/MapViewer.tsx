@@ -1,4 +1,3 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 type MapViewerProps = {
@@ -12,8 +11,6 @@ type MapViewerProps = {
 };
 
 const MapViewer: React.FC<MapViewerProps> = ({ src }) => {
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
   return (
     <TransformWrapper>
       <TransformComponent>
